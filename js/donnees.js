@@ -197,17 +197,16 @@ const PROJETS = [
     couverture: null,
     // Pas de capture : les cartes et les données produites appartiennent à SNCF Réseau.
     vignette: { src: "assets/projets/sncf-vignette.png", fond: "#FFFFFF", legende: "Logo de SNCF Réseau" },
-    resume: "Pour le Pôle Développement Durable de SNCF Réseau en Occitanie, j'ai modélisé les données de collisions faune-flore du réseau et créé le référentiel géographique des OLD, puis mis en page les cartes du projet.",
+    resume: "Pour le Pôle Développement Durable de SNCF Réseau en Occitanie, j'ai modélisé les données de collisions faune-flore du réseau et créé le référentiel géographique des obligations légales de débroussaillement (OLD), puis mis en page les cartes du projet.",
     contexte: [
       "J'étais en alternance au Pôle Prospective et Émergences de la direction territoriale Occitanie de SNCF Réseau, sur un poste d'assistant d'études géomatique et data.",
       "Le Pôle Développement Durable, en maîtrise d'ouvrage, avait besoin de données géographiques exploitables. J'étais côté maîtrise d'œuvre, chargé de concevoir et de livrer la partie géomatique.",
-      "Le projet portait sur deux sujets, à l'échelle de tout le réseau d'Occitanie : les collisions faune-flore et les OLD.",
+      "Le projet portait sur deux sujets, à l'échelle de tout le réseau d'Occitanie : les collisions faune-flore et les obligations légales de débroussaillement (OLD).",
       "Les cartes et les données produites sont la propriété de SNCF Réseau : je ne peux pas les montrer ici.",
     ],
     actions: [
       "J'ai précisé le besoin avec le Pôle Développement Durable, puis modélisé les données de collisions faune-flore sur l'ensemble du réseau occitan. Je les ai intégrées dans ArcGIS Enterprise avec ArcMap, sous forme de couches que les équipes de terrain peuvent exploiter.",
       "J'ai conçu et déployé le référentiel géographique des OLD sur tout le territoire occitan. C'était la première fois que ces données étaient structurées dans le SIG de l'entreprise.",
-      "[[Les OLD : que recouvre le sigle (obligations légales de débroussaillement ?) et que contient le référentiel ?]]",
       "J'ai mis en page les cartes dans ArcGIS Pro et fait leur finition graphique dans Illustrator ou Inkscape.",
       "J'ai publié des cartes web d'études sur ArcGIS Portal.",
       "Je suivais l'avancement du projet et j'en faisais le reporting sur SharePoint. Je versionnais aussi les scripts de traitement.",
@@ -323,7 +322,7 @@ const PROJETS = [
       { src: "assets/projets/vision-ar-itineraire.jpg", format: "telephone", legende: "Le choix de l'itinéraire avec un profil fauteuil roulant : 380 m, aucune marche, pente maximale de 2,8 %. L'application signale aussi 50 m sur la chaussée et trois traversées sans feu sonore connu." },
       { src: "assets/projets/vision-ar-parametres.jpg", format: "telephone", legende: "Les paramètres : profil de mobilité, consignes à la voix (deux voix Piper ou celle du téléphone) et vibrations de direction." },
       { src: "assets/projets/vision-ar-demarrage.jpg", format: "telephone", legende: "L'écran de démarrage, pendant la préparation du plan." },
-      "[[Le guidage dans l'image de la caméra : assets/projets/vision-ar-guidage.jpg]]",
+      { src: "assets/projets/vision-ar-guidage.jpg", format: "telephone", legende: "Le guidage, en mode démonstration : le trajet défile tout seul et, sans caméra, la rue est remplacée par un sol quadrillé. Le ruban de flèches montre le chemin ; la consigne (tourner à droite dans 16 m), les marches, l'heure d'arrivée et la distance sont en haut, le plan en bas." },
     ],
     resultat: [
       "J'ai testé l'application sur le terrain, à Gennevilliers. Les essais ont fait apparaître des bugs, qui restent à corriger.",
@@ -342,8 +341,7 @@ const PROJETS = [
       detail: "en attente d'une autorisation",
       classe: "bloque",
       texte: [
-        "Le projet est bloqué. Pour recueillir ces réponses et en tirer des statistiques, il faut l'autorisation de la structure chargée des calculs statistiques. Tant que nous n'avons pas ces droits, le projet ne peut pas avancer.",
-        "[[Nom de la structure, et date de la demande d'autorisation si elle est déposée]]",
+        "Le projet est bloqué. Pour recueillir ces réponses et en tirer des statistiques, il faut deux autorisations : celle de l'Institut national de la statistique et de la démographie (INSD), et celle de la Commission de l'informatique et des libertés (CIL), l'autorité de protection des données personnelles du Burkina Faso. Tant que nous ne les avons pas, le projet ne peut pas avancer.",
       ],
     },
     logo: { src: "assets/logos/geomessen.png", nom: "Géomessen" },
@@ -504,8 +502,8 @@ const FORMATIONS = [
       ["Structurer et intégrer les données", "Modélisation (MCD, MLD, MPD), PostgreSQL / PostGIS, géodatabases ESRI, GDAL / OGR et GeoPackage, ETL avec FME, données 3D."],
       ["Diffuser les données", "Serveur cartographique GeoServer, applications web (Lizmap, solutions ArcGIS), collecte de terrain sur mobile (QField, Field Maps)."],
     ],
-    validation: "Le titre se valide devant un jury de professionnels : un questionnaire professionnel, la présentation d'un projet avec la démonstration d'un SIG web, puis un entretien technique.",
-    validationDetail: "[[Le projet présenté au jury du titre de technicien : lequel ?]]",
+    validation: "Le titre se valide devant un jury de professionnels : un questionnaire professionnel, la présentation d'un projet avec la démonstration d'un SIG web, puis un entretien technique. J'ai présenté ma solution de saisie et de visualisation des zones d'accélération des énergies renouvelables (ZAEnR), réalisée pendant mon alternance à la Communauté de communes de l'Ouest Vosgien.",
+    projet: "zaenr",
     liens: [
       { texte: "Fiche RNCP 37103", url: "https://www.francecompetences.fr/recherche/rncp/37103/" },
       { texte: "Page de la formation (IDGEO)", url: "https://www.idgeo.fr/formations-certifiantes/malt" },
