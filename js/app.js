@@ -93,7 +93,9 @@ function carteProjet(p) {
   return `<a class="projet" href="#${p.id}">
     <div class="projet-image"${fond}>${image}</div>
     <div class="projet-texte">
-      <span class="projet-cadre">${logoProjet(p)}${p.cadre}, ${p.periode.toLowerCase()}</span>
+      <span class="projet-cadre">${logoProjet(p)}${p.cadre}, ${p.periode.toLowerCase()}${
+        p.statut ? `<span class="statut ${p.statut.classe}">${p.statut.libelle}</span>` : ""
+      }</span>
       <h3>${p.titreCourt}</h3>
       <p>${p.resume}</p>
       <span class="projet-lien">Lire le projet</span>
@@ -284,12 +286,14 @@ function pageProjet(p) {
       <div><dt>Rôle</dt><dd>${p.role}</dd></div>
       <div><dt>Période</dt><dd>${p.periode}</dd></div>
       <div><dt>Lieu</dt><dd>${p.lieu}</dd></div>
+      ${p.statut ? `<div><dt>État</dt><dd class="statut ${p.statut.classe}">${p.statut.libelle}${p.statut.detail ? `, ${p.statut.detail}` : ""}</dd></div>` : ""}
     </dl>
     ${liens ? `<div class="boutons">${liens}</div>${notes}` : ""}
   </div></div>
 
   <div class="wrap contenu-projet">
     ${p.couverture ? visuel(p.couverture).replace("<figure>", '<figure class="couverture">') : ""}
+    ${p.statut && p.statut.texte ? section("Où en est le projet", paragraphes(p.statut.texte)).replace("<section>", `<section class="etat-projet ${p.statut.classe}">`) : ""}
     ${section("Contexte", paragraphes(p.contexte))}
     ${section("Ce que j'ai fait", paragraphes(p.actions))}
     ${visuels ? `<div class="visuels">${visuels}</div>` : ""}

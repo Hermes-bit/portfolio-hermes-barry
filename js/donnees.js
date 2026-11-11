@@ -28,6 +28,10 @@ const PROFIL = {
    vignette : image de la carte du projet (liste des projets) quand il n'y a pas de couverture.
      Ajouter fond: "#couleur" pour afficher l'image entière (un logo par exemple) sur ce fond, sans recadrage.
    perso : true pour un projet personnel (rubrique « Projets personnels » de la page Projets).
+   statut : état d'un projet personnel { libelle, classe, detail?, texte? }.
+     classe : "en-cours" ou "bloque" (couleur). Le libellé s'affiche sur la carte du projet et,
+     suivi du détail, dans l'en-tête de sa page ; texte (paragraphes) ouvre la page,
+     sous le titre « Où en est le projet ».
    logo : { src, nom } affiché sur la carte du projet et dans l'en-tête de sa page (facultatif) ;
      surBlanc: true pour un logo prévu sur fond blanc (il est alors posé dans un cadre blanc).
    situation : fond de la carte de situation, "france" par défaut ou "burkina".
@@ -227,6 +231,7 @@ const PROJETS = [
   {
     id: "geoburkina",
     perso: true,
+    statut: { libelle: "En cours", classe: "en-cours" },
     logo: { src: "assets/logos/geomessen.png", nom: "Géomessen" },
     vignette: { src: "assets/logos/geomessen-burkina-faso.png", fond: "#14343b", legende: "Logo Géomessen Burkina Faso" },
     titreCourt: "GéoBurkina, portail de données géographiques",
@@ -274,6 +279,7 @@ const PROJETS = [
   {
     id: "vision-ar",
     perso: true,
+    statut: { libelle: "En cours", classe: "en-cours" },
     logo: { src: "assets/logos/geomessen.png", nom: "Géomessen" },
     vignette: { src: "assets/logos/geomessen-burkina-faso.png", fond: "#14343b", legende: "Logo Géomessen Burkina Faso" },
     titreCourt: "Vision AR, guidage piéton accessible",
@@ -313,6 +319,59 @@ const PROJETS = [
       "Je n'ai pas encore trouvé la solution. Je regarde pour l'instant comment d'autres projets de réalité augmentée, confrontés au même problème, l'ont traité.",
     ],
     outils: ["Python (FastAPI)", "PostgreSQL / PostGIS / pgRouting", "Kotlin / Jetpack Compose", "JavaScript", "Leaflet", "OpenStreetMap", "RGE ALTI (IGN)", "GitHub Actions"],
+  },
+  {
+    id: "ideomes",
+    perso: true,
+    statut: {
+      libelle: "Bloqué",
+      detail: "en attente d'une autorisation",
+      classe: "bloque",
+      texte: [
+        "Le projet est bloqué. Pour recueillir ces réponses et en tirer des statistiques, il faut l'autorisation de la structure chargée des calculs statistiques. Tant que nous n'avons pas ces droits, le projet ne peut pas avancer.",
+        "[[Nom de la structure, et date de la demande d'autorisation si elle est déposée]]",
+      ],
+    },
+    logo: { src: "assets/logos/geomessen.png", nom: "Géomessen" },
+    vignette: { src: "assets/projets/ideomes-vignette.png", fond: "#14343b", legende: "Logo d'Idéomès" },
+    titreCourt: "Idéomès, les besoins du quotidien localisés à la commune",
+    titre: "Une application pour recueillir les besoins du quotidien au Burkina Faso et les localiser à la commune",
+    cadre: "Projet personnel",
+    role: "Conception et développement",
+    periode: "2026",
+    lieu: "Burkina Faso",
+    ll: null,
+    situation: "burkina",
+    couverture: null,
+    resume: "Un questionnaire en ligne où chacun raconte un problème de son quotidien et indique sa commune. Les réponses sont placées sur une carte des 351 communes et s'exportent en GeoJSON pour QGIS.",
+    liens: [
+      { texte: "Voir le code sur GitHub", url: "https://github.com/Hermes-bit/ideomes" },
+    ],
+    contexte: [
+      "Avec Géomessen, je veux développer des applications utiles au Burkina Faso. Avant de les concevoir, il faut savoir quels problèmes les gens rencontrent au quotidien, et dans quelles communes. Idéomès sert à le leur demander.",
+      "On peut répondre sans créer de compte. Le participant choisit un domaine (santé, transport, papiers, eau et électricité…), raconte la dernière difficulté qu'il a rencontrée, dit à quelle fréquence elle revient, lui donne une note de gravité et explique comment il se débrouille aujourd'hui. Il indique aussi sa région, sa province et sa commune.",
+    ],
+    actions: [
+      "J'ai construit le référentiel territorial à partir des contours geoBoundaries (domaine public) : 13 régions, 45 provinces et 351 communes. Chaque unité garde ses codes de jointure (HASC, GID de GADM, identifiant geoBoundaries, code ISO des régions), ce qui permet de relier les réponses aux couches GADM ou geoBoundaries dans un SIG. Les contours sont compressés (coordonnées entières, codées par écarts successifs) dans un fichier de 230 Ko.",
+      "Aucune position GPS n'est collectée. Une réponse est placée au point intérieur du polygone de la commune choisie (son pôle d'inaccessibilité), ou de la province si la commune manque. Ce point tombe toujours dans le polygone, ce que ne garantit pas le centroïde d'une commune de forme irrégulière : une jointure spatiale dans QGIS retrouve donc la bonne commune.",
+      "Sur la carte du tableau de bord, les réponses d'une même commune sont dispersées à l'intérieur de ses limites sans les toucher, ou disposées en spirale autour du centre quand la place manque. La taille des étiquettes dépend de l'échelle affichée (pays, région ou province). Une étiquette qui en chevaucherait une autre est d'abord déplacée, puis réduite, et n'est pas dessinée si elle ne trouve toujours pas de place.",
+      "Les exports sont pensés pour QGIS : les réponses en GeoJSON (un point par réponse) ou en CSV avec latitude, longitude et WKT en WGS 84, les limites administratives en GeoJSON avec le nombre de réponses par unité, et le référentiel des 409 unités avec leurs codes. Un classeur Excel réunit le tout, avec une feuille qui précise le système de coordonnées et les clés de jointure.",
+      "L'application est une page statique, publiée sur GitHub Pages par GitHub Actions. Les réponses sont stockées dans PostgreSQL, via Supabase, et protégées par des règles de sécurité au niveau des lignes (Row Level Security). Le consentement est demandé avant chaque envoi, et laisser son prénom ou son numéro reste facultatif.",
+      "Un second volet, écrit en Python, doit ensuite analyser les réponses avec une chaîne d'agents d'IA (LangGraph et l'API Claude) : modération, regroupement des idées proches, rattachement à la commune, priorisation. Aux étapes clés, rien n'avance sans une décision humaine. Ce volet est testé sur des réponses simulées, mais il n'est pas encore relié à la base.",
+    ],
+    visuels: [
+      { src: "assets/projets/ideomes-accueil.jpg", format: "telephone", legende: "L'accueil de l'application sur téléphone. Répondre prend environ cinq minutes, et on peut rester anonyme." },
+      { src: "assets/projets/ideomes-localisation.jpg", format: "telephone", legende: "Le participant indique où il habite : la liste des provinces dépend de la région choisie, celle des communes dépend de la province." },
+    ],
+    resultat: [
+      "Le questionnaire, la carte et les exports sont développés, et l'application a été publiée sur GitHub Pages. La chaîne d'analyse est écrite mais pas encore branchée sur la base.",
+    ],
+    difficulte: [
+      "Les réponses envoyées sans compte étaient refusées par la base, alors que la règle de sécurité autorisait bien un visiteur anonyme à ajouter une ligne. PostgreSQL répondait par l'erreur 42501 (droits insuffisants).",
+      "L'application enregistrait chaque réponse par un « upsert », qui ajoute la ligne ou la met à jour si elle existe déjà. Sous Row Level Security, PostgreSQL exige pour cette opération une règle de mise à jour en plus de la règle d'ajout, et un visiteur anonyme n'en a pas.",
+      "Je l'ai vérifié sur la base de production : la même réponse est acceptée en ajout simple et refusée en upsert. L'envoi anonyme passe désormais par un ajout simple. Un visiteur anonyme peut seulement ajouter une réponse : il ne peut ni la relire ni la modifier.",
+    ],
+    outils: ["JavaScript", "PostgreSQL (Supabase)", "Row Level Security", "geoBoundaries", "GeoJSON / WKT", "Python", "LangGraph", "GitHub Actions", "GitHub Pages"],
   },
 ];
 
