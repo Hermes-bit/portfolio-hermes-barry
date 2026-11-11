@@ -536,6 +536,18 @@ window.addEventListener("resize", () => {
 });
 window.addEventListener("hashchange", afficher);
 
+// Pied de page fixe : sa hauteur (qui change si les liens passent sur deux lignes) est réservée en bas de la page.
+const pied = document.getElementById("pied");
+new ResizeObserver(() => document.documentElement.style.setProperty("--hauteur-pied", `${pied.offsetHeight}px`)).observe(pied);
+
+// Bouton « revenir en haut » : visible dès qu'on a fait défiler la page de 400 px.
+const boutonHaut = document.getElementById("haut");
+window.addEventListener("scroll", () => (boutonHaut.hidden = window.scrollY < 400), { passive: true });
+boutonHaut.addEventListener("click", () => {
+  const doux = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.scrollTo({ top: 0, behavior: doux ? "smooth" : "auto" });
+});
+
 remplirPied();
 rappelLocal();
 afficher();

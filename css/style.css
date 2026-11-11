@@ -431,18 +431,42 @@ figcaption { margin-top: 8px; font-size: .95rem; color: var(--muted); }
 }
 .copier:hover { border-color: var(--muted); }
 
-/* ---------- Pied de page ---------- */
-.pied { background: var(--navy); color: var(--on-navy-muted); font-size: .95rem; }
-.pied .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding-block: 28px; }
+/* ---------- Pied de page ----------
+   Fixé en bas de l'écran, comme l'en-tête en haut. Sa hauteur réelle (--hauteur-pied, mesurée
+   dans app.js) est réservée en bas de la page pour qu'il ne cache jamais le contenu. */
+body { padding-bottom: var(--hauteur-pied, 56px); }
+.pied { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; background: var(--navy); color: var(--on-navy-muted); font-size: .95rem; border-top: 1px solid var(--navy-line); }
+.pied .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px 24px; padding-block: 12px; padding-bottom: max(12px, env(safe-area-inset-bottom, 0px)); }
 .pied-liens { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .pied a { color: var(--on-navy); text-decoration: none; }
 .pied a:hover { text-decoration: underline; }
+
+/* Bouton « revenir en haut », juste au-dessus du pied de page, à droite */
+.haut {
+  position: fixed;
+  z-index: 60;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(var(--hauteur-pied, 56px) + 16px);
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 8px;
+  border: 1px solid var(--navy-accent);
+  background: var(--navy);
+  color: var(--navy-accent);
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+}
+.haut svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.haut:hover { background: var(--navy-accent); color: var(--navy); }
 
 /* Rappel affiché uniquement en local (voir rappelLocal dans app.js) */
 .rappel-local {
   position: fixed;
   left: 16px;
-  bottom: 16px;
+  bottom: calc(var(--hauteur-pied, 56px) + 16px);
   z-index: 1000;
   max-width: min(420px, calc(100% - 32px));
   padding: 10px 14px;
