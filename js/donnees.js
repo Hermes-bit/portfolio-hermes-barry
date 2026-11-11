@@ -457,7 +457,6 @@ const RECOMMANDATIONS = [
 const FORMATIONS = [
   {
     titre: "Chef de projet géomatique",
-    niveau: "Bac+5",
     organisme: "IDGEO, Colomiers",
     periode: "2024 – 2026",
     certification: "Titre à finalité professionnelle de niveau 7, inscrit au RNCP (n° 39877) et certifié par l'OPCO Atlas.",
@@ -480,7 +479,6 @@ const FORMATIONS = [
   },
   {
     titre: "Technicien en géomatique",
-    niveau: "Bac+2",
     organisme: "IDGEO, Colomiers",
     periode: "2023 – 2024",
     certification: "Titre professionnel du ministère du Travail, de niveau 5, inscrit au RNCP (n° 37103).",
@@ -500,7 +498,6 @@ const FORMATIONS = [
   },
   {
     titre: "Licence Géographie et aménagement",
-    niveau: "Bac+3",
     organisme: "Université Paris 8, Saint-Denis",
     periode: "2019 – 2023",
     intro: "Une formation universitaire à l'analyse des territoires :",

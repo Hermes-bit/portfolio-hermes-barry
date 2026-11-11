@@ -172,7 +172,6 @@ function sectionFormations() {
           <h3>${f.titre}</h3>
           <p class="formation-meta">${f.organisme}, ${f.periode}</p>
         </div>
-        <span class="formation-niveau">${f.niveau}</span>
       </div>
       ${f.certification ? `<p>${f.certification} ${f.alternance || ""}</p>` : ""}
       ${f.obtenu ? `<p class="formation-obtenu">${f.obtenu}</p>` : ""}

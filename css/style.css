@@ -228,7 +228,6 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .formation-entete { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .formation h3 { font-size: 1.3rem; }
 .formation-meta { margin-top: 2px; color: var(--muted); }
-.formation-niveau { flex: none; padding: 3px 10px; border-radius: 4px; font-size: .9rem; font-weight: 700; background: rgba(183, 114, 14, .14); color: #8F5A0B; }
 .formation-intro { color: var(--muted); }
 .formation-contenu { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px 28px; margin: 0; }
 .formation-contenu dt { font-weight: 600; }
@@ -236,7 +235,6 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .formation a { color: var(--accent); font-weight: 600; text-decoration: none; }
 .formation a:hover { text-decoration: underline; }
 .formation-liens { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: .95rem; }
-@media (prefers-color-scheme: dark) { .formation-niveau { color: #E8A93C; } }
 
 /* Compétences */
 .competences { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
