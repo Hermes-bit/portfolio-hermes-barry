@@ -248,7 +248,8 @@ const PAGES = {
         <div>
           <h1>${PROFIL.nom}</h1>
           <p class="hero-poste">${PROFIL.poste}, formé en alternance à l'IDGEO (Bac+5)</p>
-          <p class="hero-intro">Je cherche un poste de chef de projet SIG ou de géomaticien.
+          <p class="hero-intro">Fraîchement diplômé de l'IDGEO et impatient de commencer ma carrière, je recherche un poste de géomaticien ou de technicien SIG.
+            Mon métier consiste à transformer des données géographiques en outils utiles pour décider et aménager le territoire.
             Pendant mes alternances à la Région Nouvelle-Aquitaine, chez SNCF Réseau et à la Communauté de communes de l'Ouest Vosgien,
             j'ai surtout travaillé sur des bases PostGIS et sur l'automatisation des mises à jour de données.
             Mon projet de certification, une application web sur l'accessibilité des cheminements piétons, est <a href="#accessibilite">en ligne</a>.</p>
