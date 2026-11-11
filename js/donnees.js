@@ -194,20 +194,22 @@ const PROJETS = [
     lieu: "Montpellier (34)",
     ll: [43.61, 3.88],
     couverture: null,
-    resume: "Au Pôle Prospective et Émergences de SNCF Réseau en Occitanie, j'ai préparé les données et les cartes d'un projet du Pôle Développement Durable, et répondu aux demandes cartographiques des autres services.",
+    resume: "Pour le Pôle Développement Durable de SNCF Réseau en Occitanie, j'ai modélisé les données de collisions faune-flore du réseau et créé le référentiel géographique des OLD, puis mis en page les cartes du projet.",
     contexte: [
       "J'étais en alternance au Pôle Prospective et Émergences de la direction territoriale Occitanie de SNCF Réseau, sur un poste d'assistant d'études géomatique et data.",
       "Le Pôle Développement Durable, en maîtrise d'ouvrage, avait besoin de données géographiques exploitables. J'étais côté maîtrise d'œuvre, chargé de concevoir et de livrer la partie géomatique.",
-      "Le projet portait sur [[le sujet du projet du Pôle Développement Durable : thème, ligne ou territoire concerné]].",
+      "Le projet portait sur deux sujets, à l'échelle de tout le réseau d'Occitanie : les collisions faune-flore et les OLD.",
     ],
     actions: [
-      "J'ai échangé avec le Pôle Développement Durable pour préciser le besoin, puis conçu le modèle de données.",
-      "J'ai intégré les données géographiques ferroviaires dans la base et vérifié leur cohérence.",
+      "J'ai précisé le besoin avec le Pôle Développement Durable, puis modélisé les données de collisions faune-flore sur l'ensemble du réseau occitan. Je les ai intégrées dans ArcGIS Enterprise avec ArcMap, sous forme de couches que les équipes de terrain peuvent exploiter.",
+      "J'ai conçu et déployé le référentiel géographique des OLD sur tout le territoire occitan. C'était la première fois que ces données étaient structurées dans le SIG de l'entreprise.",
+      "[[Les OLD : que recouvre le sigle (obligations légales de débroussaillement ?) et que contient le référentiel ?]]",
       "J'ai mis en page les cartes dans ArcGIS Pro et fait leur finition graphique dans Illustrator ou Inkscape.",
       "J'ai publié des cartes web d'études sur ArcGIS Portal.",
+      "Je suivais l'avancement du projet et j'en faisais le reporting sur SharePoint. Je versionnais aussi les scripts de traitement.",
       "Je répondais aussi aux autres services de la direction territoriale qui avaient besoin d'une carte ou d'un traitement de données, et j'accompagnais les agents dans l'utilisation du SIG.",
     ],
-    outils: ["ArcGIS Pro", "ArcGIS Portal", "Adobe Illustrator", "Inkscape"],
+    outils: ["ArcMap", "ArcGIS Pro", "ArcGIS Enterprise / Portal", "SharePoint", "Adobe Illustrator", "Inkscape"],
   },
   {
     id: "web",
@@ -394,7 +396,7 @@ const COMPETENCES = [
   {
     titre: "SIG et bases de données",
     lignes: [
-      ["SIG", "QGIS, ArcGIS Pro"],
+      ["SIG", "QGIS, ArcGIS Pro, ArcMap"],
       ["Bases de données", "PostgreSQL / PostGIS, SQL, Oracle"],
       ["Administration", "pgAdmin, DBeaver"],
       ["ETL", "FME, KNIME, Data Interoperability, GDAL / ogr2ogr"],
@@ -420,6 +422,28 @@ const COMPETENCES = [
   },
 ];
 
+/* Recommandations de mes tuteurs d'alternance (page d'accueil et page du projet concerné).
+   Extraits recopiés mot pour mot des lettres ; […] marque un passage coupé.
+   Les lettres complètes ne sont pas publiées : elles contiennent les coordonnées personnelles des auteurs. */
+const RECOMMANDATIONS = [
+  {
+    auteur: "Dominique Louis",
+    fonction: "Responsable de l'Unité Données – Information Géographique",
+    structure: "Région Nouvelle-Aquitaine",
+    date: "21 juillet 2026",
+    projet: "hub-pnr",
+    extrait: "Il dispose par ailleurs de compétences en développement qui lui ont permis d'être force de proposition sur le projet dont il a eu la charge durant son alternance, à savoir la conception et la réalisation d'un hub sur les Parcs Naturels Régionaux en Nouvelle-Aquitaine. […] Il est désormais opérationnel sur la plupart des outils de la suite ESRI utilisés par notre service. […] Je recommande donc Hermès BARRY pour toute fonction en lien avec la géomatique.",
+  },
+  {
+    auteur: "Driss Zeroili",
+    fonction: "Chargé d'études géomatique, tuteur d'alternance",
+    structure: "SNCF Réseau, Montpellier",
+    date: "30 juin 2025",
+    projet: "sncf",
+    extrait: "Durant cette période, Hermès a fait preuve d'un excellent niveau technique, démontrant rapidement une bonne maîtrise des outils SIG et des méthodes propres à notre métier. Sa capacité à assimiler les procédures et à appliquer les consignes avec rigueur a été un véritable atout pour l'équipe.",
+  },
+];
+
 /* Formations (page Parcours, sous la carte), de la plus récente à la plus ancienne.
    Sources : programmes IDGEO (CPGEOM 2026-2028, TGEO 2026-2027), fiches RNCP de France Compétences,
    fiche de compétences de la licence (Paris 8, 2017).
@@ -432,12 +456,14 @@ const FORMATIONS = [
     periode: "2024 – 2026",
     certification: "Titre à finalité professionnelle de niveau 7, inscrit au RNCP (n° 39877) et certifié par l'OPCO Atlas.",
     alternance: "Préparé en alternance, chez SNCF Réseau puis à la Région Nouvelle-Aquitaine.",
+    obtenu: "Les quatre blocs de compétences sont validés : certificats délivrés le 15 octobre 2026.",
     intro: "La formation est découpée en quatre blocs de compétences, chacun validé séparément :",
+    // Intitulés repris des certificats de compétences
     contenu: [
       ["Piloter des projets de géomatique", "Note de cadrage et plan d'assurance qualité, planification, budget et risques, relation entre maîtrise d'ouvrage et maîtrise d'œuvre, animation de comités de pilotage, management d'équipe, veille technique et réglementaire."],
-      ["Mettre en place des bases de données géographiques", "Modélisation (MCD, MLD, MPD), SQL et requêtes spatiales, qualité des données (ISO 19157, directive INSPIRE), métadonnées, catalogage et moissonnage, administration d'une base."],
-      ["Exploiter des données géographiques", "Analyse spatiale (vecteur, raster, télédétection, 3D), chaînes de traitement automatisées avec un ETL ou en Python, cartographie thématique, diffusion sur le web et en tableaux de bord."],
-      ["Concevoir des applications géomatiques", "Recueil des besoins et cahier des charges fonctionnel, prototypage, développement (JavaScript, Python, SQL, API), sécurité, tests et mise en production, maintenance, formation des utilisateurs."],
+      ["Mettre en place des bases de données à dominante géographique", "Modélisation (MCD, MLD, MPD), SQL et requêtes spatiales, qualité des données (ISO 19157, directive INSPIRE), métadonnées, catalogage et moissonnage, administration d'une base."],
+      ["Exploiter des données à dominante géographique", "Analyse spatiale (vecteur, raster, télédétection, 3D), chaînes de traitement automatisées avec un ETL ou en Python, cartographie thématique, diffusion sur le web et en tableaux de bord."],
+      ["Concevoir des applications et interfaces géomatiques", "Recueil des besoins et cahier des charges fonctionnel, prototypage, développement (JavaScript, Python, SQL, API), sécurité, tests et mise en production, maintenance, formation des utilisateurs."],
     ],
     validation: "Chaque bloc se valide devant un jury de professionnels, à partir d'une étude de cas : un rapport, puis une soutenance orale. Pour le bloc sur les bases de données, j'ai présenté mon projet sur l'accessibilité PMR.",
     projet: "accessibilite",

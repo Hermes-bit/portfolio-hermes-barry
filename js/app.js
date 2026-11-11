@@ -124,6 +124,30 @@ function sectionLangues() {
   </div>`;
 }
 
+/* Recommandations (données : RECOMMANDATIONS). Sur l'accueil, avec un lien vers le projet ;
+   sur la page d'un projet, sans ce lien. */
+function recommandation(r, avecLienProjet) {
+  const projet = avecLienProjet && PROJETS.find((p) => p.id === r.projet);
+  return `<figure class="recommandation">
+    <blockquote><p>« ${r.extrait} »</p></blockquote>
+    <figcaption>
+      <b>${r.auteur}</b>
+      <span>${r.fonction}, ${r.structure}</span>
+      <span>Lettre du ${r.date}</span>
+      ${projet ? `<a href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}
+    </figcaption>
+  </figure>`;
+}
+
+function sectionRecommandations() {
+  if (!RECOMMANDATIONS.length) return "";
+  return `<section class="bloc">
+    <h2>Recommandations</h2>
+    <p class="chapo">Extraits des lettres de recommandation de mes tuteurs d'alternance. Les lettres complètes sont disponibles sur demande.</p>
+    <div class="recommandations">${RECOMMANDATIONS.map((r) => recommandation(r, true)).join("")}</div>
+  </section>`;
+}
+
 /* Section « Formation » de la page Parcours (données : FORMATIONS dans donnees.js). */
 function sectionFormations() {
   const formation = (f) => {
@@ -139,6 +163,7 @@ function sectionFormations() {
         <span class="formation-niveau">${f.niveau}</span>
       </div>
       ${f.certification ? `<p>${f.certification} ${f.alternance || ""}</p>` : ""}
+      ${f.obtenu ? `<p class="formation-obtenu">${f.obtenu}</p>` : ""}
       <p class="formation-intro">${f.intro}</p>
       <dl class="formation-contenu">${f.contenu.map(([intitule, detail]) => `<div><dt>${intitule}</dt><dd>${detail}</dd></div>`).join("")}</dl>
       ${f.validation ? `<p>${f.validation}${lienProjet}</p>` : ""}
@@ -235,6 +260,8 @@ const PAGES = {
         <div class="grille-projets">${PROJETS.slice(0, 3).map(carteProjet).join("")}</div>
       </section>
 
+      ${sectionRecommandations()}
+
       <section class="bloc">
         <h2>Compétences</h2>
         <div class="competences">
@@ -321,6 +348,7 @@ function pageProjet(p) {
     ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
     ${section("Résultat", paragraphes(p.resultat))}
     ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
+    ${section("Recommandation", RECOMMANDATIONS.filter((r) => r.projet === p.id).map((r) => recommandation(r, false)).join(""))}
     ${section("Outils", outils.length ? `<p>${outils.join(", ")}</p>` : "")}
     <nav class="projets-voisins" aria-label="Autres projets">
       <a href="#${precedent.id}"><span>← Projet précédent</span>${precedent.titreCourt}</a>

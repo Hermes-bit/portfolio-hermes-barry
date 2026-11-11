@@ -246,6 +246,20 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .competences dt { font-weight: 600; font-size: .95rem; margin-top: 12px; }
 .competences dt:first-child { margin-top: 0; }
 .competences dd { margin: 2px 0 0; color: var(--muted); font-size: .97rem; }
+/* Recommandations : extraits de lettres, sans guillemets géants ni bordure décorative */
+.recommandations { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.recommandation { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.recommandation blockquote { margin: 0; }
+.recommandation blockquote p { margin: 0; line-height: 1.6; }
+.recommandation figcaption { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; font-size: .95rem; }
+.recommandation figcaption span { color: var(--muted); }
+.recommandation figcaption a { margin-top: 8px; color: var(--accent); font-weight: 600; text-decoration: none; }
+.recommandation figcaption a:hover { text-decoration: underline; }
+.contenu-projet .recommandation { max-width: 70ch; }
+
+/* Formation : validation des blocs */
+.formation-obtenu { font-weight: 600; color: var(--accent); }
+
 /* Langues : même carte que les compétences, une colonne par langue */
 .langues { margin-top: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; }
 .langues h3 { font-size: 1.15rem; margin-bottom: 14px; }
@@ -414,6 +428,7 @@ figcaption { margin-top: 8px; font-size: .9rem; color: var(--muted); }
   .hero-photo { width: 140px; height: 140px; order: -1; }
   .competences { grid-template-columns: 1fr; }
   .langues-liste { grid-template-columns: 1fr; gap: 16px; }
+  .recommandations { grid-template-columns: 1fr; }
   .infos-projet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 600px) {
