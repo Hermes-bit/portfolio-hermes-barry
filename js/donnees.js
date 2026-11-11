@@ -7,7 +7,7 @@
 
 const PROFIL = {
   nom: "Hermès Barry",
-  poste: "Chef de projet géomatique",
+  poste: "Géomaticien", // poste recherché (en-tête, accueil, titre de l'onglet)
   photo: "assets/photo.jpg",
   cv: "assets/CV-Hermes-Barry.pdf",
   email: "hermesbarry58@gmail.com",
@@ -518,7 +518,7 @@ const FORMATIONS = [
       ["Géographie et aménagement", "Organisation des territoires et inégalités spatiales, enjeux environnementaux, acteurs et étapes d'une opération d'aménagement."],
       ["Méthodes", "Statistiques, cartographie et premiers pas en SIG, enquêtes de terrain (entretiens, questionnaires) pour établir un diagnostic territorial, stages de terrain dès la première année."],
     ],
-    validationDetail: "[[La spécialisation suivie en fin de licence : Aménagement-Environnement ou Géographie sociale ?]]",
+    validationDetail: "Spécialisation suivie en fin de licence : Géographie et aménagement du territoire.",
     liens: [
       { texte: "Fiche de compétences de la licence (PDF)", url: "https://www.univ-paris8.fr/IMG/pdf/fiche_comp_lic_ge_ographie_2017.pdf" },
     ],

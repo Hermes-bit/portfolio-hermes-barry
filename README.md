@@ -1,6 +1,6 @@
 # Portfolio – Hermès Barry
 
-Mon portfolio de chef de projet géomatique : mes projets, mon parcours et mes coordonnées.
+Mon portfolio de géomaticien : mes projets, mon parcours et mes coordonnées.
 
 Site en ligne : https://hermes-bit.github.io/portfolio-hermes-barry/
 

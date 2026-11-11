@@ -331,7 +331,7 @@ const PAGES = {
     const tel = PROFIL.telephone.replace(/\s/g, "");
     return `<div class="wrap"><section class="bloc">
       <h1 class="titre-page">Contact</h1>
-      <p class="chapo">Je cherche un poste de chef de projet SIG ou de géomaticien, en Île-de-France ou ailleurs.
+      <p class="chapo">Je cherche un poste de géomaticien, en Île-de-France ou ailleurs.
         Le plus simple est de m'écrire.</p>
       <dl class="coordonnees">
         <div><dt>E-mail</dt><dd><a id="email" href="mailto:${PROFIL.email}">${PROFIL.email}</a><button class="copier" type="button" data-copier="email">Copier</button></dd></div>
