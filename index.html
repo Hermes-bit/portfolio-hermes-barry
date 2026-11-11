@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hermès Barry | Chef de projet géomatique</title>
+  <meta name="description" content="Hermès Barry, chef de projet géomatique : projets SIG (PostGIS, ETL, web SIG), parcours et contact.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/carte.css">
+</head>
+<body>
+
+<header class="entete">
+  <div class="wrap">
+    <a class="nom" href="#accueil">Hermès Barry<small>Chef de projet géomatique</small></a>
+    <nav class="menu" id="menu" aria-label="Navigation principale">
+      <a href="#accueil" data-nav="accueil">Accueil</a>
+      <a href="#projets" data-nav="projets">Projets</a>
+      <a href="#parcours" data-nav="parcours">Parcours</a>
+      <a href="#contact" data-nav="contact">Contact</a>
+    </nav>
+    <a class="cv-entete" id="cv-entete" href="assets/CV-Hermes-Barry.pdf" download>CV (PDF)</a>
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer class="pied" id="pied"></footer>
+
+<!-- Leaflet 1.9.4 (copie locale) -->
+<script src="vendor/leaflet/leaflet.js"></script>
+<!-- Fond de carte : régions, départements et contour de la France -->
+<script src="js/fond-carte-france.js"></script>
+<!-- Contour du Burkina Faso (carte de situation du projet GéoBurkina) -->
+<script src="js/fond-carte-burkina.js"></script>
+<!-- Contenu : profil, projets, compétences, lieux du parcours -->
+<script src="js/donnees.js"></script>
+<!-- Carte du parcours -->
+<script src="js/carte.js"></script>
+<!-- Pages et navigation -->
+<script src="js/app.js"></script>
+</body>
+</html>

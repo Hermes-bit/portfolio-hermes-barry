@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+node_modules/
+
+# Notes perso (guide, questionnaire) : ne pas publier
+_notes/

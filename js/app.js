@@ -1,0 +1,468 @@
+/* Pages du site et navigation.
+   Le site tient sur une seule page HTML : le contenu de <main> est régénéré
+   à chaque changement d'ancre (#projets, #contact, #hub-pnr…). */
+
+/* ---------- Textes à compléter ---------- */
+
+// En local, on montre les [[...]] ; en ligne, on les masque.
+// Ajouter ?en-ligne à l'adresse pour prévisualiser la version publique.
+const MODE_LOCAL =
+  (location.protocol === "file:" || ["localhost", "127.0.0.1", ""].includes(location.hostname)) &&
+  !new URLSearchParams(location.search).has("en-ligne");
+
+const A_COMPLETER = /\[\[(.+?)\]\]/g;
+
+// Renvoie le texte prêt à afficher, ou null s'il doit être masqué.
+function texte(t) {
+  if (!t || !t.includes("[[")) return t;
+  if (!MODE_LOCAL) return null;
+  return t.replace(A_COMPLETER, '<mark class="todo">$1</mark>');
+}
+
+function textes(liste) {
+  return (liste || []).map(texte).filter(Boolean);
+}
+
+function paragraphes(liste) {
+  return textes(liste).map((t) => `<p>${t}</p>`).join("");
+}
+
+/* ---------- Carte de situation des projets ---------- */
+
+// Projection équirectangulaire corrigée par le cosinus de la latitude moyenne :
+// largement suffisant pour situer un point sur une vignette.
+// Chaque fond : coin haut gauche (lonMin, latMax), unités SVG par degré,
+// latitude moyenne, taille du cadre SVG et anneaux du contour.
+const FONDS_SITUATION = {
+  france: {
+    lonMin: -5.3, latMax: 51.2, echelle: 20, latMoy: 46.5, largeur: 207, hauteur: 200,
+    anneaux: () => FR.o.geometries.flatMap((g) => (g.type === "MultiPolygon" ? g.coordinates.flat() : g.coordinates)),
+  },
+  burkina: {
+    lonMin: -5.67, latMax: 15.23, echelle: 25, latMoy: 12.2, largeur: 201, hauteur: 150,
+    anneaux: () => BF, // défini dans fond-carte-burkina.js
+  },
+};
+const cheminsSituation = {};
+
+function projeterSituation(fond, lon, lat) {
+  const cosLat = Math.cos((fond.latMoy * Math.PI) / 180);
+  return [(lon - fond.lonMin) * cosLat * fond.echelle, (fond.latMax - lat) * fond.echelle];
+}
+
+function contourSituation(nom) {
+  if (cheminsSituation[nom]) return cheminsSituation[nom];
+  const fond = FONDS_SITUATION[nom];
+  cheminsSituation[nom] = fond.anneaux()
+    .map((anneau) => "M" + anneau.map(([lon, lat]) => projeterSituation(fond, lon, lat).map((v) => v.toFixed(1)).join(" ")).join("L") + "Z")
+    .join("");
+  return cheminsSituation[nom];
+}
+
+// Sans coordonnées (p.ll), c'est tout le territoire qui est mis en évidence.
+function carteSituation(p) {
+  const nom = p.situation || "france";
+  const fond = FONDS_SITUATION[nom];
+  const cadre = `<svg class="situation" viewBox="0 0 ${fond.largeur} ${fond.hauteur}" role="img" aria-label="Localisation : ${p.lieu}">`;
+  if (!p.ll) {
+    return `${cadre}
+      <path class="territoire" d="${contourSituation(nom)}"/>
+      <text x="${fond.largeur / 2}" y="${fond.hauteur / 2 + 5}" text-anchor="middle">${p.lieu}</text>
+    </svg>`;
+  }
+  const [x, y] = projeterSituation(fond, p.ll[1], p.ll[0]);
+  const ville = p.lieu.replace(/\s*\(.*\)$/, "");
+  const aDroite = x < fond.largeur / 2;
+  return `${cadre}
+    <path d="${contourSituation(nom)}"/>
+    <circle class="halo" cx="${x}" cy="${y}" r="10"/>
+    <circle class="point" cx="${x}" cy="${y}" r="4.5"/>
+    <text x="${x + (aDroite ? 14 : -14)}" y="${y + 4.5}" text-anchor="${aDroite ? "start" : "end"}">${ville}</text>
+  </svg>`;
+}
+
+/* ---------- Composants ---------- */
+
+function carteProjet(p) {
+  let image = "";
+  const photo = p.couverture || p.vignette;
+  // Avec un fond (cas d'un logo), l'image est affichée entière sur ce fond au lieu d'être recadrée.
+  const fond = photo && photo.fond ? ` style="background:${photo.fond}"` : "";
+  if (photo) image = `<img src="${photo.src}" alt="${photo.fond ? photo.legende || "" : ""}" loading="lazy"${photo.fond ? ' class="contenir"' : ""}>`;
+  else if (p.ll || p.situation) image = carteSituation(p);
+  return `<a class="projet" href="#${p.id}">
+    <div class="projet-image"${fond}>${image}</div>
+    <div class="projet-texte">
+      <span class="projet-cadre">${logoProjet(p)}${p.cadre}, ${p.periode.toLowerCase()}</span>
+      <h3>${p.titreCourt}</h3>
+      <p>${p.resume}</p>
+      <span class="projet-lien">Lire le projet</span>
+    </div>
+  </a>`;
+}
+
+/* Section « Formation » de la page Parcours (données : FORMATIONS dans donnees.js). */
+function sectionFormations() {
+  const formation = (f) => {
+    const projet = f.projet && PROJETS.find((p) => p.id === f.projet);
+    const lienProjet = projet ? ` <a href="#${projet.id}">Voir le projet →</a>` : "";
+    const detail = texte(f.validationDetail);
+    return `<article class="formation">
+      <div class="formation-entete">
+        <div>
+          <h3>${f.titre}</h3>
+          <p class="formation-meta">${f.organisme}, ${f.periode}</p>
+        </div>
+        <span class="formation-niveau">${f.niveau}</span>
+      </div>
+      ${f.certification ? `<p>${f.certification} ${f.alternance || ""}</p>` : ""}
+      <p class="formation-intro">${f.intro}</p>
+      <dl class="formation-contenu">${f.contenu.map(([intitule, detail]) => `<div><dt>${intitule}</dt><dd>${detail}</dd></div>`).join("")}</dl>
+      ${f.validation ? `<p>${f.validation}${lienProjet}</p>` : ""}
+      ${detail ? `<p>${detail}</p>` : ""}
+      <p class="formation-liens">${f.liens.map((l) => `<a href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`).join("")}</p>
+    </article>`;
+  };
+  return `<section class="bloc formations">
+    <h2>Formation</h2>
+    <p class="chapo">Une licence de géographie à l'université, puis deux titres de géomatique préparés en alternance à l'IDGEO.</p>
+    ${FORMATIONS.map(formation).join("")}
+  </section>`;
+}
+
+// Logo de la structure ou de la marque du projet (champ logo de donnees.js), vide s'il n'y en a pas.
+function logoProjet(p) {
+  if (!p.logo) return "";
+  return `<img class="logo-projet${p.logo.surBlanc ? " sur-blanc" : ""}" src="${p.logo.src}" alt="${p.logo.nom}" title="${p.logo.nom}">`;
+}
+
+function visuel(v) {
+  if (typeof v === "string") {
+    const t = texte(v);
+    return t ? `<div class="visuel-a-ajouter">Image à ajouter : ${t}</div>` : "";
+  }
+  // Un clic sur l'image l'ouvre en taille réelle (utile pour lire les cartes).
+  // format "telephone" : capture en portrait, affichée en colonne étroite à côté des autres.
+  return `<figure${v.format === "telephone" ? ' class="telephone"' : ""}><a href="${v.src}" target="_blank" rel="noopener"><img src="${v.src}" alt="${v.legende}" loading="lazy"></a><figcaption>${v.legende}</figcaption></figure>`;
+}
+
+// Planches de l'atlas des ZAEnR, regroupées par type d'énergie (ordre alphabétique),
+// puis par commune. Un bouton par type permet de n'afficher que ses planches
+// (le clic est géré plus bas, dans « Interactions »).
+function atlasParType(planches) {
+  if (!planches || !planches.length) return "";
+  const types = [...new Set(planches.map((pl) => pl.type))].sort((a, b) => a.localeCompare(b, "fr"));
+  const pastille = (type) => `<i class="pastille" style="background:${COULEURS_ENR[type] || "#9AA7B8"}"></i>`;
+  const nombre = (type) => planches.filter((pl) => pl.type === type).length;
+
+  const boutons = types.length < 2 ? "" : `<div class="filtres-enr" role="group" aria-label="Filtrer les planches par type d'énergie">
+    <button type="button" data-filtre-enr="" aria-pressed="true">Tous <span>${planches.length}</span></button>
+    ${types.map((t) => `<button type="button" data-filtre-enr="${t}" aria-pressed="false">${pastille(t)}${t} <span>${nombre(t)}</span></button>`).join("")}
+  </div>`;
+
+  const cartes = types
+    .flatMap((t) => planches.filter((pl) => pl.type === t).sort((a, b) => a.commune.localeCompare(b.commune, "fr")))
+    .map((pl) => `<figure data-type-enr="${pl.type}">
+      <a href="${pl.src}" target="_blank" rel="noopener"><img src="${pl.vignette || pl.src}" alt="Carte des zones d'accélération de ${pl.commune} : ${pl.type.toLowerCase()}" loading="lazy"></a>
+      <figcaption><b>${pl.commune}</b><span>${pastille(pl.type)}${pl.type}</span></figcaption>
+    </figure>`)
+    .join("");
+
+  return `<div class="atlas">
+    <p>Quelques planches de l'atlas destiné aux communes, classées par type d'énergie. Un clic sur une carte l'ouvre en taille réelle.</p>
+    ${boutons}
+    <div class="planches">${cartes}</div>
+  </div>`;
+}
+
+/* ---------- Pages ---------- */
+
+const PAGES = {
+  accueil() {
+    return `
+    <section class="hero">
+      <canvas id="courbes" aria-hidden="true"></canvas>
+      <div class="wrap hero-grille">
+        <div>
+          <h1>${PROFIL.nom}</h1>
+          <p class="hero-poste">${PROFIL.poste}, formé en alternance à l'IDGEO (Bac+5)</p>
+          <p class="hero-intro">Je cherche un poste de chef de projet SIG ou de géomaticien.
+            Pendant mes alternances à la Région Nouvelle-Aquitaine, chez SNCF Réseau et à la Communauté de communes de l'Ouest Vosgien,
+            j'ai surtout travaillé sur des bases PostGIS et sur l'automatisation des mises à jour de données.
+            Mon projet de certification, une application web sur l'accessibilité des cheminements piétons, est <a href="#accessibilite">en ligne</a>.</p>
+          <dl class="hero-infos">
+            <div><dt>Disponibilité</dt><dd>${PROFIL.disponibilite}</dd></div>
+            <div><dt>Secteur</dt><dd>${PROFIL.zone}</dd></div>
+          </dl>
+          <div class="boutons">
+            <a class="btn principal" href="${PROFIL.cv}" download>Télécharger mon CV (PDF)</a>
+            <a class="btn secondaire" href="#contact">Me contacter</a>
+          </div>
+        </div>
+        <img class="hero-photo" src="${PROFIL.photo}" alt="Portrait d'${PROFIL.nom}">
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section class="bloc">
+        <div class="bloc-entete">
+          <h2>Projets</h2>
+          <a href="#projets">Voir les ${PROJETS.length} projets →</a>
+        </div>
+        <div class="grille-projets">${PROJETS.slice(0, 3).map(carteProjet).join("")}</div>
+      </section>
+
+      <section class="bloc">
+        <h2>Compétences</h2>
+        <div class="competences">
+          ${COMPETENCES.map((c) => `
+            <div>
+              <h3>${c.titre}</h3>
+              <dl>${c.lignes.map(([cat, outils]) => `<dt>${cat}</dt><dd>${outils}</dd>`).join("")}</dl>
+            </div>`).join("")}
+        </div>
+        <p class="langues"><b>Langues :</b> ${PROFIL.langues}.</p>
+      </section>
+    </div>`;
+  },
+
+  projets() {
+    const perso = PROJETS.filter((p) => p.perso);
+    return `<div class="wrap"><section class="bloc">
+      <h1 class="titre-page">Projets</h1>
+      <p class="chapo">Quatre missions d'alternance et mon projet de certification à l'IDGEO.
+        Chaque page présente le contexte, ce que j'ai fait et le résultat.</p>
+      <div class="grille-projets">${PROJETS.filter((p) => !p.perso).map(carteProjet).join("")}</div>
+    </section>
+    ${perso.length ? `<section class="bloc">
+      <h2>Projets personnels</h2>
+      <p class="chapo">Des projets que je mène de mon côté, en dehors de l'alternance et de la formation.</p>
+      <div class="grille-projets">${perso.map(carteProjet).join("")}</div>
+    </section>` : ""}</div>`;
+  },
+
+  parcours() {
+    return pageParcours(); // défini dans carte.js
+  },
+
+  contact() {
+    const tel = PROFIL.telephone.replace(/\s/g, "");
+    return `<div class="wrap"><section class="bloc">
+      <h1 class="titre-page">Contact</h1>
+      <p class="chapo">Je cherche un poste de chef de projet SIG ou de géomaticien, en Île-de-France ou ailleurs.
+        Le plus simple est de m'écrire.</p>
+      <dl class="coordonnees">
+        <div><dt>E-mail</dt><dd><a id="email" href="mailto:${PROFIL.email}">${PROFIL.email}</a><button class="copier" type="button" data-copier="email">Copier</button></dd></div>
+        <div><dt>Téléphone</dt><dd><a id="telephone" href="tel:${tel}">${PROFIL.telephone}</a><button class="copier" type="button" data-copier="telephone">Copier</button></dd></div>
+        <div><dt>LinkedIn</dt><dd><a href="${PROFIL.linkedin}" target="_blank" rel="noopener">hermes-barry</a></dd></div>
+        <div><dt>GitHub</dt><dd><a href="${PROFIL.github}" target="_blank" rel="noopener">Hermes-bit</a></dd></div>
+        <div><dt>CV</dt><dd><a href="${PROFIL.cv}" download>Télécharger (PDF)</a></dd></div>
+        <div><dt>Secteur</dt><dd>${PROFIL.zone}</dd></div>
+      </dl>
+    </section></div>`;
+  },
+};
+
+function pageProjet(p) {
+  const i = PROJETS.indexOf(p);
+  const precedent = PROJETS[(i - 1 + PROJETS.length) % PROJETS.length];
+  const suivant = PROJETS[(i + 1) % PROJETS.length];
+  const section = (titre, contenu) => (contenu ? `<section><h2>${titre}</h2>${contenu}</section>` : "");
+  const visuels = (p.visuels || []).map(visuel).join("");
+  const outils = textes(p.outils);
+  const liens = (p.liens || [])
+    .map((l) => `<a class="btn ${l === p.liens[0] ? "principal" : "secondaire"}" href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`)
+    .join("");
+  const notes = (p.liens || []).filter((l) => l.note).map((l) => `<p class="note-lien">${l.note}</p>`).join("");
+
+  return `
+  <div class="entete-projet"><div class="wrap">
+    <a class="retour" href="#projets">← Tous les projets</a>
+    <h1>${p.titre}</h1>
+    <dl class="infos-projet">
+      <div><dt>Structure</dt><dd${p.logo ? ' class="avec-logo"' : ""}>${logoProjet(p)}${p.cadre}</dd></div>
+      <div><dt>Rôle</dt><dd>${p.role}</dd></div>
+      <div><dt>Période</dt><dd>${p.periode}</dd></div>
+      <div><dt>Lieu</dt><dd>${p.lieu}</dd></div>
+    </dl>
+    ${liens ? `<div class="boutons">${liens}</div>${notes}` : ""}
+  </div></div>
+
+  <div class="wrap contenu-projet">
+    ${p.couverture ? visuel(p.couverture).replace("<figure>", '<figure class="couverture">') : ""}
+    ${section("Contexte", paragraphes(p.contexte))}
+    ${section("Ce que j'ai fait", paragraphes(p.actions))}
+    ${visuels ? `<div class="visuels">${visuels}</div>` : ""}
+    ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
+    ${section("Résultat", paragraphes(p.resultat))}
+    ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
+    ${section("Outils", outils.length ? `<p>${outils.join(", ")}</p>` : "")}
+    <nav class="projets-voisins" aria-label="Autres projets">
+      <a href="#${precedent.id}"><span>← Projet précédent</span>${precedent.titreCourt}</a>
+      <a href="#${suivant.id}"><span>Projet suivant →</span>${suivant.titreCourt}</a>
+    </nav>
+  </div>`;
+}
+
+/* ---------- Courbes de niveau du bandeau d'accueil ----------
+   On fabrique un relief fictif (somme de quelques « bosses » gaussiennes),
+   puis on trace ses isolignes avec l'algorithme des marching squares. */
+
+function dessinerCourbes() {
+  const canvas = document.getElementById("courbes");
+  if (!canvas) return;
+  const { width, height } = canvas.getBoundingClientRect();
+  if (!width) return;
+  const ratio = Math.min(2, window.devicePixelRatio || 1);
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(ratio, ratio);
+
+  // Générateur pseudo-aléatoire à graine fixe : le relief est le même à chaque visite.
+  let graine = 11;
+  const aleatoire = () => (graine = (graine * 16807) % 2147483647) / 2147483647;
+  const bosses = Array.from({ length: 7 }, () => ({
+    x: width * (aleatoire() * 1.1 - 0.05),
+    y: height * aleatoire(),
+    rayon: 100 + aleatoire() * 200,
+    hauteur: 0.6 + aleatoire(),
+  }));
+  const altitude = (x, y) =>
+    bosses.reduce((z, b) => z + b.hauteur * Math.exp(-((x - b.x) ** 2 + (y - b.y) ** 2) / (2 * b.rayon * b.rayon)), 0);
+
+  // Altitude calculée aux nœuds d'une grille de PAS pixels.
+  const PAS = 12;
+  const nx = Math.ceil(width / PAS) + 2;
+  const ny = Math.ceil(height / PAS) + 2;
+  const grille = [];
+  for (let j = 0; j < ny; j++) {
+    grille[j] = [];
+    for (let i = 0; i < nx; i++) grille[j][i] = altitude(i * PAS, j * PAS);
+  }
+
+  // Pour chaque niveau, chaque case de la grille est classée selon les coins
+  // situés au-dessus du niveau (16 cas), ce qui donne le ou les segments à tracer.
+  const niveaux = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2, 1.35];
+  niveaux.forEach((niveau, n) => {
+    const maitresse = n % 4 === 3; // une courbe sur quatre est plus marquée
+    ctx.beginPath();
+    ctx.lineWidth = maitresse ? 1.2 : 0.8;
+    ctx.strokeStyle = maitresse ? "rgba(69,201,163,.30)" : "rgba(255,255,255,.07)";
+    for (let j = 0; j < ny - 1; j++) {
+      for (let i = 0; i < nx - 1; i++) {
+        const a = grille[j][i], b = grille[j][i + 1], c = grille[j + 1][i + 1], d = grille[j + 1][i];
+        const cas = (a > niveau ? 8 : 0) | (b > niveau ? 4 : 0) | (c > niveau ? 2 : 0) | (d > niveau ? 1 : 0);
+        if (cas === 0 || cas === 15) continue;
+        // Position du niveau sur chaque côté de la case (interpolation linéaire)
+        const x = i * PAS, y = j * PAS, t = (p, q) => (niveau - p) / (q - p);
+        const haut = [x + PAS * t(a, b), y];
+        const droite = [x + PAS, y + PAS * t(b, c)];
+        const bas = [x + PAS * t(d, c), y + PAS];
+        const gauche = [x, y + PAS * t(a, d)];
+        const segments = {
+          1: [gauche, bas], 2: [bas, droite], 3: [gauche, droite], 4: [haut, droite],
+          5: [gauche, haut, bas, droite], 6: [haut, bas], 7: [gauche, haut], 8: [gauche, haut],
+          9: [haut, bas], 10: [haut, droite, gauche, bas], 11: [haut, droite], 12: [gauche, droite],
+          13: [bas, droite], 14: [gauche, bas],
+        }[cas];
+        for (let k = 0; k < segments.length; k += 2) {
+          ctx.moveTo(...segments[k]);
+          ctx.lineTo(...segments[k + 1]);
+        }
+      }
+    }
+    ctx.stroke();
+  });
+}
+
+/* ---------- Navigation ---------- */
+
+const app = document.getElementById("app");
+
+function afficher() {
+  const id = location.hash.slice(1) || "accueil";
+  const projet = PROJETS.find((p) => p.id === id);
+  const page = projet ? "projets" : PAGES[id] ? id : "accueil";
+
+  if (page !== "parcours") fermerCarte(); // libère la carte Leaflet si on quitte la page Parcours
+  app.innerHTML = projet ? pageProjet(projet) : PAGES[page]();
+
+  document.querySelectorAll("[data-nav]").forEach((a) => {
+    if (a.dataset.nav === page) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+  document.getElementById("menu").classList.remove("ouvert");
+  document.getElementById("burger").setAttribute("aria-expanded", "false");
+  document.title = projet ? `${projet.titreCourt} | ${PROFIL.nom}` : `${PROFIL.nom} | ${PROFIL.poste}`;
+  window.scrollTo(0, 0);
+
+  if (page === "accueil") requestAnimationFrame(dessinerCourbes);
+  if (page === "parcours") requestAnimationFrame(initCarte);
+}
+
+function remplirPied() {
+  document.getElementById("cv-entete").href = PROFIL.cv;
+  document.getElementById("pied").innerHTML = `<div class="wrap">
+    <span>© ${new Date().getFullYear()} ${PROFIL.nom}</span>
+    <span class="pied-liens">
+      <a href="mailto:${PROFIL.email}">${PROFIL.email}</a>
+      <a href="${PROFIL.linkedin}" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="${PROFIL.github}" target="_blank" rel="noopener">GitHub</a>
+    </span>
+  </div>`;
+}
+
+// Petit rappel visible uniquement en local : nombre de [[...]] restant à compléter.
+function rappelLocal() {
+  if (!MODE_LOCAL) return;
+  // On parcourt tous les textes des données (les listes imbriquées commencent aussi par « [[ » en JSON).
+  const chaines = (v) => (typeof v === "string" ? [v] : v && typeof v === "object" ? Object.values(v).flatMap(chaines) : []);
+  const restants = chaines([PROJETS, FORMATIONS]).filter((t) => t.includes("[[")).length;
+  if (!restants) return;
+  const div = document.createElement("div");
+  div.className = "rappel-local";
+  div.innerHTML = `${restants} passages à compléter dans <code>js/donnees.js</code> (surlignés en jaune).
+    <a href="?en-ligne${location.hash}">Voir la version en ligne</a>
+    <button type="button" aria-label="Masquer ce rappel">×</button>`;
+  div.querySelector("button").addEventListener("click", () => div.remove());
+  document.body.append(div);
+}
+
+/* ---------- Interactions ---------- */
+
+document.addEventListener("click", (e) => {
+  const bouton = e.target.closest("[data-copier]");
+  if (bouton) {
+    const valeur = document.getElementById(bouton.dataset.copier).textContent;
+    const confirmer = (msg) => {
+      bouton.textContent = msg;
+      setTimeout(() => (bouton.textContent = "Copier"), 1600);
+    };
+    navigator.clipboard?.writeText(valeur).then(() => confirmer("Copié"), () => confirmer("Échec"));
+  }
+  // Atlas des ZAEnR : n'afficher que les planches du type choisi ("" = tous les types)
+  const filtre = e.target.closest("[data-filtre-enr]");
+  if (filtre) {
+    const atlas = filtre.closest(".atlas");
+    const type = filtre.dataset.filtreEnr;
+    atlas.querySelectorAll("[data-filtre-enr]").forEach((b) => b.setAttribute("aria-pressed", b === filtre));
+    atlas.querySelectorAll("[data-type-enr]").forEach((f) => (f.hidden = type !== "" && f.dataset.typeEnr !== type));
+  }
+  if (e.target.closest("#burger")) {
+    const menu = document.getElementById("menu");
+    menu.classList.toggle("ouvert");
+    e.target.closest("#burger").setAttribute("aria-expanded", menu.classList.contains("ouvert"));
+  }
+});
+
+let redimension;
+window.addEventListener("resize", () => {
+  clearTimeout(redimension);
+  redimension = setTimeout(dessinerCourbes, 150);
+});
+window.addEventListener("hashchange", afficher);
+
+remplirPied();
+rappelLocal();
+afficher();

@@ -1,0 +1,187 @@
+/* Carte du parcours (page Parcours).
+   Présentée comme une planche cartographique : fond clair, titre, légende, orientation,
+   échelle, projection et sources. Elle reste claire quel que soit le thème du site. */
+
+.planche {
+  --surface: #FFFFFF;
+  --ink: #13202F;
+  --muted: #566274;
+  --line: #D9DFE5;
+  --accent: #157A62;
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  /* Les calques Leaflet ont des z-index de 400 à 1000 : sans cette isolation, la carte passait
+     par-dessus l'en-tête fixe du site (z-index 50) quand on faisait défiler la page. */
+  isolation: isolate;
+}
+.planche-titre {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 700;
+}
+.planche-bouton {
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.planche-bouton:hover { border-color: var(--muted); }
+.planche-pied {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--line);
+  font-size: .8rem;
+  color: var(--muted);
+}
+.coords { font-variant-numeric: tabular-nums; white-space: pre; }
+
+.mapstage { position: relative; }
+#map { height: 600px; background: #E9EDF0; font-family: var(--sans); }
+#map:focus { outline: none; }
+.leaflet-container { background: #E9EDF0; }
+
+/* Symboles des lieux : rond = alternance, carré = formation, numéro = ordre chronologique */
+.forme {
+  width: 22px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  border-radius: 50%;
+  border: 1.5px solid #FFFFFF;
+  box-shadow: 0 0 0 1px rgba(19, 32, 47, .35);
+  background: #157A62;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+}
+.forme.edu { background: #B7720E; border-radius: 3px; }
+
+.lieu-icone { background: none; border: 0; }
+.lieu { position: relative; width: 0; height: 0; }
+.lieu-symbole {
+  position: absolute;
+  left: var(--dx);
+  top: var(--dy);
+  transform: translate(-11px, -50%); /* centre le symbole sur le point, le nom à droite */
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.lieu-nom { font-size: 12.5px; font-weight: 600; color: #1F2A37; text-shadow: 0 0 2px #FFF, 0 0 2px #FFF, 0 0 3px #FFF; }
+.lieu.hot .forme, .lieu.actif .forme { box-shadow: 0 0 0 3px rgba(19, 32, 47, .3); }
+.renvoi { position: absolute; left: 0; top: 0; overflow: visible; }
+.renvoi line { stroke: #5E6B78; stroke-width: 1; }
+.point-exact { position: absolute; left: -2.5px; top: -2.5px; width: 5px; height: 5px; border-radius: 50%; background: #13202F; }
+
+/* Étiquettes des régions et des villes de repère */
+.rlabel, .clabel { background: none; border: 0; }
+.rlabel span { display: block; transform: translate(-50%, -50%); white-space: nowrap; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8C97A3; pointer-events: none; }
+.clabel span { display: flex; align-items: center; gap: 4px; transform: translate(-2px, -50%); white-space: nowrap; font-size: 11px; color: #6B7682; pointer-events: none; }
+.clabel span::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: #8C97A3; }
+/* En vue d'ensemble, seuls les lieux sont nommés ; régions et villes apparaissent en zoomant */
+#map[data-z="low"] .clabel, #map[data-z="low"] .rlabel { display: none; }
+#map[data-z="high"] .rlabel { opacity: .5; }
+
+/* Habillage : orientation, légende, échelle, zoom */
+.nord { position: absolute; z-index: 500; left: 16px; top: 14px; width: 20px; height: 34px; pointer-events: none; }
+.nord path { fill: #13202F; }
+.nord text { font: 700 11px var(--sans); fill: #13202F; text-anchor: middle; }
+.legende {
+  position: absolute;
+  z-index: 500;
+  left: 12px;
+  bottom: 12px;
+  display: grid;
+  gap: 6px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, .94);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: .85rem;
+}
+.legende span { display: flex; align-items: center; gap: 8px; }
+.legende .forme { width: 14px; height: 14px; border-width: 1px; }
+.legende-note { color: var(--muted); font-size: .8rem; }
+.leaflet-bar { border: 1px solid var(--line) !important; box-shadow: none !important; }
+.leaflet-bar a { color: var(--ink); }
+.leaflet-control-scale-line { background: rgba(255, 255, 255, .85); border-color: #5E6B78; color: var(--ink); font-size: 11px; }
+
+/* Fiche d'un lieu (à droite de la carte) */
+.mapcard {
+  position: absolute;
+  z-index: 600;
+  right: 12px;
+  top: 12px;
+  width: 320px;
+  max-width: calc(100% - 24px);
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(19, 32, 47, .12);
+}
+.mapcard .x { position: absolute; right: 10px; top: 10px; width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; font-size: 16px; line-height: 1; }
+.fiche-entete { display: flex; gap: 10px; align-items: center; padding-right: 30px; }
+.fiche-entete b { display: block; line-height: 1.25; }
+.fiche-entete div span { display: block; font-size: .85rem; color: var(--muted); }
+/* Logo d'une structure (fiche et liste des lieux) : toujours sur fond blanc, comme prévu par les chartes */
+.logo-lieu { display: block; width: 64px; height: 48px; flex: none; padding: 4px; background: #FFFFFF; border: 1px solid #D9DFE5; border-radius: 6px; }
+.logo-lieu img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.fiche-role { font-size: .9rem; font-weight: 700; color: var(--accent); }
+.mapcard ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .9rem; }
+.mapcard .go { font-weight: 600; color: var(--accent); text-decoration: none; }
+.mapcard .go:hover { text-decoration: underline; }
+
+/* Liste des lieux sous la carte */
+.places { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+.place { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: start; text-align: left; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; cursor: pointer; }
+.place:hover { border-color: var(--muted); }
+.place.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.place > .forme { justify-self: center; margin-top: 12px; } /* lieu sans logo : le numéro prend sa place */
+.row-debut { display: flex; align-items: center; gap: 8px; }
+.row-debut .forme { width: 20px; height: 20px; font-size: 11px; }
+.place .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
+.place b { display: block; font-size: 1.02rem; line-height: 1.3; margin-top: 4px; }
+.place .where, .place .dates { font-size: .88rem; color: var(--muted); }
+.place .rl { font-size: .9rem; font-weight: 600; margin-top: 4px; }
+.kind { font-size: .78rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.kind.pro { background: rgba(21, 122, 98, .12); color: var(--accent); }
+.kind.edu { background: rgba(183, 114, 14, .14); color: #8F5A0B; }
+@media (prefers-color-scheme: dark) { .kind.edu { color: #E8A93C; } }
+
+@media (max-width: 960px) { .places { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 680px) {
+  #map { height: 460px; }
+  /* Vue d'ensemble sur téléphone : seulement les numéros, la liste sous la carte donne les noms */
+  #map[data-z="low"] .lieu-nom { display: none; }
+  .places { grid-template-columns: 1fr; }
+  /* Sur mobile, la légende puis la fiche du lieu choisi passent sous la carte */
+  .legende { position: static; grid-auto-flow: column; justify-content: start; gap: 6px 16px; border: 0; border-top: 1px solid var(--line); border-radius: 0; }
+  .legende b { display: none; }
+  .mapcard { position: static; width: auto; max-width: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; box-shadow: none; }
+  .coords { display: none; }
+}

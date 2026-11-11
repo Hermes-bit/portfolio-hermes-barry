@@ -1,0 +1,7 @@
+{
+  "liveServer.settings.root": "/",
+  "liveServer.settings.CustomBrowser": "chrome",
+  "editor.tabSize": 2,
+  "files.encoding": "utf8",
+  "files.exclude": { "vendor/leaflet/images": true }
+}
