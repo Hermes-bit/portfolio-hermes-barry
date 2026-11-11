@@ -63,6 +63,7 @@ const PROJETS = [
       "Les 13 couches sont servies en GeoJSON par une API Flask avec authentification, puis affichées dans mviewer. L'ensemble tourne dans des conteneurs Docker derrière Nginx, et GitHub Actions déploie chaque nouvelle version.",
     ],
     visuels: [
+      { src: "assets/projets/accessibilite-demo.webp", legende: "L'application en fonctionnement : vue d'ensemble, zoom sur le centre-ville, puis la fiche d'un tronçon (type, largeur utile, pente, dévers, revêtement, niveau d'accès et nombre d'obstacles)." },
       { src: "assets/projets/accessibilite-mcd.png", legende: "Le modèle conceptuel de données, en formalisme Merise : nœuds, tronçons de cheminement, obstacles, ERP et places de stationnement PMR. Les entrées et ascenseurs sont des cas particuliers de nœuds ; les traversées, escaliers et rampes, des cas particuliers de tronçons." },
     ],
     resultat: [
@@ -298,6 +299,7 @@ const PROJETS = [
       "Dans la démo, le guidage s'affiche dans l'image de la caméra : l'itinéraire est dessiné au sol, et les obstacles, marches et ascenseurs sont signalés. Si l'on s'écarte du trajet, un nouvel itinéraire est calculé. Les applications Android du téléphone et des lunettes sont écrites en Kotlin.",
     ],
     visuels: [
+      { src: "assets/projets/vision-ar-demo.webp", format: "telephone", legende: "La démo en ligne, avec une position simulée à Gennevilliers : choix du profil fauteuil roulant, recherche d'une destination, puis l'itinéraire le plus accessible (1,2 km, aucune marche, pente maximale de 2,8 %)." },
       { src: "assets/projets/vision-ar-itineraire.jpg", format: "telephone", legende: "Le choix de l'itinéraire avec un profil fauteuil roulant : 380 m, aucune marche, pente maximale de 2,8 %. L'application signale aussi 50 m sur la chaussée et trois traversées sans feu sonore connu." },
       { src: "assets/projets/vision-ar-parametres.jpg", format: "telephone", legende: "Les paramètres : profil de mobilité, consignes à la voix (deux voix Piper ou celle du téléphone) et vibrations de direction." },
       { src: "assets/projets/vision-ar-demarrage.jpg", format: "telephone", legende: "L'écran de démarrage, pendant la préparation du plan." },
