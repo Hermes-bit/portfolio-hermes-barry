@@ -319,7 +319,7 @@ const PAGES = {
       <dl class="coordonnees">
         <div><dt>E-mail</dt><dd><a id="email" href="mailto:${PROFIL.email}">${PROFIL.email}</a><button class="copier" type="button" data-copier="email">Copier</button></dd></div>
         <div><dt>Téléphone</dt><dd><a id="telephone" href="tel:${tel}">${PROFIL.telephone}</a><button class="copier" type="button" data-copier="telephone">Copier</button></dd></div>
-        <div><dt>LinkedIn</dt><dd><a href="${PROFIL.linkedin}" target="_blank" rel="noopener">hermes-barry</a></dd></div>
+        <div><dt>LinkedIn</dt><dd><a href="${PROFIL.linkedin}" target="_blank" rel="noopener">hermès-barry</a></dd></div>
         <div><dt>GitHub</dt><dd><a href="${PROFIL.github}" target="_blank" rel="noopener">Hermes-bit</a></dd></div>
         <div><dt>CV</dt><dd><a href="${PROFIL.cv}" download>Télécharger (PDF)</a></dd></div>
         <div><dt>Secteur</dt><dd>${PROFIL.zone}</dd></div>

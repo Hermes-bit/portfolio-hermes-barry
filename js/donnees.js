@@ -12,7 +12,8 @@ const PROFIL = {
   cv: "assets/CV-Hermes-Barry.pdf",
   email: "hermesbarry58@gmail.com",
   telephone: "+33 7 51 50 34 26",
-  linkedin: "https://www.linkedin.com/in/hermes-barry-8727581bb",
+  // « è » encodé (%C3%A8) : l'adresse de mon profil est linkedin.com/in/hermès-barry-8727581bb
+  linkedin: "https://www.linkedin.com/in/herm%C3%A8s-barry-8727581bb",
   github: "https://github.com/Hermes-bit",
   zone: "Paris et périphérie, ouvert à la mobilité",
   disponibilite: "Dès maintenant",
