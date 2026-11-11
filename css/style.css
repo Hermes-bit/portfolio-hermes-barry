@@ -251,10 +251,20 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .recommandation { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
 .recommandation blockquote { margin: 0; }
 .recommandation blockquote p { margin: 0; line-height: 1.6; }
-.recommandation figcaption { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 2px; font-size: .95rem; }
-.recommandation figcaption span { color: var(--muted); }
-.recommandation figcaption a { margin-top: 8px; color: var(--accent); font-weight: 600; text-decoration: none; }
-.recommandation figcaption a:hover { text-decoration: underline; }
+.recommandation figcaption { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; font-size: .95rem; }
+.recommandation-auteur { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.recommandation-auteur b { color: var(--ink); }
+.recommandation-auteur > span { color: var(--muted); }
+.recommandation .lien-projet { margin-top: 6px; }
+/* Aperçu de la première page de la lettre, cliquable */
+.lettre-apercu { flex: none; display: block; width: 92px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: #FFFFFF; }
+.lettre-apercu img { display: block; width: 100%; height: auto; }
+.lettre-apercu:hover { border-color: var(--accent); }
+/* Liens vers un PDF : lire / télécharger */
+.liens-pdf { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; }
+.recommandation a, .formation-certificat a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.recommandation a:hover, .formation-certificat a:hover { text-decoration: underline; }
+.formation-certificat { font-size: .92rem; }
 .contenu-projet .recommandation { max-width: 70ch; }
 
 /* Formation : validation des blocs */

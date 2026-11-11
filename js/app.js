@@ -126,15 +126,27 @@ function sectionLangues() {
 
 /* Recommandations (données : RECOMMANDATIONS). Sur l'accueil, avec un lien vers le projet ;
    sur la page d'un projet, sans ce lien. */
+// Liens « Lire » (nouvel onglet) et « Télécharger » vers un document PDF.
+function liensPdf(src, texteLire) {
+  return `<span class="liens-pdf"><a href="${src}" target="_blank" rel="noopener">${texteLire} ↗</a><a href="${src}" download>Télécharger</a></span>`;
+}
+
 function recommandation(r, avecLienProjet) {
   const projet = avecLienProjet && PROJETS.find((p) => p.id === r.projet);
+  const apercu = r.lettre && r.apercu
+    ? `<a class="lettre-apercu" href="${r.lettre}" target="_blank" rel="noopener" title="Ouvrir la lettre (PDF)"><img src="${r.apercu}" alt="Première page de la lettre de ${r.auteur}" loading="lazy"></a>`
+    : "";
   return `<figure class="recommandation">
     <blockquote><p>« ${r.extrait} »</p></blockquote>
     <figcaption>
-      <b>${r.auteur}</b>
-      <span>${r.fonction}, ${r.structure}</span>
-      <span>Lettre du ${r.date}</span>
-      ${projet ? `<a href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}
+      <div class="recommandation-auteur">
+        <b>${r.auteur}</b>
+        <span>${r.fonction}, ${r.structure}</span>
+        <span>Lettre du ${r.date}</span>
+        ${r.lettre ? liensPdf(r.lettre, "Lire la lettre") : ""}
+        ${projet ? `<a class="lien-projet" href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}
+      </div>
+      ${apercu}
     </figcaption>
   </figure>`;
 }
@@ -143,7 +155,7 @@ function sectionRecommandations() {
   if (!RECOMMANDATIONS.length) return "";
   return `<section class="bloc">
     <h2>Recommandations</h2>
-    <p class="chapo">Extraits des lettres de recommandation de mes tuteurs d'alternance. Les lettres complètes sont disponibles sur demande.</p>
+    <p class="chapo">Extraits des lettres de recommandation de mes tuteurs d'alternance. Les lettres originales sont à lire ou à télécharger en PDF.</p>
     <div class="recommandations">${RECOMMANDATIONS.map((r) => recommandation(r, true)).join("")}</div>
   </section>`;
 }
@@ -165,7 +177,9 @@ function sectionFormations() {
       ${f.certification ? `<p>${f.certification} ${f.alternance || ""}</p>` : ""}
       ${f.obtenu ? `<p class="formation-obtenu">${f.obtenu}</p>` : ""}
       <p class="formation-intro">${f.intro}</p>
-      <dl class="formation-contenu">${f.contenu.map(([intitule, detail]) => `<div><dt>${intitule}</dt><dd>${detail}</dd></div>`).join("")}</dl>
+      <dl class="formation-contenu">${f.contenu.map(([intitule, detail, certificat]) => `<div><dt>${intitule}</dt><dd>${detail}</dd>${
+        certificat ? `<dd class="formation-certificat">${liensPdf(certificat, "Voir le certificat")}</dd>` : ""
+      }</div>`).join("")}</dl>
       ${f.validation ? `<p>${f.validation}${lienProjet}</p>` : ""}
       ${detail ? `<p>${detail}</p>` : ""}
       <p class="formation-liens">${f.liens.map((l) => `<a href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`).join("")}</p>

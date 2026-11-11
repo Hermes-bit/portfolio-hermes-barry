@@ -424,7 +424,7 @@ const COMPETENCES = [
 
 /* Recommandations de mes tuteurs d'alternance (page d'accueil et page du projet concerné).
    Extraits recopiés mot pour mot des lettres ; […] marque un passage coupé.
-   Les lettres complètes ne sont pas publiées : elles contiennent les coordonnées personnelles des auteurs. */
+   lettre : PDF original (lien « Lire » et « Télécharger ») ; apercu : image de sa première page. */
 const RECOMMANDATIONS = [
   {
     auteur: "Dominique Louis",
@@ -432,6 +432,8 @@ const RECOMMANDATIONS = [
     structure: "Région Nouvelle-Aquitaine",
     date: "21 juillet 2026",
     projet: "hub-pnr",
+    lettre: "assets/documents/recommandation-region-nouvelle-aquitaine.pdf",
+    apercu: "assets/documents/recommandation-region-nouvelle-aquitaine-apercu.jpg",
     extrait: "Il dispose par ailleurs de compétences en développement qui lui ont permis d'être force de proposition sur le projet dont il a eu la charge durant son alternance, à savoir la conception et la réalisation d'un hub sur les Parcs Naturels Régionaux en Nouvelle-Aquitaine. […] Il est désormais opérationnel sur la plupart des outils de la suite ESRI utilisés par notre service. […] Je recommande donc Hermès BARRY pour toute fonction en lien avec la géomatique.",
   },
   {
@@ -440,6 +442,8 @@ const RECOMMANDATIONS = [
     structure: "SNCF Réseau, Montpellier",
     date: "30 juin 2025",
     projet: "sncf",
+    lettre: "assets/documents/recommandation-sncf-reseau.pdf",
+    apercu: "assets/documents/recommandation-sncf-reseau-apercu.jpg",
     extrait: "Durant cette période, Hermès a fait preuve d'un excellent niveau technique, démontrant rapidement une bonne maîtrise des outils SIG et des méthodes propres à notre métier. Sa capacité à assimiler les procédures et à appliquer les consignes avec rigueur a été un véritable atout pour l'équipe.",
   },
 ];
@@ -458,12 +462,12 @@ const FORMATIONS = [
     alternance: "Préparé en alternance, chez SNCF Réseau puis à la Région Nouvelle-Aquitaine.",
     obtenu: "Les quatre blocs de compétences sont validés : certificats délivrés le 15 octobre 2026.",
     intro: "La formation est découpée en quatre blocs de compétences, chacun validé séparément :",
-    // Intitulés repris des certificats de compétences
+    // Intitulés repris des certificats de compétences ; 3e valeur : le certificat en PDF
     contenu: [
-      ["Piloter des projets de géomatique", "Note de cadrage et plan d'assurance qualité, planification, budget et risques, relation entre maîtrise d'ouvrage et maîtrise d'œuvre, animation de comités de pilotage, management d'équipe, veille technique et réglementaire."],
-      ["Mettre en place des bases de données à dominante géographique", "Modélisation (MCD, MLD, MPD), SQL et requêtes spatiales, qualité des données (ISO 19157, directive INSPIRE), métadonnées, catalogage et moissonnage, administration d'une base."],
-      ["Exploiter des données à dominante géographique", "Analyse spatiale (vecteur, raster, télédétection, 3D), chaînes de traitement automatisées avec un ETL ou en Python, cartographie thématique, diffusion sur le web et en tableaux de bord."],
-      ["Concevoir des applications et interfaces géomatiques", "Recueil des besoins et cahier des charges fonctionnel, prototypage, développement (JavaScript, Python, SQL, API), sécurité, tests et mise en production, maintenance, formation des utilisateurs."],
+      ["Piloter des projets de géomatique", "Note de cadrage et plan d'assurance qualité, planification, budget et risques, relation entre maîtrise d'ouvrage et maîtrise d'œuvre, animation de comités de pilotage, management d'équipe, veille technique et réglementaire.", "assets/documents/certificat-bloc-piloter-des-projets.pdf"],
+      ["Mettre en place des bases de données à dominante géographique", "Modélisation (MCD, MLD, MPD), SQL et requêtes spatiales, qualité des données (ISO 19157, directive INSPIRE), métadonnées, catalogage et moissonnage, administration d'une base.", "assets/documents/certificat-bloc-bases-de-donnees.pdf"],
+      ["Exploiter des données à dominante géographique", "Analyse spatiale (vecteur, raster, télédétection, 3D), chaînes de traitement automatisées avec un ETL ou en Python, cartographie thématique, diffusion sur le web et en tableaux de bord.", "assets/documents/certificat-bloc-exploiter-des-donnees.pdf"],
+      ["Concevoir des applications et interfaces géomatiques", "Recueil des besoins et cahier des charges fonctionnel, prototypage, développement (JavaScript, Python, SQL, API), sécurité, tests et mise en production, maintenance, formation des utilisateurs.", "assets/documents/certificat-bloc-applications.pdf"],
     ],
     validation: "Chaque bloc se valide devant un jury de professionnels, à partir d'une étude de cas : un rapport, puis une soutenance orale. Pour le bloc sur les bases de données, j'ai présenté mon projet sur l'accessibilité PMR.",
     projet: "accessibilite",
