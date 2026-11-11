@@ -121,6 +121,8 @@ function pageParcours() {
   return `<div class="wrap"><section class="bloc">
     <h1 class="titre-page">Parcours</h1>
     <p class="chapo">Six lieux entre 2019 et 2026, numérotés dans l'ordre chronologique. Cliquez sur un lieu pour voir ce que j'y ai fait.</p>
+    <!-- Sur grand écran, la liste des lieux se range à droite de la carte (voir .parcours-grille) -->
+    <div class="parcours-grille">
     <figure class="planche">
       <div class="planche-titre">
         <span>Lieux de formation et d'alternance, 2019-2026</span>
@@ -147,6 +149,7 @@ function pageParcours() {
         <div class="row"><span class="row-debut">${LOGOS[p.id] ? forme(p) : ""}<span class="kind ${p.kind}">${p.kind === "pro" ? "Alternance" : "Formation"}</span></span><span class="dates">${p.dates}</span></div>
         <b>${p.org}</b><span class="where">${p.city}</span><div class="rl">${p.role}</div>
       </div></button>`).join("")}
+    </div>
     </div>
   </section>
   ${sectionFormations() /* défini dans app.js */}

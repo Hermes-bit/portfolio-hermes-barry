@@ -46,13 +46,14 @@
   gap: 4px 24px;
   padding: 8px 14px;
   border-top: 1px solid var(--line);
-  font-size: .8rem;
+  font-size: .85rem;
   color: var(--muted);
 }
 .coords { font-variant-numeric: tabular-nums; white-space: pre; }
 
 .mapstage { position: relative; }
-#map { height: 600px; background: #E9EDF0; font-family: var(--sans); }
+/* Hauteur qui suit l'écran : la France occupe plus de place sur un grand écran */
+#map { height: clamp(520px, 74vh, 860px); background: #E9EDF0; font-family: var(--sans); }
 #map:focus { outline: none; }
 .leaflet-container { background: #E9EDF0; }
 
@@ -88,7 +89,7 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.lieu-nom { font-size: 12.5px; font-weight: 600; color: #1F2A37; text-shadow: 0 0 2px #FFF, 0 0 2px #FFF, 0 0 3px #FFF; }
+.lieu-nom { font-size: 14px; font-weight: 600; color: #1F2A37; text-shadow: 0 0 2px #FFF, 0 0 2px #FFF, 0 0 3px #FFF; }
 .lieu.hot .forme, .lieu.actif .forme { box-shadow: 0 0 0 3px rgba(19, 32, 47, .3); }
 .renvoi { position: absolute; left: 0; top: 0; overflow: visible; }
 .renvoi line { stroke: #5E6B78; stroke-width: 1; }
@@ -96,8 +97,8 @@
 
 /* Étiquettes des régions et des villes de repère */
 .rlabel, .clabel { background: none; border: 0; }
-.rlabel span { display: block; transform: translate(-50%, -50%); white-space: nowrap; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8C97A3; pointer-events: none; }
-.clabel span { display: flex; align-items: center; gap: 4px; transform: translate(-2px, -50%); white-space: nowrap; font-size: 11px; color: #6B7682; pointer-events: none; }
+.rlabel span { display: block; transform: translate(-50%, -50%); white-space: nowrap; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #8C97A3; pointer-events: none; }
+.clabel span { display: flex; align-items: center; gap: 4px; transform: translate(-2px, -50%); white-space: nowrap; font-size: 12px; color: #5E6A76; pointer-events: none; }
 .clabel span::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: #8C97A3; }
 /* En vue d'ensemble, seuls les lieux sont nommés ; régions et villes apparaissent en zoomant */
 #map[data-z="low"] .clabel, #map[data-z="low"] .rlabel { display: none; }
@@ -118,7 +119,7 @@
   background: rgba(255, 255, 255, .94);
   border: 1px solid var(--line);
   border-radius: 4px;
-  font-size: .85rem;
+  font-size: .9rem;
 }
 .legende span { display: flex; align-items: center; gap: 8px; }
 .legende .forme { width: 14px; height: 14px; border-width: 1px; }
@@ -133,7 +134,7 @@
   z-index: 600;
   right: 12px;
   top: 12px;
-  width: 320px;
+  width: 360px;
   max-width: calc(100% - 24px);
   display: grid;
   gap: 10px;
@@ -149,30 +150,38 @@
 .fiche-entete b { display: block; line-height: 1.25; }
 .fiche-entete div span { display: block; font-size: .85rem; color: var(--muted); }
 /* Logo d'une structure (fiche et liste des lieux) : toujours sur fond blanc, comme prévu par les chartes */
-.logo-lieu { display: block; width: 64px; height: 48px; flex: none; padding: 4px; background: #FFFFFF; border: 1px solid #D9DFE5; border-radius: 6px; }
+.logo-lieu { display: block; width: 72px; height: 54px; flex: none; padding: 4px; background: #FFFFFF; border: 1px solid #D9DFE5; border-radius: 6px; }
 .logo-lieu img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.fiche-role { font-size: .9rem; font-weight: 700; color: var(--accent); }
-.mapcard ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .9rem; }
+.fiche-role { font-size: .95rem; font-weight: 700; color: var(--accent); }
+.mapcard ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .95rem; }
 .mapcard .go { font-weight: 600; color: var(--accent); text-decoration: none; }
 .mapcard .go:hover { text-decoration: underline; }
 
 /* Liste des lieux sous la carte */
-.places { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
-.place { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: start; text-align: left; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; cursor: pointer; }
+.places { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 28px; }
+.place { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: start; text-align: left; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; cursor: pointer; }
 .place:hover { border-color: var(--muted); }
 .place.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 .place > .forme { justify-self: center; margin-top: 12px; } /* lieu sans logo : le numéro prend sa place */
 .row-debut { display: flex; align-items: center; gap: 8px; }
 .row-debut .forme { width: 20px; height: 20px; font-size: 11px; }
 .place .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; flex-wrap: wrap; }
-.place b { display: block; font-size: 1.02rem; line-height: 1.3; margin-top: 4px; }
-.place .where, .place .dates { font-size: .88rem; color: var(--muted); }
-.place .rl { font-size: .9rem; font-weight: 600; margin-top: 4px; }
-.kind { font-size: .78rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.place b { display: block; font-size: 1.1rem; line-height: 1.3; margin-top: 4px; }
+.place .where, .place .dates { font-size: .95rem; color: var(--muted); }
+.place .rl { font-size: .97rem; font-weight: 600; margin-top: 4px; }
+.kind { font-size: .82rem; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
 .kind.pro { background: rgba(21, 122, 98, .12); color: var(--accent); }
 .kind.edu { background: rgba(183, 114, 14, .14); color: #8F5A0B; }
 @media (prefers-color-scheme: dark) { .kind.edu { color: #E8A93C; } }
 
+/* Grand écran : la carte à gauche, les six lieux à droite sur deux colonnes (logo au-dessus du texte) */
+@media (min-width: 1200px) {
+  .parcours-grille { display: grid; grid-template-columns: minmax(0, 1fr) minmax(480px, 600px); gap: 28px; align-items: start; }
+  .parcours-grille .places { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 0; }
+  .parcours-grille .place { grid-template-columns: 1fr; gap: 10px; padding: 16px; }
+  .parcours-grille .place > .forme { justify-self: start; margin-top: 0; }
+  .parcours-grille .place .row { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
 @media (max-width: 960px) { .places { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 680px) {
   #map { height: 460px; }

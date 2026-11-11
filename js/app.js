@@ -166,22 +166,23 @@ function sectionFormations() {
     const projet = f.projet && PROJETS.find((p) => p.id === f.projet);
     const lienProjet = projet ? ` <a href="#${projet.id}">Voir le projet →</a>` : "";
     const detail = texte(f.validationDetail);
+    // Sur grand écran : présentation et validation à gauche, contenu de la formation à droite
     return `<article class="formation">
-      <div class="formation-entete">
-        <div>
-          <h3>${f.titre}</h3>
-          <p class="formation-meta">${f.organisme}, ${f.periode}</p>
-        </div>
+      <div class="formation-gauche">
+        <h3>${f.titre}</h3>
+        <p class="formation-meta">${f.organisme}, ${f.periode}</p>
+        ${f.certification ? `<p>${f.certification} ${f.alternance || ""}</p>` : ""}
+        ${f.obtenu ? `<p class="formation-obtenu">${f.obtenu}</p>` : ""}
+        ${f.validation ? `<p>${f.validation}${lienProjet}</p>` : ""}
+        ${detail ? `<p>${detail}</p>` : ""}
+        <p class="formation-liens">${f.liens.map((l) => `<a href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`).join("")}</p>
       </div>
-      ${f.certification ? `<p>${f.certification} ${f.alternance || ""}</p>` : ""}
-      ${f.obtenu ? `<p class="formation-obtenu">${f.obtenu}</p>` : ""}
-      <p class="formation-intro">${f.intro}</p>
-      <dl class="formation-contenu">${f.contenu.map(([intitule, detail, certificat]) => `<div><dt>${intitule}</dt><dd>${detail}</dd>${
-        certificat ? `<dd class="formation-certificat">${liensPdf(certificat, "Voir le certificat")}</dd>` : ""
-      }</div>`).join("")}</dl>
-      ${f.validation ? `<p>${f.validation}${lienProjet}</p>` : ""}
-      ${detail ? `<p>${detail}</p>` : ""}
-      <p class="formation-liens">${f.liens.map((l) => `<a href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`).join("")}</p>
+      <div class="formation-droite">
+        <p class="formation-intro">${f.intro}</p>
+        <dl class="formation-contenu">${f.contenu.map(([intitule, detail, certificat]) => `<div><dt>${intitule}</dt><dd>${detail}</dd>${
+          certificat ? `<dd class="formation-certificat">${liensPdf(certificat, "Voir le certificat")}</dd>` : ""
+        }</div>`).join("")}</dl>
+      </div>
     </article>`;
   };
   return `<section class="bloc formations">
@@ -352,17 +353,22 @@ function pageProjet(p) {
     ${liens ? `<div class="boutons">${liens}</div>${notes}` : ""}
   </div></div>
 
+  <!-- Sur grand écran : le récit à gauche, les outils et la recommandation dans une colonne à droite -->
   <div class="wrap contenu-projet">
-    ${p.couverture ? visuel(p.couverture).replace("<figure>", '<figure class="couverture">') : ""}
-    ${p.statut && p.statut.texte ? section("Où en est le projet", paragraphes(p.statut.texte)).replace("<section>", `<section class="etat-projet ${p.statut.classe}">`) : ""}
-    ${section("Contexte", paragraphes(p.contexte))}
-    ${section("Ce que j'ai fait", paragraphes(p.actions))}
-    ${visuels ? `<div class="visuels">${visuels}</div>` : ""}
-    ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
-    ${section("Résultat", paragraphes(p.resultat))}
-    ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
-    ${section("Recommandation", RECOMMANDATIONS.filter((r) => r.projet === p.id).map((r) => recommandation(r, false)).join(""))}
-    ${section("Outils", outils.length ? `<p>${outils.join(", ")}</p>` : "")}
+    <div class="projet-principal">
+      ${p.couverture ? visuel(p.couverture).replace("<figure>", '<figure class="couverture">') : ""}
+      ${p.statut && p.statut.texte ? section("Où en est le projet", paragraphes(p.statut.texte)).replace("<section>", `<section class="etat-projet ${p.statut.classe}">`) : ""}
+      ${section("Contexte", paragraphes(p.contexte))}
+      ${section("Ce que j'ai fait", paragraphes(p.actions))}
+      ${visuels ? `<div class="visuels">${visuels}</div>` : ""}
+      ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
+      ${section("Résultat", paragraphes(p.resultat))}
+      ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
+    </div>
+    <aside class="projet-cote">
+      ${section("Outils", outils.length ? `<ul class="outils">${outils.map((o) => `<li>${o}</li>`).join("")}</ul>` : "")}
+      ${section("Recommandation", RECOMMANDATIONS.filter((r) => r.projet === p.id).map((r) => recommandation(r, false)).join(""))}
+    </aside>
     <nav class="projets-voisins" aria-label="Autres projets">
       <a href="#${precedent.id}"><span>← Projet précédent</span>${precedent.titreCourt}</a>
       <a href="#${suivant.id}"><span>Projet suivant →</span>${suivant.titreCourt}</a>
