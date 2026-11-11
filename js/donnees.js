@@ -451,6 +451,17 @@ const RECOMMANDATIONS = [
   },
 ];
 
+/* Savoir-être (page d'accueil). Chaque qualité est appuyée par un passage d'une lettre de recommandation,
+   recopié mot pour mot. lettre : champ projet de la recommandation citée (voir RECOMMANDATIONS). */
+const SAVOIR_ETRE = [
+  { qualite: "Rigueur", extrait: "appliquer les consignes avec rigueur", lettre: "sncf" },
+  { qualite: "Esprit d'initiative", extrait: "Son esprit d'initiative et son sens du travail en équipe ont contribué à la bonne dynamique du service.", lettre: "sncf" },
+  { qualite: "Force de proposition", extrait: "force de proposition sur le projet dont il a eu la charge", lettre: "hub-pnr" },
+  { qualite: "Adaptabilité", extrait: "une grande adaptabilité face aux diverses situations rencontrées", lettre: "sncf" },
+  { qualite: "Travail en équipe", extrait: "parfaitement intégré dans une équipe pluridisciplinaire", lettre: "hub-pnr" },
+  { qualite: "Qualités relationnelles", extrait: "unanimement apprécié pour sa bienveillance, sa simplicité et ses qualités relationnelles", lettre: "hub-pnr" },
+];
+
 /* Formations (page Parcours, sous la carte), de la plus récente à la plus ancienne.
    Sources : programmes IDGEO (CPGEOM 2026-2028, TGEO 2026-2027), fiches RNCP de France Compétences,
    fiche de compétences de la licence (Paris 8, 2017).

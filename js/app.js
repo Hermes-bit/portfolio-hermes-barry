@@ -160,6 +160,21 @@ function sectionRecommandations() {
   </section>`;
 }
 
+/* Section « Savoir-être » de l'accueil (données : SAVOIR_ETRE). Chaque citation renvoie à la lettre d'où elle vient. */
+function sectionSavoirEtre() {
+  if (!SAVOIR_ETRE.length) return "";
+  const qualite = (q) => {
+    const r = RECOMMANDATIONS.find((x) => x.projet === q.lettre);
+    const source = r ? `<a href="${r.lettre}" target="_blank" rel="noopener">${r.auteur}, ${r.structure} ↗</a>` : "";
+    return `<li><h3>${q.qualite}</h3><p>« ${q.extrait} »</p>${source}</li>`;
+  };
+  return `<section class="bloc">
+    <h2>Savoir-être</h2>
+    <p class="chapo">Ce que mes tuteurs d'alternance ont relevé dans leurs lettres de recommandation, avec leurs mots.</p>
+    <ul class="savoir-etre">${SAVOIR_ETRE.map(qualite).join("")}</ul>
+  </section>`;
+}
+
 /* Section « Formation » de la page Parcours (données : FORMATIONS dans donnees.js). */
 function sectionFormations() {
   const formation = (f) => {
@@ -288,6 +303,8 @@ const PAGES = {
         </div>
         ${sectionLangues()}
       </section>
+
+      ${sectionSavoirEtre()}
     </div>`;
   },
 
