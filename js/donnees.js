@@ -213,6 +213,8 @@ const PROJETS = [
   },
   {
     id: "web",
+    logo: { src: "assets/logos/mca-consulting.png", nom: "MCA Consulting", surBlanc: true },
+    vignette: { src: "assets/projets/web-vignette.png", fond: "#FFFFFF", legende: "Logo de MCA Consulting" },
     titreCourt: "Développement web",
     titre: "Maintenance de sites et développement d'applications mobiles",
     cadre: "MCA Consulting",
@@ -519,10 +521,11 @@ const FORMATIONS = [
    project : identifiant du projet lié (facultatif) */
 
 // Logos des structures (liste des lieux et fiche de la carte). null : le numéro du lieu s'affiche à la place.
-// Sources : Wikimedia Commons (Paris 8, SNCF Réseau), site de la CC de l'Ouest Vosgien, fichiers IDGEO et Région.
+// Sources : Wikimedia Commons (Paris 8, SNCF Réseau), site de la CC de l'Ouest Vosgien, fichiers IDGEO et Région,
+// site de MCA Consulting (logo passé entièrement en noir pour rester lisible sur fond blanc).
 const LOGOS = {
   p8: "assets/logos/universite-paris-8.svg",
-  mca: null,
+  mca: "assets/logos/mca-consulting.png",
   idgeo: "assets/logos/idgeo.png",
   ccov: "assets/logos/cc-ouest-vosgien.png",
   sncf: "assets/logos/sncf-reseau.png",
