@@ -195,11 +195,14 @@ const PROJETS = [
     lieu: "Montpellier (34)",
     ll: [43.61, 3.88],
     couverture: null,
+    // Pas de capture : les cartes et les données produites appartiennent à SNCF Réseau.
+    vignette: { src: "assets/projets/sncf-vignette.png", fond: "#FFFFFF", legende: "Logo de SNCF Réseau" },
     resume: "Pour le Pôle Développement Durable de SNCF Réseau en Occitanie, j'ai modélisé les données de collisions faune-flore du réseau et créé le référentiel géographique des OLD, puis mis en page les cartes du projet.",
     contexte: [
       "J'étais en alternance au Pôle Prospective et Émergences de la direction territoriale Occitanie de SNCF Réseau, sur un poste d'assistant d'études géomatique et data.",
       "Le Pôle Développement Durable, en maîtrise d'ouvrage, avait besoin de données géographiques exploitables. J'étais côté maîtrise d'œuvre, chargé de concevoir et de livrer la partie géomatique.",
       "Le projet portait sur deux sujets, à l'échelle de tout le réseau d'Occitanie : les collisions faune-flore et les OLD.",
+      "Les cartes et les données produites sont la propriété de SNCF Réseau : je ne peux pas les montrer ici.",
     ],
     actions: [
       "J'ai précisé le besoin avec le Pôle Développement Durable, puis modélisé les données de collisions faune-flore sur l'ensemble du réseau occitan. Je les ai intégrées dans ArcGIS Enterprise avec ArcMap, sous forme de couches que les équipes de terrain peuvent exploiter.",
