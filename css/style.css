@@ -246,7 +246,17 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .competences dt { font-weight: 600; font-size: .95rem; margin-top: 12px; }
 .competences dt:first-child { margin-top: 0; }
 .competences dd { margin: 2px 0 0; color: var(--muted); font-size: .97rem; }
-.langues { margin-top: 20px; }
+/* Langues : même carte que les compétences, une colonne par langue */
+.langues { margin-top: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 24px; }
+.langues h3 { font-size: 1.15rem; margin-bottom: 14px; }
+.langues-liste { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 24px; }
+.langue-nom { display: block; font-weight: 600; }
+.langue-niveau { display: block; margin-top: 2px; color: var(--muted); font-size: .97rem; }
+.langue-niveau b { color: var(--ink); }
+.echelle { display: flex; gap: 3px; margin-top: 10px; max-width: 228px; }
+.echelle span { flex: 1; padding: 2px 0; border-radius: 3px; text-align: center; font-size: .72rem; font-weight: 600; background: var(--line); color: var(--muted); }
+.echelle span.atteint { background: var(--accent); color: var(--surface); }
+.langues-note { margin-top: 16px; font-size: .88rem; color: var(--muted); }
 
 /* ---------- Page projet ---------- */
 .entete-projet { background: var(--navy); color: var(--on-navy); padding-block: 40px 44px; }
@@ -403,6 +413,7 @@ figcaption { margin-top: 8px; font-size: .9rem; color: var(--muted); }
   .hero-grille { grid-template-columns: 1fr; gap: 32px; padding-block: 48px 56px; }
   .hero-photo { width: 140px; height: 140px; order: -1; }
   .competences { grid-template-columns: 1fr; }
+  .langues-liste { grid-template-columns: 1fr; gap: 16px; }
   .infos-projet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 600px) {

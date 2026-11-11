@@ -103,6 +103,27 @@ function carteProjet(p) {
   </a>`;
 }
 
+/* Bloc « Langues » de la page d'accueil (données : PROFIL.langues).
+   Le niveau CECRL est montré sur l'échelle complète A1 → C2, cases remplies jusqu'au niveau atteint. */
+const ECHELLE_CECRL = ["A1", "A2", "B1", "B2", "C1", "C2"];
+
+function sectionLangues() {
+  const langue = (l) => {
+    const rang = ECHELLE_CECRL.indexOf(l.cecrl);
+    const echelle = rang < 0 ? "" : `
+      <span class="echelle" role="img" aria-label="Niveau ${l.cecrl} sur l'échelle du CECRL, de A1 à C2">
+        ${ECHELLE_CECRL.map((n, i) => `<span${i <= rang ? ' class="atteint"' : ""}>${n}</span>`).join("")}
+      </span>`;
+    const niveau = l.cecrl ? `<b>${l.cecrl}</b>, ${l.niveau}` : l.niveau;
+    return `<li><span class="langue-nom">${l.langue}</span><span class="langue-niveau">${niveau}</span>${echelle}</li>`;
+  };
+  return `<div class="langues">
+    <h3>Langues</h3>
+    <ul class="langues-liste">${PROFIL.langues.map(langue).join("")}</ul>
+    <p class="langues-note">Niveaux du Cadre européen commun de référence pour les langues (CECRL).</p>
+  </div>`;
+}
+
 /* Section « Formation » de la page Parcours (données : FORMATIONS dans donnees.js). */
 function sectionFormations() {
   const formation = (f) => {
@@ -223,7 +244,7 @@ const PAGES = {
               <dl>${c.lignes.map(([cat, outils]) => `<dt>${cat}</dt><dd>${outils}</dd>`).join("")}</dl>
             </div>`).join("")}
         </div>
-        <p class="langues"><b>Langues :</b> ${PROFIL.langues}.</p>
+        ${sectionLangues()}
       </section>
     </div>`;
   },

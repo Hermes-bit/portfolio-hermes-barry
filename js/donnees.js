@@ -16,7 +16,13 @@ const PROFIL = {
   github: "https://github.com/Hermes-bit",
   zone: "Paris et périphérie, ouvert à la mobilité",
   disponibilite: "Dès maintenant",
-  langues: "Français (langue maternelle), anglais (B1), allemand (A2)",
+  // cecrl : niveau du Cadre européen commun de référence (A1 à C2), affiché sur une échelle.
+  // Sans cecrl (langue maternelle), seul le niveau en toutes lettres s'affiche.
+  langues: [
+    { langue: "Français", niveau: "Langue maternelle" },
+    { langue: "Anglais", cecrl: "B1", niveau: "utilisateur indépendant" },
+    { langue: "Allemand", cecrl: "A2", niveau: "utilisateur élémentaire" },
+  ],
 };
 
 /* Projets
