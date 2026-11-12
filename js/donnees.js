@@ -259,7 +259,7 @@ const PROJETS = [
       "La principale difficulté est venue de la mise en place du SIG de la collectivité : les besoins exprimés étaient difficiles à traduire en solution technique.",
       "Pour avancer, je faisais valider chaque étape par ma tutrice lors de réunions planifiées à l'avance, avant de passer à la suivante. J'ai aussi échangé directement avec les maires qui voulaient parler des zones d'accélération. Enfin, toutes les données ont été centralisées sur QGIS Cloud, pour que les agents travaillent à partir des mêmes données de référence.",
     ],
-    outils: ["QGIS", "QGIS Cloud", "ArcGIS Pro", "PostgreSQL / PostGIS", "pgAdmin", "GEO (Business Geografic)", "WMS / WFS / WMTS"],
+    outils: ["QGIS", "QGIS Cloud", "PostgreSQL / PostGIS", "pgAdmin", "GEO (Business Geografic)", "WMS / WFS / WMTS"],
   },
   {
     id: "sncf",
