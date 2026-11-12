@@ -518,7 +518,8 @@ const PAGES = {
         </section>
         <section>
           <h2>Données personnelles</h2>
-          <p>Ce site ne dépose aucun cookie, ne mesure pas l'audience et ne contient aucun formulaire. Les polices de caractères sont hébergées sur le site&nbsp;: votre navigateur n'interroge ni Google ni aucun autre service.</p>
+          <p>Ce site ne dépose aucun cookie, ne mesure pas l'audience et ne contient aucun formulaire. Les polices de caractères sont hébergées sur le site, et la carte du parcours s'affiche par défaut sans faire appel à un service extérieur.</p>
+          <p>Si vous choisissez le fond OpenStreetMap, les photos aériennes ou le Plan IGN, votre navigateur charge les images de la carte depuis les serveurs de la ${lien("https://osmfoundation.org/wiki/Privacy_Policy", "Fondation OpenStreetMap")} ou de l'${lien("https://geoservices.ign.fr/cgu-licences", "IGN")}, qui reçoivent alors votre adresse IP.</p>
           <p>GitHub enregistre l'adresse IP des visiteurs pour des raisons de sécurité, comme l'indique sa ${lien("https://docs.github.com/fr/pages/getting-started-with-github-pages/about-github-pages#data-collection", "documentation")}. Voir aussi sa ${lien("https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement", "déclaration de confidentialité")}.</p>
           <p>Si vous m'écrivez, votre message sert uniquement à vous répondre et je ne le transmets à personne. Vous pouvez me demander par e-mail d'accéder à vos données, de les corriger ou de les supprimer. Vous pouvez aussi ${lien("https://www.cnil.fr/fr/adresser-une-plainte", "adresser une réclamation à la CNIL")}.</p>
         </section>
@@ -542,7 +543,7 @@ const PAGES = {
           <h2>Sources des données</h2>
           <p>Les principales sources des cartes de ce site&nbsp;:</p>
           <ul>
-            <li>IGN&nbsp;: Admin Express, RGE ALTI&nbsp;;</li>
+            <li>IGN&nbsp;: Admin Express, RGE ALTI, photographies aériennes et Plan IGN (Géoplateforme)&nbsp;;</li>
             <li>Inventaire national du patrimoine naturel (INPN)&nbsp;;</li>
             <li>plan cadastral (DGFiP, cadastre.gouv.fr)&nbsp;;</li>
             <li>OpenStreetMap&nbsp;: ©&nbsp;les contributeurs OpenStreetMap, ${lien("https://www.openstreetmap.org/copyright", "licence ODbL")}&nbsp;;</li>

@@ -1,6 +1,6 @@
 /* Carte du parcours (page Parcours).
-   Présentée comme une planche cartographique : fond clair, titre, légende, orientation,
-   échelle, projection et sources. Elle reste claire quel que soit le thème du site. */
+   Présentée comme une planche cartographique : fond clair, titre, choix du fond, légende,
+   orientation, échelle et crédits. Elle reste claire quel que soit le thème du site. */
 
 .planche {
   --surface: #FFFFFF;
@@ -39,23 +39,41 @@
   cursor: pointer;
 }
 .planche-bouton:hover { border-color: var(--muted); }
-.planche-pied {
+/* Choix du fond de carte : boutons en pastilles, comme les filtres de la Cartothèque */
+.planche-fonds {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 4px 24px;
+  align-items: center;
+  gap: 6px 8px;
   padding: 8px 14px;
-  border-top: 1px solid var(--line);
-  font-size: .85rem;
-  color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  font-size: .88rem;
 }
-.coords { font-variant-numeric: tabular-nums; white-space: pre; }
+.planche-fonds > span { color: var(--muted); font-weight: 600; margin-right: 2px; }
+.planche-fonds button {
+  font: inherit;
+  font-weight: 600;
+  padding: 3px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.planche-fonds button:hover { border-color: var(--muted); }
+.planche-fonds button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); color: var(--accent); }
 
 .mapstage { position: relative; }
 /* Hauteur qui suit l'écran : la France occupe plus de place sur un grand écran */
 #map { height: clamp(520px, 74vh, 860px); background: #E9EDF0; font-family: var(--sans); }
 #map:focus { outline: none; }
 .leaflet-container { background: #E9EDF0; }
+/* La carte est dans une <figure> : on annule le cadre que le site donne aux images de figure
+   (figure img, style.css), sinon chaque tuile du fond aurait sa bordure et la carte serait quadrillée. */
+.planche .leaflet-container img { border: 0; border-radius: 0; }
+/* Même chose pour les liens (figure a, style.css) : les crédits restent sur une ligne */
+.planche .leaflet-container a { cursor: pointer; }
+.planche .leaflet-control-attribution a { display: inline; }
 
 /* Symboles des lieux : rond = alternance, carré = formation, numéro = ordre chronologique */
 .forme {
@@ -108,6 +126,8 @@
 .nord { position: absolute; z-index: 500; left: 16px; top: 14px; width: 20px; height: 34px; pointer-events: none; }
 .nord path { fill: #13202F; }
 .nord text { font: 700 11px var(--sans); fill: #13202F; text-anchor: middle; }
+/* Liseré blanc : la flèche reste lisible sur les photos aériennes */
+.nord path, .nord text { stroke: #FFFFFF; stroke-width: 2px; stroke-linejoin: round; paint-order: stroke; }
 .legende {
   position: absolute;
   z-index: 500;
@@ -127,6 +147,9 @@
 .leaflet-bar { border: 1px solid var(--line) !important; box-shadow: none !important; }
 .leaflet-bar a { color: var(--ink); }
 .leaflet-control-scale-line { background: rgba(255, 255, 255, .85); border-color: #5E6B78; color: var(--ink); font-size: 11px; }
+/* Crédits des données (obligatoires) : discrets, dans le coin de la carte */
+.leaflet-control-attribution.leaflet-control { background: rgba(255, 255, 255, .85); color: var(--muted); font-size: 11px; padding: 1px 6px; }
+.leaflet-control-attribution a { color: var(--ink); }
 
 /* Fiche d'un lieu (à droite de la carte) */
 .mapcard {
@@ -192,5 +215,4 @@
   .legende { position: static; grid-auto-flow: column; justify-content: start; gap: 6px 16px; border: 0; border-top: 1px solid var(--line); border-radius: 0; }
   .legende b { display: none; }
   .mapcard { position: static; width: auto; max-width: none; border: 0; border-top: 1px solid var(--line); border-radius: 0; box-shadow: none; }
-  .coords { display: none; }
 }

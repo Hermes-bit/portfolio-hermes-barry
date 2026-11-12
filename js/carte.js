@@ -1,7 +1,11 @@
 /* Carte du parcours (page Parcours), avec Leaflet.
-   La carte est affichée en Lambert-93 (EPSG:2154), la projection officielle de la France
-   métropolitaine, grâce à un système de coordonnées (CRS) Leaflet défini ci-dessous.
-   Fond : régions, départements et contour de la France (js/fond-carte-france.js). */
+   Quatre fonds au choix (voir FONDS) :
+   - « Carte simple », le fond par défaut : régions, départements et contour de la France
+     (js/fond-carte-france.js), dessinés par le site en Lambert-93 (EPSG:2154), la projection
+     officielle de la France métropolitaine. Aucune requête vers un service extérieur ;
+   - OpenStreetMap, photos aériennes et Plan IGN : des tuiles en Web Mercator (EPSG:3857),
+     chargées seulement si le visiteur les choisit. La carte est alors reconstruite dans
+     cette projection, à la même place et à la même échelle. */
 
 const ETIQUETTES_REGIONS = [
   ["Hauts-de-France", 49.95, 2.75], ["Normandie", 49.05, 0.1], ["Bretagne", 48.1, -2.9],
@@ -93,7 +97,34 @@ const CRS_LAMBERT93 = L.extend({}, L.CRS.Earth, {
   zoom: (echelle) => Math.log2(echelle * RESOLUTION_ZOOM_0),
   infinite: false,
 });
-const metres = (v) => Math.round(v).toLocaleString("fr-FR");
+/* ---------- Fonds de carte ----------
+   Les crédits s'affichent dans le coin de la carte, comme l'exigent les licences
+   (ODbL pour OpenStreetMap, Licence Ouverte pour l'IGN). */
+const lienSource = (url, texte) => `<a href="${url}" target="_blank" rel="noopener">${texte}</a>`;
+const SOURCE_IGN = lienSource("https://geoservices.ign.fr/", "IGN");
+// Géoplateforme de l'IGN : tuiles WMTS en Web Mercator (jeu de tuiles « PM »), sans clé.
+const tuilesIGN = (couche, format) => "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0"
+  + `&LAYER=${couche}&STYLE=normal&TILEMATRIXSET=PM&FORMAT=${format}&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}`;
+const FONDS = {
+  simple: { nom: "Carte simple", credit: `Sources : ${SOURCE_IGN}, Admin Express` },
+  osm: {
+    nom: "OpenStreetMap",
+    tuiles: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    credit: `© les contributeurs ${lienSource("https://www.openstreetmap.org/copyright", "OpenStreetMap")}`,
+  },
+  ortho: {
+    nom: "Photos aériennes",
+    tuiles: tuilesIGN("ORTHOIMAGERY.ORTHOPHOTOS", "image/jpeg"),
+    credit: `© ${SOURCE_IGN}, Géoplateforme`,
+  },
+  plan: {
+    nom: "Plan IGN",
+    tuiles: tuilesIGN("GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2", "image/png"),
+    credit: `© ${SOURCE_IGN}, Géoplateforme`,
+  },
+};
+let fondActif = "simple";
+let lieuActif = null; // lieu dont la fiche est ouverte : elle reste ouverte quand on change de fond
 
 /* ---------- Éléments HTML ---------- */
 
@@ -120,13 +151,17 @@ function pageParcours() {
   const antechronologique = [...ORDRE].reverse().map(lieu);
   return `<div class="wrap"><section class="bloc">
     <h1 class="titre-page">Parcours</h1>
-    <p class="chapo">Six lieux entre 2019 et 2026, numérotés dans l'ordre chronologique. Cliquez sur un lieu pour voir ce que j'y ai fait.</p>
+    <p class="chapo">Six lieux entre 2019 et 2026, numérotés dans l'ordre chronologique. Cliquez sur un lieu pour voir ce que j'y ai fait, et changez de fond de carte avec les boutons au-dessus de la carte.</p>
     <!-- Sur grand écran, la liste des lieux se range à droite de la carte (voir .parcours-grille) -->
     <div class="parcours-grille">
     <figure class="planche">
       <div class="planche-titre">
         <span>Lieux de formation et d'alternance, 2019-2026</span>
         <button class="planche-bouton" id="resetbtn" type="button">Vue d'ensemble</button>
+      </div>
+      <div class="planche-fonds" role="group" aria-label="Fond de carte">
+        <span>Fond</span>
+        ${Object.entries(FONDS).map(([id, f]) => `<button type="button" data-fond="${id}" aria-pressed="${id === fondActif}">${f.nom}</button>`).join("")}
       </div>
       <div class="mapstage">
         <div id="map" aria-label="Carte des lieux de formation et d'alternance"></div>
@@ -139,10 +174,6 @@ function pageParcours() {
         </div>
         <div class="mapcard" id="mapcard" hidden></div>
       </div>
-      <figcaption class="planche-pied">
-        <span>Projection : RGF93 / Lambert-93 (EPSG:2154). Sources : IGN, Admin Express (via france-geojson). Réalisation : H. Barry, 2026.</span>
-        <span class="coords" id="coords">Coordonnées du curseur en Lambert-93</span>
-      </figcaption>
     </figure>
     <div class="places">${antechronologique.map((p) => `
       <button type="button" class="place" data-place="${p.id}">${logoOuNumero(p)}<div>
@@ -158,46 +189,61 @@ function pageParcours() {
 
 /* ---------- Carte ---------- */
 
-function initCarte() {
+// vue : { centre, zoom, molette } quand la carte est reconstruite pour changer de fond.
+// (Appelée sans vue à l'ouverture de la page : requestAnimationFrame lui passe alors un nombre.)
+function initCarte(vue) {
+  const reconstruction = Boolean(vue && vue.centre);
+  if (!reconstruction) lieuActif = null;
   fermerCarte();
   marqueurs = {};
   regions = {};
   const conteneur = document.getElementById("map");
   if (!conteneur || !window.L) return;
+  const fond = FONDS[fondActif];
+  const tuiles = Boolean(fond.tuiles);
 
   carte = L.map(conteneur, {
-    crs: CRS_LAMBERT93,
+    crs: tuiles ? L.CRS.EPSG3857 : CRS_LAMBERT93,
     renderer: L.svg({ padding: 2.5 }), // marge de rendu : évite les bords vides pendant les déplacements animés
     zoomSnap: 0.25,
     minZoom: 4.25,
-    maxZoom: 11,
+    maxZoom: tuiles ? 18 : 11, // les tuiles permettent de zoomer jusqu'à la rue
     scrollWheelZoom: false, // activé au premier clic, pour ne pas bloquer le défilement de la page
     zoomControl: false,
-    attributionControl: false, // les sources sont indiquées sous la carte
     maxBounds: [[39.5, -9], [52.5, 13]],
     dragging: SURVOL_POSSIBLE || !L.Browser.mobile,
   });
+  carte.attributionControl.setPrefix(false); // seulement les crédits des données
   L.control.zoom({ position: "bottomright", zoomInTitle: "Zoom avant", zoomOutTitle: "Zoom arrière" }).addTo(carte);
   L.control.scale({ position: "bottomright", imperial: false, maxWidth: 120 }).addTo(carte);
-  carte.fitBounds(EMPRISE_FRANCE, MARGES_ENSEMBLE);
-  conteneur.addEventListener("click", () => carte && carte.scrollWheelZoom.enable(), { once: true });
+  if (reconstruction) carte.setView(vue.centre, vue.zoom, { animate: false });
+  else carte.fitBounds(EMPRISE_FRANCE, MARGES_ENSEMBLE);
+  if (reconstruction && vue.molette) carte.scrollWheelZoom.enable();
+  else conteneur.addEventListener("click", () => carte && carte.scrollWheelZoom.enable(), { once: true });
+  conteneur.dataset.fond = fondActif;
 
-  // Fond : aplat des régions (pour mettre en valeur la région du lieu choisi), limites des
-  // départements, puis limites des régions et contour du pays par-dessus.
-  L.geoJSON(FR.r, {
-    style: { stroke: false, fillColor: COULEURS.region, fillOpacity: 1 },
-    interactive: false,
-    onEachFeature: (f, couche) => (regions[f.properties.nom] = couche),
-  }).addTo(carte);
-  L.geoJSON(FR.d, { style: { color: "#D5DBE1", weight: 0.6, fill: false }, interactive: false }).addTo(carte);
-  L.geoJSON(FR.r, { style: { color: "#9FAAB6", weight: 1, fill: false }, interactive: false }).addTo(carte);
-  L.geoJSON(FR.o, { style: { color: "#5E6B78", weight: 1.3, fill: false }, interactive: false }).addTo(carte);
+  if (tuiles) {
+    L.tileLayer(fond.tuiles, { maxZoom: 18, attribution: fond.credit }).addTo(carte);
+  } else {
+    carte.attributionControl.addAttribution(fond.credit);
+    // Fond : aplat des régions (pour mettre en valeur la région du lieu choisi), limites des
+    // départements, puis limites des régions et contour du pays par-dessus.
+    L.geoJSON(FR.r, {
+      style: { stroke: false, fillColor: COULEURS.region, fillOpacity: 1 },
+      interactive: false,
+      onEachFeature: (f, couche) => (regions[f.properties.nom] = couche),
+    }).addTo(carte);
+    L.geoJSON(FR.d, { style: { color: "#D5DBE1", weight: 0.6, fill: false }, interactive: false }).addTo(carte);
+    L.geoJSON(FR.r, { style: { color: "#9FAAB6", weight: 1, fill: false }, interactive: false }).addTo(carte);
+    L.geoJSON(FR.o, { style: { color: "#5E6B78", weight: 1.3, fill: false }, interactive: false }).addTo(carte);
 
-  // zIndexOffset négatif : les noms de régions et de villes restent sous les symboles des lieux.
-  const etiquette = (classe) => ([nom, lat, lon]) =>
-    L.marker([lat, lon], { interactive: false, keyboard: false, zIndexOffset: -1000, icon: L.divIcon({ className: classe, html: `<span>${nom}</span>`, iconSize: [0, 0] }) }).addTo(carte);
-  ETIQUETTES_REGIONS.forEach(etiquette("rlabel"));
-  VILLES.forEach(etiquette("clabel"));
+    // Noms des régions et des villes de repère (les fonds en tuiles ont déjà les leurs).
+    // zIndexOffset négatif : ils restent sous les symboles des lieux.
+    const etiquette = (classe) => ([nom, lat, lon]) =>
+      L.marker([lat, lon], { interactive: false, keyboard: false, zIndexOffset: -1000, icon: L.divIcon({ className: classe, html: `<span>${nom}</span>`, iconSize: [0, 0] }) }).addTo(carte);
+    ETIQUETTES_REGIONS.forEach(etiquette("rlabel"));
+    VILLES.forEach(etiquette("clabel"));
+  }
 
   // Symboles des lieux. Saint-Denis et Paris sont trop proches pour être lisibles à l'échelle
   // de la France : leur symbole est décalé (champ off) et relié au point exact par un trait.
@@ -230,13 +276,17 @@ function initCarte() {
   };
   carte.on("zoomend", majNiveau);
   majNiveau();
+}
 
-  // Coordonnées du curseur : la position est reprojetée en Lambert-93 (aller-retour par la projection).
-  const coords = document.getElementById("coords");
-  carte.on("mousemove", (e) => {
-    const [x, y] = LAMBERT93.projeter(e.latlng.lat, e.latlng.lng);
-    coords.textContent = `X ${metres(x)} m   Y ${metres(y)} m`;
-  });
+// Change de fond en gardant la vue et la fiche ouverte.
+function changerFond(id) {
+  if (!FONDS[id] || id === fondActif) return;
+  fondActif = id;
+  document.querySelectorAll("[data-fond]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.fond === id)));
+  if (!carte) return;
+  const ouvert = lieuActif;
+  initCarte({ centre: carte.getCenter(), zoom: carte.getZoom(), molette: carte.scrollWheelZoom.enabled() });
+  if (ouvert) choisir(ouvert, false);
 }
 
 function fermerCarte() {
@@ -267,6 +317,7 @@ function surligner(id, actif) {
 function choisir(id, deplacer) {
   const p = lieu(id);
   if (!p || !carte) return;
+  lieuActif = id;
   Object.values(regions).forEach((r) => r.setStyle({ fillColor: COULEURS.region }));
   if (regions[p.region]) regions[p.region].setStyle({ fillColor: COULEURS.regionActive });
   PLACES.forEach((q) => {
@@ -283,6 +334,7 @@ function choisir(id, deplacer) {
 function fermerFiche() {
   const carteFiche = document.getElementById("mapcard");
   if (carteFiche) carteFiche.hidden = true;
+  lieuActif = null;
   Object.values(regions).forEach((r) => r.setStyle({ fillColor: COULEURS.region }));
   document.querySelectorAll(".lieu.actif").forEach((el) => el.classList.remove("actif"));
   document.querySelectorAll(".place").forEach((b) => b.classList.remove("on"));
@@ -297,6 +349,8 @@ function vueEnsemble() {
 
 document.addEventListener("click", (e) => {
   if (e.target.closest("#resetbtn")) vueEnsemble();
+  const boutonFond = e.target.closest("[data-fond]");
+  if (boutonFond) changerFond(boutonFond.dataset.fond);
   if (e.target.closest("[data-fermer]")) fermerFiche();
   const carteLieu = e.target.closest(".place");
   if (carteLieu) {
