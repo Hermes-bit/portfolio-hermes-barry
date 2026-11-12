@@ -539,6 +539,15 @@ const SAVOIR_ETRE = [
   { qualite: "Qualités relationnelles", extrait: "unanimement apprécié pour sa bienveillance, sa simplicité et ses qualités relationnelles", lettre: "hub-pnr" },
 ];
 
+/* Centres d'intérêt (page d'accueil, sous le savoir-être). L'illustration de chaque carte est dessinée
+   dans app.js (ILLUSTRATIONS_INTERETS), d'après son id. badge : petite étiquette sur l'illustration. */
+const CENTRES_INTERET = [
+  { id: "lecture", titre: "Lecture", texte: "Des romans à suspense et des thrillers psychologiques, des polars, des drames et des histoires poignantes. Je lis aussi des livres de développement personnel, pour travailler les points que je veux améliorer." },
+  { id: "basket", titre: "Basket-ball", badge: "Niveau pré-national", texte: "J'ai joué au niveau pré-national. Le basket m'a beaucoup appris sur l'intégration dans un groupe et sur l'esprit d'équipe." },
+  { id: "musique", titre: "Musique", texte: "J'aime écouter de la musique." },
+  { id: "decouvertes", titre: "Rencontres et découvertes", texte: "J'aime faire de nouvelles connaissances et découvrir de nouvelles activités." },
+];
+
 /* Formations (page Parcours, sous la carte), de la plus récente à la plus ancienne.
    Sources : programmes IDGEO (CPGEOM 2026-2028, TGEO 2026-2027), fiches RNCP de France Compétences,
    fiche de compétences de la licence (Paris 8, 2017).

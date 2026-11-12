@@ -176,6 +176,44 @@ function sectionSavoirEtre() {
   </section>`;
 }
 
+/* Section « Centres d'intérêt » de l'accueil (données : CENTRES_INTERET). Chaque carte a une illustration
+   dessinée en SVG / CSS, qui s'anime au survol (rien ne bouge si l'utilisateur a réduit les animations). */
+const ILLUSTRATIONS_INTERETS = {
+  // Une étagère : un livre par genre, de hauteurs et couleurs différentes
+  lecture: () => `<div class="etagere">${[
+    ["Thriller", 86, "#2F5D7C"], ["Policier", 72, "#8C3B3B"], ["Drame", 92, "#5B4A8A"],
+    ["Poignant", 66, "#B7720E"], ["Dév. perso", 80, "#157A62"],
+  ].map(([genre, h, c], i) => `<span style="--h:${h}%;--c:${c};--i:${i}">${genre}</span>`).join("")}</div>`,
+  // Un ballon sur un demi-terrain, avec son ombre
+  basket: () => `<svg class="terrain" viewBox="0 0 200 110" aria-hidden="true"><path d="M4 106V4h192v102M100 4v102"/><circle cx="100" cy="55" r="18"/><path d="M4 33h34v44H4M196 33h-34v44h34"/></svg>
+    <span class="ombre-ballon"></span>
+    <svg class="ballon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M6 50h88M50 6v88M20 18c15 13 15 51 0 64M80 18c-15 13-15 51 0 64"/></svg>`,
+  // Un égaliseur de neuf barres et une note
+  musique: () => `<svg class="note" viewBox="0 0 40 50" aria-hidden="true"><path d="M14 40V8l22-5v31"/><ellipse cx="9" cy="40" rx="7" ry="5.5"/><ellipse cx="31" cy="35" rx="7" ry="5.5"/></svg>
+    <div class="egaliseur">${[45, 75, 55, 95, 65, 85, 40, 70, 50].map((h, i) => `<i style="--h:${h}%;--d:${(i % 4) * -0.18}s"></i>`).join("")}</div>`,
+  // Un itinéraire en pointillés entre trois repères (clin d'œil de géomaticien)
+  decouvertes: () => `<svg class="itineraire" viewBox="0 0 220 120" aria-hidden="true">
+      <path class="trace" d="M30 98C60 42 90 112 112 72S170 32 190 54"/>
+      ${[[30, 98, "Rencontres", "start"], [112, 72, "Activités", "middle"], [190, 54, "Et ensuite ?", "end"]]
+        .map(([x, y, txt, ancre], i) => `<g class="repere r${i}"><path d="M${x} ${y}c-7-9-11-14-11-19a11 11 0 0 1 22 0c0 5-4 10-11 19z"/><circle cx="${x}" cy="${y - 19}" r="4"/>
+          <text x="${x + (ancre === "start" ? -12 : ancre === "end" ? 12 : 0)}" y="${y - 36}" text-anchor="${ancre}">${txt}</text></g>`).join("")}
+    </svg>`,
+};
+
+function sectionInterets() {
+  if (!CENTRES_INTERET.length) return "";
+  const carte = (c) => `<li class="interet interet-${c.id}">
+      <div class="interet-illu" aria-hidden="true">${(ILLUSTRATIONS_INTERETS[c.id] || (() => ""))()}${c.badge ? `<b class="interet-badge">${c.badge}</b>` : ""}</div>
+      <h3>${c.titre}</h3>
+      <p>${c.texte}</p>
+    </li>`;
+  return `<section class="bloc">
+    <h2>Centres d'intérêt</h2>
+    <p class="chapo">Ce que je fais quand je ne suis pas devant une carte.</p>
+    <ul class="interets">${CENTRES_INTERET.map(carte).join("")}</ul>
+  </section>`;
+}
+
 /* Section « Formation » de la page Parcours (données : FORMATIONS dans donnees.js). */
 function sectionFormations() {
   const formation = (f) => {
@@ -351,6 +389,8 @@ const PAGES = {
       </section>
 
       ${sectionSavoirEtre()}
+
+      ${sectionInterets()}
     </div>`;
   },
 

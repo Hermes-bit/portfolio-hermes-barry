@@ -290,6 +290,89 @@ main { padding-bottom: 96px; min-height: 60vh; }
 @media (max-width: 1000px) { .savoir-etre { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .savoir-etre { grid-template-columns: 1fr; gap: 16px; } }
 
+/* ---------- Centres d'intérêt : une carte illustrée par passion, animée au survol ---------- */
+.interets { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+.interet { display: flex; flex-direction: column; gap: 10px; padding: 16px 16px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.interet:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 16px 34px rgba(9, 20, 35, .16); }
+.interet h3 { margin: 6px 8px 0; font-size: 1.2rem; }
+.interet p { margin: 0 8px; color: var(--muted); line-height: 1.55; }
+.interet-illu {
+  position: relative;
+  height: 160px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 9%, var(--bg));
+}
+.interet-badge { position: absolute; bottom: 10px; left: 10px; padding: 3px 10px; border-radius: 6px; background: var(--navy); color: #FFB15C; font-size: .78rem; letter-spacing: .02em; }
+
+/* Lecture : une étagère de livres ; au survol, les livres se soulèvent l'un après l'autre */
+.etagere { display: flex; align-items: flex-end; gap: 5px; height: 122px; padding: 0 10px; border-bottom: 6px solid #8A6A45; border-radius: 0 0 3px 3px; }
+.etagere span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: var(--h);
+  border-radius: 3px 3px 1px 1px;
+  background: var(--c);
+  box-shadow: inset -4px 0 0 rgba(0, 0, 0, .18), inset 0 6px 0 rgba(255, 255, 255, .14);
+  color: #FFFFFF;
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  transition: transform .3s ease;
+  transition-delay: calc(var(--i) * 60ms);
+}
+.interet-lecture:hover .etagere span { transform: rotate(180deg) translateY(10px); }
+.interet-lecture:hover .etagere span:nth-child(3) { transform: rotate(180deg) translateY(16px) rotate(-4deg); }
+
+/* Basket : demi-terrain en traits fins, ballon qui rebondit au survol */
+.terrain { position: absolute; inset: 14px; width: calc(100% - 28px); height: calc(100% - 28px); fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: .35; }
+.ballon { position: relative; width: 66px; height: 66px; margin-bottom: 18px; }
+.ballon circle { fill: #E07B2A; stroke: #6E3510; stroke-width: 3; }
+.ballon path { fill: none; stroke: #6E3510; stroke-width: 3; stroke-linecap: round; }
+.ombre-ballon { position: absolute; bottom: 30px; width: 46px; height: 8px; border-radius: 50%; background: rgba(9, 20, 35, .25); }
+.interet-basket:hover .ballon { animation: rebond .8s cubic-bezier(.45, 0, .55, 1) infinite; }
+.interet-basket:hover .ombre-ballon { animation: ombre .8s cubic-bezier(.45, 0, .55, 1) infinite; }
+@keyframes rebond { 0%, 100% { transform: translateY(0) scale(1.06, .94); } 50% { transform: translateY(-38px) rotate(160deg); } }
+@keyframes ombre { 0%, 100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(.55); opacity: .45; } }
+
+/* Musique : égaliseur ; au survol, les barres dansent */
+.interet-musique .interet-illu { grid-template-columns: auto auto; justify-content: center; gap: 22px; }
+.note { width: 38px; height: 48px; fill: var(--accent); stroke: var(--accent); stroke-width: 3; }
+.note path { fill: none; }
+.egaliseur { display: flex; align-items: flex-end; gap: 5px; height: 90px; }
+.egaliseur i { width: 9px; height: var(--h); border-radius: 3px; background: linear-gradient(var(--navy-accent), var(--accent)); transform-origin: bottom; }
+.interet-musique:hover .egaliseur i { animation: danse .6s ease-in-out infinite alternate; animation-delay: var(--d); }
+@keyframes danse { from { transform: scaleY(.3); } to { transform: scaleY(1.05); } }
+
+/* Rencontres et découvertes : un itinéraire en pointillés entre trois repères ; au survol, on avance */
+.itineraire { width: 100%; height: 100%; padding: 6px 4px; overflow: visible; }
+.itineraire .trace { fill: none; stroke: var(--muted); stroke-width: 2.5; stroke-dasharray: 2 7; stroke-linecap: round; }
+.itineraire .repere path { stroke: rgba(0, 0, 0, .2); stroke-width: 1; }
+.itineraire .r0 path { fill: var(--accent); }
+.itineraire .r1 path { fill: #B7720E; }
+.itineraire .r2 path { fill: #8C3B3B; }
+.itineraire .repere circle { fill: #FFFFFF; }
+.itineraire text { fill: var(--ink); font: 700 11.5px var(--sans); }
+.itineraire .repere { transition: transform .3s ease; transform-box: fill-box; transform-origin: bottom; }
+.interet-decouvertes:hover .trace { animation: marche 1.4s linear infinite; }
+.interet-decouvertes:hover .r2 { transform: translateY(-4px); }
+@keyframes marche { to { stroke-dashoffset: -36; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .interet, .etagere span, .itineraire .repere { transition: none; }
+  .interet:hover, .interet-lecture:hover .etagere span, .interet-decouvertes:hover .r2 { transform: none; }
+  .interet-lecture:hover .etagere span { transform: rotate(180deg); }
+  .interet-basket:hover .ballon, .interet-basket:hover .ombre-ballon, .interet-musique:hover .egaliseur i, .interet-decouvertes:hover .trace { animation: none; }
+}
+@media (max-width: 1100px) { .interets { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .interets { grid-template-columns: 1fr; gap: 16px; } }
+
 /* Langues : même carte que les compétences, une colonne par langue */
 .langues { margin-top: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 28px; }
 .langues h3 { font-size: 1.25rem; margin-bottom: 16px; }
