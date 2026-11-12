@@ -303,7 +303,7 @@ const PROJETS = [
     lieu: "Gennevilliers (92)",
     ll: [48.933, 2.293],
     couverture: null,
-    resume: "Une application qui calcule l'itinéraire selon l'effort réel (pentes, marches, bordures de trottoir) et guide la personne dans l'image de la caméra, à la voix ou en vibrations.",
+    resume: "Une application qui calcule l'itinéraire selon l'effort réel (pentes, marches, bordures de trottoir) et guide la personne dans l'image de la caméra, à la voix ou en vibrations. Les obstacles sont repérés par un modèle de détection que j'entraîne moi-même.",
     liens: [
       { texte: "Ouvrir la démo", url: "https://hermes-bit.github.io/vision-ar-demo/", note: "La démo est faite pour un téléphone. Le guidage suit le GPS : il ne fonctionne vraiment que sur place, à Gennevilliers." },
     ],
@@ -316,6 +316,8 @@ const PROJETS = [
       "Le schéma de la base est construit par des migrations numérotées : réseau piéton, signalements d'obstacles, équipements (ascenseurs, entrées et toilettes accessibles, places PMR), calcul d'itinéraire.",
       "Pour la démonstration, j'ai exporté le réseau piéton de Gennevilliers depuis OpenStreetMap : 8 798 tronçons, dont les pentes sont calculées avec le RGE ALTI de l'IGN. La démo web reprend en JavaScript le moteur d'itinéraire du serveur Python, et un test automatique vérifie que les deux donnent les mêmes résultats sur ce réseau.",
       "Dans la démo, le guidage s'affiche dans l'image de la caméra : l'itinéraire est dessiné au sol, et les obstacles, marches et ascenseurs sont signalés. Si l'on s'écarte du trajet, un nouvel itinéraire est calculé. Les applications Android du téléphone et des lunettes sont écrites en Kotlin.",
+      "J'entraîne moi-même le modèle qui reconnaît les obstacles dans l'image de la caméra. Je filme mes trajets à pied avec le téléphone ; un script Python extrait deux images par seconde de ces vidéos et écarte les images floues et les quasi-doublons. J'annote ensuite les obstacles dans Roboflow, puis j'entraîne un modèle YOLO11 sur Google Colab. La première version reconnaît huit classes : potelets, poteaux, barrières, mobilier urbain, travaux, deux-roues et voitures stationnés sur le trottoir, piétons arrêtés. Les trottoirs abaissés viendront avec la version suivante.",
+      "Le modèle est exporté au format ONNX et tourne directement dans le navigateur du téléphone. L'appli ne retient que les obstacles situés dans le couloir de marche, estime leur distance d'après leur position dans l'image et les annonce à la voix. Chaque nouvelle version est mesurée sur un jeu de test qui ne change jamais, avec un objectif : détecter au moins 90 % des potelets.",
     ],
     visuels: [
       { src: "assets/projets/vision-ar-demo.webp", format: "telephone", legende: "La démo en ligne, avec une position simulée à Gennevilliers : choix du profil fauteuil roulant, recherche d'une destination, puis l'itinéraire le plus accessible (1,2 km, aucune marche, pente maximale de 2,8 %)." },
@@ -331,7 +333,7 @@ const PROJETS = [
       "La difficulté qui me résiste encore : faire coïncider exactement le ruban dessiné dans l'image de la caméra avec le sol réel. Le dessin est calculé à partir de la position GPS, de la boussole, de l'inclinaison du téléphone et de sa hauteur (debout ou en fauteuil) ; la moindre imprécision de l'un de ces éléments décale le ruban, et le GPS n'est précis qu'à quelques mètres.",
       "Je n'ai pas encore trouvé la solution. Je regarde pour l'instant comment d'autres projets de réalité augmentée, confrontés au même problème, l'ont traité.",
     ],
-    outils: ["Python (FastAPI)", "PostgreSQL / PostGIS / pgRouting", "Kotlin / Jetpack Compose", "JavaScript", "Leaflet", "OpenStreetMap", "RGE ALTI (IGN)", "GitHub Actions"],
+    outils: ["Python (FastAPI)", "PostgreSQL / PostGIS / pgRouting", "Kotlin / Jetpack Compose", "JavaScript", "Leaflet", "OpenStreetMap", "RGE ALTI (IGN)", "Roboflow", "YOLO11 (Ultralytics)", "Google Colab", "ONNX Runtime Web", "GitHub Actions"],
   },
   {
     id: "ideomes",
