@@ -273,11 +273,21 @@ function pageParcours() {
         <div class="mapcard" id="mapcard" hidden></div>
       </div>
     </figure>
-    <div class="places">${antechronologique.map((p) => `
-      <button type="button" class="place" data-place="${p.id}">${logoOuNumero(p)}<div>
-        <div class="row"><span class="row-debut">${LOGOS[p.id] ? forme(p) : ""}<span class="kind ${p.kind}">${p.kind === "pro" ? "Alternance" : "Formation"}</span></span><span class="dates">${p.dates}</span></div>
-        <b>${p.org}</b><span class="where">${p.city}</span><div class="rl">${p.role}</div>
-      </div></button>`).join("")}
+    <!-- Frise des six lieux, du plus récent au plus ancien : chaque étape porte le même symbole
+         numéroté que sur la carte ; un clic l'ouvre sur la carte (voir « Interactions »). -->
+    <div class="frise-bloc">
+      <p class="frise-titre">Du plus récent au plus ancien</p>
+      <ol class="frise">${antechronologique.map((p) => `
+        <li><button type="button" class="place ${p.kind}" data-place="${p.id}">
+          <span class="frise-noeud">${forme(p)}</span>
+          <span class="frise-carte">
+            <span class="frise-haut"><span class="dates">${p.dates}</span><span class="kind ${p.kind}">${p.kind === "pro" ? "Alternance" : "Formation"}</span></span>
+            <span class="frise-org">${LOGOS[p.id] ? `<span class="logo-lieu"><img src="${LOGOS[p.id]}" alt=""></span>` : ""}
+              <span><b>${p.org}</b><span class="where">${p.city}</span></span></span>
+            <span class="rl">${p.role}</span>
+          </span>
+        </button></li>`).join("")}
+      </ol>
     </div>
     </div>
   </section>

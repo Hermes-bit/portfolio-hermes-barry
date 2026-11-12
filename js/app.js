@@ -780,6 +780,9 @@ document.addEventListener("timeupdate", (e) => {
 // Pied de page fixe : sa hauteur (qui change si les liens passent sur deux lignes) est réservée en bas de la page.
 const pied = document.getElementById("pied");
 new ResizeObserver(() => document.documentElement.style.setProperty("--hauteur-pied", `${pied.offsetHeight}px`)).observe(pied);
+// Même chose pour l'en-tête : la carte du parcours reste collée juste en dessous (carte.css).
+const entete = document.querySelector(".entete");
+new ResizeObserver(() => document.documentElement.style.setProperty("--hauteur-entete", `${entete.offsetHeight}px`)).observe(entete);
 
 // Bouton « revenir en haut » : visible dès qu'on a fait défiler la page de 400 px.
 const boutonHaut = document.getElementById("haut");
