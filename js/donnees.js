@@ -193,6 +193,7 @@ const PROJETS = [
       "J'ai produit un atlas de cartes des ZAEnR destiné aux élus et aux communes.",
       "J'ai participé à la mise en place du SIG mutualisé sur QGIS Cloud, et j'y ai intégré des flux WMTS : le cadastre de la collectivité, le PLUi et les fonds de l'IGN.",
       "J'ai aussi travaillé sur les cartes de randonnée pédestre de l'office du tourisme.",
+      "Enfin, j'ai réalisé les cartes de la construction des city-stades : elles ont donné aux agents de la CCOV une vue d'ensemble des communes choisies pour les travaux.",
     ],
     // Deux galeries de captures (l'analyse, puis le portail et ses applications) ; l'atlas suit (champ atlas)
     galeries: [
@@ -636,7 +637,7 @@ const PLACES = [
     id: "ccov", kind: "pro", org: "Communauté de communes de l'Ouest Vosgien", city: "Neufchâteau (88)",
     ll: [48.3556, 5.6966], off: [0, 0], region: "Grand Est", dates: "Sept. 2023 – oct. 2024",
     role: "Technicien géomatique (alternance)",
-    missions: ["Analyse spatiale pour les zones d'accélération des EnR", "Atlas cartographique des ZAEnR", "Base de données SIG mutualisée", "Intégration de flux WMS, WFS et WMTS", "Cartes de randonnée pour l'office du tourisme"],
+    missions: ["Analyse spatiale pour les zones d'accélération des EnR", "Atlas cartographique des ZAEnR", "Base de données SIG mutualisée", "Intégration de flux WMS, WFS et WMTS", "Cartes de randonnée pour l'office du tourisme", "Cartes de la construction des city-stades"],
     project: "zaenr",
   },
   {
