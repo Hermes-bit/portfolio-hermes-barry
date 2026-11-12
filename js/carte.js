@@ -128,16 +128,22 @@ let fondActif = "simple";
 let lieuActif = null; // lieu dont la fiche est ouverte : elle reste ouverte quand on change de fond
 
 /* ---------- Limites administratives sur les fonds en tuiles ----------
-   - Vue large (zoom < 10) : régions et départements du fond de la carte simple (js/fond-carte-france.js).
-   - En zoomant : les communes de la vue, demandées au service WFS de l'IGN (Admin Express COG CARTO,
-     version « petite échelle » puis version détaillée à partir du zoom 13).
-     Les limites de départements et de régions sont déduites des communes : deux communes voisines
+   Les traits doivent tomber exactement sur les limites des fonds : la version des contours
+   dépend donc du zoom (écarts mesurés par rapport aux contours complets de l'IGN).
+   - Jusqu'au zoom 12 : limites des départements et des régions préparées à l'avance
+     (assets/donnees/limites-departements-regions.json). Source : IGN, Admin Express COG CARTO ;
+     seuls les côtés partagés entre deux départements sont gardés (côtes et frontières sont
+     déjà sur les fonds), simplifiés à 40 m et encodés en « polyline ».
+   - À partir du zoom 12 : les communes de la zone affichée, demandées au service WFS de l'IGN
+     (Admin Express COG CARTO, à 5 m près ; contours complets à partir du zoom 15).
+     Les limites des départements et des régions en sont déduites : deux communes voisines
      partagent exactement les mêmes sommets, et un côté commun à deux communes de départements
      (ou de régions) différents est une limite de département (ou de région). */
-const ZOOM_COMMUNES = 10;
-const ZOOM_COMMUNES_DETAILLEES = 13;
+const ZOOM_COMMUNES = 12;
+const ZOOM_COMMUNES_PRECISES = 15;
+const FICHIER_LIMITES = "assets/donnees/limites-departements-regions.json";
 const STYLES_LIMITES = {
-  commune: { weight: 1, halo: 3, dashArray: "5 4", opacity: 0.9 },
+  commune: { weight: 1.3, halo: 3.5, dashArray: "6 4", opacity: 1 },
   departement: { weight: 1.4, halo: 3.5, opacity: 1 },
   region: { weight: 2.8, halo: 6.5, opacity: 1 },
 };
@@ -147,45 +153,116 @@ const urlCommunes = (jeu, b) => "https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSI
   + "&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=5000"
   + `&BBOX=${[b.getSouth(), b.getWest(), b.getNorth(), b.getEast()].map((v) => v.toFixed(4)).join(",")},urn:ogc:def:crs:EPSG::4326`;
 let limites = null; // état des limites de la carte affichée (fonds en tuiles seulement)
+let limitesFrance = null; // promesse du fichier des limites départementales et régionales (chargé une fois)
 
 // Chaque niveau est tracé deux fois : un liseré blanc dessous, pour rester lisible sur les photos aériennes.
-function tracerLimite(groupe, niveau, ajouter) {
+function tracerLimite(groupe, niveau, lignes) {
+  if (!lignes.length) return;
   const s = STYLES_LIMITES[niveau];
-  ajouter({ color: "#FFFFFF", weight: s.halo, opacity: 0.6, fill: false, interactive: false }).addTo(groupe);
-  ajouter({ color: COULEUR_LIMITES, weight: s.weight, opacity: s.opacity, dashArray: s.dashArray, fill: false, interactive: false }).addTo(groupe);
+  L.polyline(lignes, { color: "#FFFFFF", weight: s.halo, opacity: 0.6, interactive: false }).addTo(groupe);
+  L.polyline(lignes, { color: COULEUR_LIMITES, weight: s.weight, opacity: s.opacity, dashArray: s.dashArray, interactive: false }).addTo(groupe);
 }
 
-// Communes (GeoJSON) → segments classés par niveau : { commune: [...], departement: [...], region: [...] }.
+// Décodage du format « polyline » (précision 1e-5) : texte → [[lat, lon], ...]
+function decoderPolyline(texte) {
+  const points = [];
+  let i = 0;
+  let lat = 0;
+  let lon = 0;
+  while (i < texte.length) {
+    const ecarts = [0, 0].map(() => {
+      let valeur = 0;
+      let decalage = 0;
+      let octet;
+      do {
+        octet = texte.charCodeAt(i++) - 63;
+        valeur |= (octet & 0x1f) << decalage;
+        decalage += 5;
+      } while (octet >= 0x20);
+      return valeur & 1 ? ~(valeur >> 1) : valeur >> 1;
+    });
+    lat += ecarts[0];
+    lon += ecarts[1];
+    points.push([lat / 1e5, lon / 1e5]);
+  }
+  return points;
+}
+
+function chargerLimitesFrance() {
+  if (!limitesFrance) {
+    limitesFrance = fetch(FICHIER_LIMITES)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`limites ${r.status}`))))
+      .then((d) => ({ departement: d.departement.map(decoderPolyline), region: d.region.map(decoderPolyline) }))
+      .catch((erreur) => {
+        limitesFrance = null; // nouvel essai au prochain affichage
+        throw erreur;
+      });
+  }
+  return limitesFrance;
+}
+
+// Communes (GeoJSON) → lignes par niveau : { commune: [...], departement: [...], region: [...] }.
+// Chaque côté n'est tracé qu'une fois, et les côtés d'un même niveau qui se suivent sur le contour
+// d'une commune forment une seule ligne : les pointillés restent réguliers.
+// Les côtés vus une seule fois (bord de la zone chargée, côte, frontière) ne sont pas tracés.
 function limitesDepuisCommunes(geojson) {
-  const cote = new Map();
+  const cle = (a, b) => {
+    const ka = `${a[0].toFixed(6)},${a[1].toFixed(6)}`;
+    const kb = `${b[0].toFixed(6)},${b[1].toFixed(6)}`;
+    return ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+  };
+  const anneaux = [];
+  const cotes = new Map();
   for (const f of geojson.features) {
     const dep = f.properties.code_insee_du_departement;
     const reg = f.properties.code_insee_de_la_region;
     const polygones = f.geometry.type === "MultiPolygon" ? f.geometry.coordinates : [f.geometry.coordinates];
     for (const anneau of polygones.flat()) {
+      anneaux.push(anneau);
       for (let i = 1; i < anneau.length; i++) {
-        const a = anneau[i - 1];
-        const b = anneau[i];
-        const ka = `${a[0].toFixed(6)},${a[1].toFixed(6)}`;
-        const kb = `${b[0].toFixed(6)},${b[1].toFixed(6)}`;
-        const cle = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
-        const deja = cote.get(cle);
-        if (!deja) cote.set(cle, { a, b, dep, reg, niveau: "commune" });
-        else if (deja.reg !== reg) deja.niveau = "region";
-        else if (deja.dep !== dep) deja.niveau = "departement";
+        const k = cle(anneau[i - 1], anneau[i]);
+        const deja = cotes.get(k);
+        if (!deja) cotes.set(k, { dep, reg, niveau: null });
+        else deja.niveau = deja.reg !== reg ? "region" : deja.dep !== dep ? "departement" : "commune";
       }
     }
   }
   const lignes = { commune: [], departement: [], region: [] };
-  for (const s of cote.values()) lignes[s.niveau].push([[s.a[1], s.a[0]], [s.b[1], s.b[0]]]);
+  const traces = new Set();
+  for (const anneau of anneaux) {
+    let ligne = null;
+    let niveauLigne = null;
+    for (let i = 1; i < anneau.length; i++) {
+      const a = anneau[i - 1];
+      const b = anneau[i];
+      const k = cle(a, b);
+      const { niveau } = cotes.get(k);
+      if (!niveau || traces.has(k)) {
+        ligne = null;
+        continue;
+      }
+      traces.add(k);
+      if (ligne && niveau === niveauLigne) ligne.push([b[1], b[0]]);
+      else {
+        ligne = [[a[1], a[0]], [b[1], b[0]]];
+        niveauLigne = niveau;
+        lignes[niveau].push(ligne);
+      }
+    }
+  }
   return lignes;
 }
 
 function initLimites() {
-  const etat = { vueLarge: L.layerGroup(), communes: L.layerGroup(), jeu: null, emprise: null, controleur: null };
-  [[FR.d, "departement"], [FR.r, "region"]].forEach(([donnees, niveau]) =>
-    tracerLimite(etat.vueLarge, niveau, (style) => L.geoJSON(donnees, { style, interactive: false })));
+  const etat = { france: L.layerGroup(), communes: L.layerGroup(), jeu: null, emprise: null, controleur: null };
   limites = etat;
+  chargerLimitesFrance()
+    .then((lignes) => {
+      if (limites !== etat) return; // la carte a changé entre-temps
+      tracerLimite(etat.france, "departement", lignes.departement);
+      tracerLimite(etat.france, "region", lignes.region);
+    })
+    .catch(() => {}); // fichier indisponible : la carte reste utilisable sans ces limites
   carte.on("moveend", majLimites);
   majLimites();
 }
@@ -194,17 +271,20 @@ function majLimites() {
   const etat = limites;
   if (!etat || !carte) return;
   const montrer = (couche, oui) => (oui ? couche.addTo(carte) : couche.remove());
-  if (carte.getZoom() < ZOOM_COMMUNES) {
+  const zoom = carte.getZoom();
+  if (zoom < ZOOM_COMMUNES) {
     montrer(etat.communes, false);
-    montrer(etat.vueLarge, true);
+    montrer(etat.france, true);
     return;
   }
-  // Tant que les premières communes ne sont pas arrivées, la vue large reste affichée.
-  montrer(etat.communes, Boolean(etat.jeu));
-  montrer(etat.vueLarge, !etat.jeu);
-  const jeu = carte.getZoom() >= ZOOM_COMMUNES_DETAILLEES ? "ADMINEXPRESS-COG-CARTO.LATEST" : "ADMINEXPRESS-COG-CARTO-PE.LATEST";
   const vue = carte.getBounds();
-  if (etat.jeu === jeu && etat.emprise.contains(vue)) return; // déjà chargé
+  const couvert = etat.jeu !== null && etat.emprise.contains(vue);
+  // Les communes déjà chargées restent affichées ; tant qu'elles ne couvrent pas toute la vue,
+  // les limites des départements et des régions restent visibles aussi.
+  montrer(etat.communes, etat.jeu !== null);
+  montrer(etat.france, !couvert);
+  const jeu = zoom >= ZOOM_COMMUNES_PRECISES ? "ADMINEXPRESS-COG.LATEST" : "ADMINEXPRESS-COG-CARTO.LATEST";
+  if (couvert && etat.jeu === jeu) return; // déjà chargé
   if (etat.controleur) etat.controleur.abort();
   const controleur = new AbortController();
   etat.controleur = controleur;
@@ -215,13 +295,11 @@ function majLimites() {
       if (limites !== etat || etat.controleur !== controleur) return; // la carte a changé entre-temps
       const lignes = limitesDepuisCommunes(geojson);
       etat.communes.clearLayers();
-      ["commune", "departement", "region"].forEach((niveau) => {
-        if (lignes[niveau].length) tracerLimite(etat.communes, niveau, (style) => L.polyline(lignes[niveau], style));
-      });
+      ["commune", "departement", "region"].forEach((niveau) => tracerLimite(etat.communes, niveau, lignes[niveau]));
       Object.assign(etat, { jeu, emprise, controleur: null });
       majLimites();
     })
-    .catch(() => {}); // service indisponible ou requête annulée : la carte reste utilisable sans les communes
+    .catch(() => {}); // service indisponible ou requête annulée : les limites départementales restent
 }
 
 /* ---------- Éléments HTML ---------- */
@@ -331,7 +409,19 @@ function initCarte(vue) {
   conteneur.dataset.fond = fondActif;
 
   if (tuiles) {
-    L.tileLayer(fond.tuiles, { maxZoom: 18, attribution: fond.credit }).addTo(carte);
+    const couche = L.tileLayer(fond.tuiles, { maxZoom: 18, keepBuffer: 3, attribution: fond.credit }).addTo(carte);
+    // Le serveur de tuiles répond parfois par une erreur passagère : sans nouvel essai, la tuile
+    // resterait grise. Elle est redemandée jusqu'à trois fois, de plus en plus espacées.
+    couche.on("tileerror", ({ tile, coords }) => {
+      const essai = Number(tile.dataset.essai || 0) + 1;
+      if (essai > 3) return;
+      tile.dataset.essai = essai;
+      setTimeout(() => {
+        if (!tile.isConnected) return; // tuile retirée entre-temps (déplacement, zoom)
+        const url = couche.getTileUrl(coords);
+        tile.src = `${url}${url.includes("?") ? "&" : "?"}essai=${essai}`;
+      }, 500 * essai);
+    });
     carte.attributionControl.addAttribution(`Limites : ${SOURCE_IGN}, Admin Express`);
     initLimites();
   } else {
