@@ -336,7 +336,7 @@ function pageCartotheque() {
     const projet = c.projet && PROJETS.find((p) => p.id === c.projet);
     return `<figure class="carte-planche" data-type-enr="${c.serie}">
       <a class="carte-papier" href="${c.src}" target="_blank" rel="noopener" title="Ouvrir la carte en grand"><img src="${c.vignette || c.src}" alt="${c.titre} : ${c.legende}" loading="lazy"></a>
-      <figcaption><b>${c.titre}</b><span>${c.legende}${c.annee ? ` (${c.annee})` : ""}</span>
+      <figcaption><b>${c.titre}</b><span>${c.legende}${c.annee ? ` Carte réalisée en ${c.annee}.` : ""}</span>
         ${projet ? `<a class="carto-projet" href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}</figcaption>
     </figure>`;
   };

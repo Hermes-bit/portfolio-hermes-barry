@@ -210,6 +210,16 @@ const PROJETS = [
         ],
       },
       {
+        titre: "Les besoins de chaleur",
+        intro: "Mes premières cartes de géomaticien : les besoins de chaleur du tertiaire, estimés secteur par secteur, avec ce qui peut y répondre (méthaniseurs existants, réseau de gaz, zones éligibles à la géothermie de minime importance).",
+        format: "carte",
+        images: [
+          { src: "assets/projets/zaenr-chaleur-secteur-nord.jpg", vignette: "assets/projets/zaenr-chaleur-secteur-nord-vignette.jpg", titre: "Secteur nord", legende: "De Domrémy-la-Pucelle à Harmonville : besoins de chaleur du tertiaire, trois méthaniseurs existants et le réseau de gaz qui traverse le secteur." },
+          { src: "assets/projets/zaenr-chaleur-secteur-est.jpg", vignette: "assets/projets/zaenr-chaleur-secteur-est-vignette.jpg", titre: "Secteur est", legende: "D'Harchéchamp à Dommartin-sur-Vraine : besoins de chaleur du tertiaire, méthaniseurs existants, réseau de gaz et une zone éligible à la géothermie de minime importance." },
+          { src: "assets/projets/zaenr-chaleur-secteur-ouest.jpg", vignette: "assets/projets/zaenr-chaleur-secteur-ouest-vignette.jpg", titre: "Secteur ouest", legende: "De Trampot à Liffol-le-Grand, où se concentrent les besoins de chaleur du secteur, près d'un méthaniseur existant et du réseau de gaz." },
+        ],
+      },
+      {
         titre: "Le portail EnR et ses applications",
         intro: "La carte montée dans GEO Générateur, puis le portail EnR et ses deux applications : la consultation des zones d'accélération, et la saisie, réservée aux gestionnaires du portail.",
         format: "ecran",
@@ -471,7 +481,7 @@ const COMPETENCES = [
   {
     titre: "SIG et bases de données",
     lignes: [
-      ["SIG", "QGIS, ArcGIS Pro, ArcMap"],
+      ["SIG", "QGIS, ArcGIS Pro, ArcMap, GEO (Business Geografic)"],
       ["Bases de données", "PostgreSQL / PostGIS, SQL, Oracle"],
       ["Administration", "pgAdmin, DBeaver"],
       ["ETL", "FME, KNIME, Data Interoperability, GDAL / ogr2ogr"],
@@ -551,7 +561,16 @@ const SAVOIR_ETRE = [
        annee: "2026",                                  // facultatif
        projet: "vision-ar" }                           // facultatif : id du projet lié (lien « Voir le projet »)
 */
-const CARTES = [];
+const CARTES = [
+  {
+    src: "assets/cartes/burkina-terrorisme-2017-2023.jpg",
+    vignette: "assets/cartes/burkina-terrorisme-2017-2023-vignette.jpg",
+    titre: "Le terrorisme au Burkina Faso, 2017-2023",
+    legende: "Les événements meurtriers attribués à l'État islamique entre 2017 et 2023, d'après les données de l'UCDP, sur le fond des provinces. Ils se concentrent dans le nord et l'est du pays (Oudalan, Séno, Soum, Yagha). Un extrait de la table attributaire donne le nombre de morts par événement.",
+    serie: "Cartes personnelles",
+    annee: "2024",
+  },
+];
 
 /* Centres d'intérêt (page d'accueil, sous le savoir-être). L'illustration de chaque carte est dessinée
    dans app.js (ILLUSTRATIONS_INTERETS), d'après son id. badge : petite étiquette sur l'illustration. */
