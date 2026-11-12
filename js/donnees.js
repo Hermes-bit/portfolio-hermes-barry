@@ -33,6 +33,9 @@ const PROFIL = {
    visuels : soit { src, legende } pour une image, soit "[[...]]" pour une image à ajouter.
      Ajouter format: "telephone" pour une capture de téléphone : elles sont réunies dans une vitrine,
      numérotées dans l'ordre du tableau, avec titre (court, sous l'écran) et légende (liste en dessous).
+   galeries : sections d'images séparées, chacune { titre, intro, format, images: [{ src, titre, legende, vignette? }] }.
+     format "ecran" : captures présentées dans une fenêtre de navigateur (titre dans la barre) ;
+     format "carte" : cartes présentées comme des planches (vignette = version allégée affichée dans la page).
    vignette : image de la carte du projet (liste des projets) quand il n'y a pas de couverture.
      Ajouter fond: "#couleur" pour afficher l'image entière (un logo par exemple) sur ce fond, sans recadrage.
    perso : true pour un projet personnel (rubrique « Projets personnels » de la page Projets).
@@ -113,17 +116,32 @@ const PROJETS = [
       "Les données sont diffusées sur le portail ArcGIS Enterprise de la Région, réservé aux agents. Un site Enterprise Sites présente l'ensemble des parcs, et chaque parc a son application Experience Builder, organisée en quatre pages : fiche d'identité, démographie, environnement et économie.",
       "J'ai produit des cartes thématiques et des cartes interactives à partir de la base.",
     ],
-    visuels: [
-      { src: "assets/projets/hub-pnr-accueil.jpg", legende: "La page d'accueil de la plateforme des PNR de Nouvelle-Aquitaine : les cinq parcs labellisés, chacun avec sa date de création et un lien vers sa page." },
-      { src: "assets/projets/hub-pnr-projets-de-parcs.jpg", legende: "Les trois projets de parc en cours (Gâtine poitevine, Marais du Littoral charentais, Montagne basque), signalés par une étiquette « projet »." },
-      { src: "assets/projets/hub-pnr-page-millevaches.jpg", legende: "La page du PNR de Millevaches en Limousin : l'accès à la cartographie des indicateurs du parc et les chiffres clés (création en 2004, 124 communes, 38 746 habitants en 2023)." },
-      { src: "assets/projets/hub-pnr-application-demographie.jpg", legende: "L'application du PNR de Millevaches, rubrique Démographie : nombre d'habitants par commune en 2023. Les onglets mènent à l'évolution de la population 2008-2023, à la densité et à la grille communale de densité." },
-      { src: "assets/projets/hub-pnr-experience-builder.jpg", legende: "La même application en construction dans Experience Builder : quatre pages (fiche d'identité, démographie, environnement, économie) et les chiffres clés à côté de la carte." },
-      { src: "assets/projets/hub-pnr-code-html.jpg", legende: "La mise en page des tuiles de la page d'accueil, écrite en HTML et CSS dans l'éditeur de code du site." },
-      { src: "assets/projets/hub-pnr-marais-poitevin.jpg", legende: "PNR du Marais poitevin : 88 communes et 8 intercommunalités au 1er janvier 2026, à cheval sur la Nouvelle-Aquitaine et les Pays de la Loire." },
-      { src: "assets/projets/hub-pnr-medoc.jpg", legende: "PNR Médoc : 51 communes et 4 intercommunalités au 1er janvier 2026." },
-      { src: "assets/projets/hub-pnr-millevaches.jpg", legende: "PNR de Millevaches en Limousin : 124 communes et 9 intercommunalités au 1er janvier 2026." },
-      { src: "assets/projets/hub-pnr-landes-de-gascogne.jpg", legende: "PNR des Landes de Gascogne : 94 communes et 7 intercommunalités au 1er janvier 2026." },
+    // Deux galeries séparées : les captures d'écran de la plateforme, puis les cartes d'exemple
+    galeries: [
+      {
+        titre: "Captures de la plateforme",
+        intro: "Le site qui présente les parcs, l'application d'un parc, puis les coulisses : sa construction dans Experience Builder et le code de la page d'accueil.",
+        format: "ecran",
+        images: [
+          { src: "assets/projets/hub-pnr-accueil.jpg", titre: "Accueil de la plateforme", legende: "La page d'accueil de la plateforme des PNR de Nouvelle-Aquitaine : les cinq parcs labellisés, chacun avec sa date de création et un lien vers sa page." },
+          { src: "assets/projets/hub-pnr-projets-de-parcs.jpg", titre: "Projets de parc", legende: "Les trois projets de parc en cours (Gâtine poitevine, Marais du Littoral charentais, Montagne basque), signalés par une étiquette « projet »." },
+          { src: "assets/projets/hub-pnr-page-millevaches.jpg", titre: "Page d'un parc", legende: "La page du PNR de Millevaches en Limousin : l'accès à la cartographie des indicateurs du parc et les chiffres clés (création en 2004, 124 communes, 38 746 habitants en 2023)." },
+          { src: "assets/projets/hub-pnr-application-demographie.jpg", titre: "Application : démographie", legende: "L'application du PNR de Millevaches, rubrique Démographie : nombre d'habitants par commune en 2023. Les onglets mènent à l'évolution de la population 2008-2023, à la densité et à la grille communale de densité." },
+          { src: "assets/projets/hub-pnr-experience-builder.jpg", titre: "Experience Builder", legende: "La même application en construction dans Experience Builder : quatre pages (fiche d'identité, démographie, environnement, économie) et les chiffres clés à côté de la carte." },
+          { src: "assets/projets/hub-pnr-code-html.jpg", titre: "Code HTML et CSS", legende: "La mise en page des tuiles de la page d'accueil, écrite en HTML et CSS dans l'éditeur de code du site." },
+        ],
+      },
+      {
+        titre: "Cartes d'exemple",
+        intro: "Une carte par parc, avec ses communes et ses intercommunalités au 1er janvier 2026. Cliquez sur une carte pour l'ouvrir en grand.",
+        format: "carte",
+        images: [
+          { src: "assets/projets/hub-pnr-marais-poitevin.jpg", vignette: "assets/projets/hub-pnr-marais-poitevin-vignette.jpg", titre: "PNR du Marais poitevin", legende: "88 communes et 8 intercommunalités, à cheval sur la Nouvelle-Aquitaine et les Pays de la Loire." },
+          { src: "assets/projets/hub-pnr-medoc.jpg", vignette: "assets/projets/hub-pnr-medoc-vignette.jpg", titre: "PNR Médoc", legende: "51 communes et 4 intercommunalités." },
+          { src: "assets/projets/hub-pnr-millevaches.jpg", vignette: "assets/projets/hub-pnr-millevaches-vignette.jpg", titre: "PNR de Millevaches en Limousin", legende: "124 communes et 9 intercommunalités." },
+          { src: "assets/projets/hub-pnr-landes-de-gascogne.jpg", vignette: "assets/projets/hub-pnr-landes-de-gascogne-vignette.jpg", titre: "PNR des Landes de Gascogne", legende: "94 communes et 7 intercommunalités." },
+        ],
+      },
     ],
     resultat: [
       "Les agents des services de la transition écologique et des territoires disposent désormais des données sur les PNR en interne : ils ont la main dessus, travaillent directement à partir d'elles et retrouvent au même endroit les informations sur les parcs de Nouvelle-Aquitaine.",

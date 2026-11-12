@@ -416,6 +416,60 @@ figcaption { margin-top: 8px; font-size: .95rem; color: var(--muted); }
 .tel-legendes p { margin: 0; max-width: none; color: var(--muted); font-size: .97rem; }
 .tel-legendes b { color: var(--ink); }
 
+/* Galeries séparées d'un projet (galerieSection dans app.js) */
+.galerie-intro { margin-top: -4px; color: var(--muted); }
+
+/* Captures d'écran : chaque image dans une fenêtre de navigateur. Deux colonnes qui gardent
+   la hauteur naturelle des captures (pas de recadrage), dans l'ordre : colonne de gauche puis de droite. */
+.galerie-ecrans { columns: 2 380px; column-gap: 32px; margin-top: 24px; }
+.ecran { break-inside: avoid; margin: 0 0 32px; }
+.ecran-fenetre, .carte-papier { text-decoration: none; }
+.ecran-fenetre {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 10px 26px rgba(9, 20, 35, .14);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.ecran-fenetre:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(9, 20, 35, .2); }
+.ecran-barre { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--bg); border-bottom: 1px solid var(--line); }
+.ecran-barre i { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.ecran-barre span {
+  flex: 1;
+  margin-left: 10px;
+  padding: 2px 12px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ecran-fenetre img { display: block; width: 100%; height: auto; border: 0; border-radius: 0; }
+
+/* Cartes d'exemple : présentées comme des planches imprimées (marge blanche, ombre légère), en grille */
+.galerie-cartes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap: 32px; margin-top: 24px; }
+.carte-planche { margin: 0; }
+.carte-papier {
+  display: block;
+  padding: 10px;
+  background: #FFFFFF;
+  border: 1px solid #D9DFE5;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(9, 20, 35, .08), 0 12px 28px rgba(9, 20, 35, .14);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.carte-papier:hover { transform: translateY(-3px) rotate(-.3deg); box-shadow: 0 1px 2px rgba(9, 20, 35, .08), 0 18px 36px rgba(9, 20, 35, .2); }
+.carte-papier img { display: block; width: 100%; height: auto; border: 0; border-radius: 0; }
+.carte-planche figcaption { display: flex; flex-direction: column; gap: 2px; margin-top: 12px; }
+.carte-planche figcaption b { color: var(--ink); font-size: 1.05rem; }
+@media (prefers-reduced-motion: reduce) { .ecran-fenetre, .carte-papier, .ecran-fenetre:hover, .carte-papier:hover { transition: none; transform: none; } }
+
 /* Atlas des ZAEnR, classé par type d'énergie (atlasParType dans app.js) */
 .filtres-enr { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .filtres-enr button {

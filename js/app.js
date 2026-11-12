@@ -241,6 +241,30 @@ function galerieTelephones(liste) {
   </div>`;
 }
 
+// Galeries séparées d'un projet (champ galeries) : une section par galerie, avec son titre et son intro.
+//   format "ecran" : chaque capture dans une fenêtre de navigateur, sur deux colonnes ;
+//   format "carte" : chaque carte présentée comme une planche imprimée, en grille.
+function galerieSection(g) {
+  if (!g.images || !g.images.length) return "";
+  const ecran = (im) => `<figure class="ecran">
+      <a class="ecran-fenetre" href="${im.src}" target="_blank" rel="noopener" title="Agrandir">
+        <span class="ecran-barre" aria-hidden="true"><i></i><i></i><i></i><span>${im.titre || ""}</span></span>
+        <img src="${im.src}" alt="${im.titre ? `${im.titre} : ` : ""}${im.legende}" loading="lazy">
+      </a>
+      <figcaption>${im.legende}</figcaption>
+    </figure>`;
+  const carte = (im) => `<figure class="carte-planche">
+      <a class="carte-papier" href="${im.src}" target="_blank" rel="noopener" title="Ouvrir la carte en grand">
+        <img src="${im.vignette || im.src}" alt="${im.titre ? `${im.titre} : ` : ""}${im.legende}" loading="lazy">
+      </a>
+      <figcaption>${im.titre ? `<b>${im.titre}</b>` : ""}<span>${im.legende}</span></figcaption>
+    </figure>`;
+  const contenu = g.format === "carte"
+    ? `<div class="galerie-cartes">${g.images.map(carte).join("")}</div>`
+    : `<div class="galerie-ecrans">${g.images.map(ecran).join("")}</div>`;
+  return `<section class="galerie"><h2>${g.titre}</h2>${g.intro ? `<p class="galerie-intro">${g.intro}</p>` : ""}${contenu}</section>`;
+}
+
 // Planches de l'atlas des ZAEnR, regroupées par type d'énergie (ordre alphabétique),
 // puis par commune. Un bouton par type permet de n'afficher que ses planches
 // (le clic est géré plus bas, dans « Interactions »).
@@ -401,6 +425,7 @@ function pageProjet(p) {
       ${section("Ce que j'ai fait", paragraphes(p.actions))}
       ${visuels ? `<div class="visuels">${visuels}</div>` : ""}
       ${galerie}
+      ${(p.galeries || []).map(galerieSection).join("")}
       ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
       ${section("Résultat", paragraphes(p.resultat))}
       ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
