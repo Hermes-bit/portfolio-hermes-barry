@@ -127,14 +127,15 @@ function sectionLangues() {
 /* Recommandations (données : RECOMMANDATIONS). Sur l'accueil, avec un lien vers le projet ;
    sur la page d'un projet, sans ce lien. */
 // Liens « Lire » (nouvel onglet) et « Télécharger » vers un document PDF.
-function liensPdf(src, texteLire) {
-  return `<span class="liens-pdf"><a href="${src}" target="_blank" rel="noopener">${texteLire} ↗</a><a href="${src}" download>Télécharger</a></span>`;
+// « Lire » s'ouvre dans la visionneuse (titre = sa légende) ; « Télécharger » enregistre le PDF original.
+function liensPdf(src, texteLire, titre) {
+  return `<span class="liens-pdf"><a href="${src}" target="_blank" rel="noopener" data-titre="${titre || texteLire}">${texteLire}</a><a href="${src}" download>Télécharger</a></span>`;
 }
 
 function recommandation(r, avecLienProjet) {
   const projet = avecLienProjet && PROJETS.find((p) => p.id === r.projet);
   const apercu = r.lettre && r.apercu
-    ? `<a class="lettre-apercu" href="${r.lettre}" target="_blank" rel="noopener" title="Ouvrir la lettre (PDF)"><img src="${r.apercu}" alt="Première page de la lettre de ${r.auteur}" loading="lazy"></a>`
+    ? `<a class="lettre-apercu" href="${r.lettre}" target="_blank" rel="noopener" title="Lire la lettre" data-titre="Lettre de recommandation de ${r.auteur} (${r.structure}), ${r.date}"><img src="${r.apercu}" alt="Première page de la lettre de ${r.auteur}" loading="lazy"></a>`
     : "";
   return `<figure class="recommandation">
     <blockquote><p>« ${r.extrait} »</p></blockquote>
@@ -143,7 +144,7 @@ function recommandation(r, avecLienProjet) {
         <b>${r.auteur}</b>
         <span>${r.fonction}, ${r.structure}</span>
         <span>Lettre du ${r.date}</span>
-        ${r.lettre ? liensPdf(r.lettre, "Lire la lettre") : ""}
+        ${r.lettre ? liensPdf(r.lettre, "Lire la lettre", `Lettre de recommandation de ${r.auteur} (${r.structure}), ${r.date}`) : ""}
         ${projet ? `<a class="lien-projet" href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}
       </div>
       ${apercu}
@@ -165,7 +166,7 @@ function sectionSavoirEtre() {
   if (!SAVOIR_ETRE.length) return "";
   const qualite = (q) => {
     const r = RECOMMANDATIONS.find((x) => x.projet === q.lettre);
-    const source = r ? `<a href="${r.lettre}" target="_blank" rel="noopener">${r.auteur}, ${r.structure} ↗</a>` : "";
+    const source = r ? `<a href="${r.lettre}" target="_blank" rel="noopener" data-titre="Lettre de recommandation de ${r.auteur} (${r.structure}), ${r.date}">${r.auteur}, ${r.structure}</a>` : "";
     return `<li><h3>${q.qualite}</h3><p>« ${q.extrait} »</p>${source}</li>`;
   };
   return `<section class="bloc">
@@ -195,7 +196,7 @@ function sectionFormations() {
       <div class="formation-droite">
         <p class="formation-intro">${f.intro}</p>
         <dl class="formation-contenu">${f.contenu.map(([intitule, detail, certificat]) => `<div><dt>${intitule}</dt><dd>${detail}</dd>${
-          certificat ? `<dd class="formation-certificat">${liensPdf(certificat, "Voir le certificat")}</dd>` : ""
+          certificat ? `<dd class="formation-certificat">${liensPdf(certificat, "Voir le certificat", `Certificat de compétences : ${intitule}`)}</dd>` : ""
         }</div>`).join("")}</dl>
       </div>
     </article>`;
@@ -610,6 +611,99 @@ window.addEventListener("scroll", () => (boutonHaut.hidden = window.scrollY < 40
 boutonHaut.addEventListener("click", () => {
   const doux = !matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.scrollTo({ top: 0, behavior: doux ? "smooth" : "auto" });
+});
+
+/* ---------- Visionneuse ----------
+   Un clic sur une image ou un document du site (lien vers assets/…) l'ouvre ici, par-dessus le site assombri,
+   au lieu d'un nouvel onglet. Les PDF (une page chacun) sont montrés par leur image « -page.jpg », générée
+   à partir du PDF, car un PDF intégré ne s'affiche pas sur la plupart des téléphones ; le PDF original
+   reste téléchargeable. Dans une galerie, les flèches (ou ← →) passent d'une image à l'autre.
+   Les liens « Télécharger » (attribut download) ne sont pas concernés. */
+const visionneuse = document.getElementById("visionneuse");
+const V = (id) => document.getElementById(id);
+const VISIONNABLE = /^assets\/.+\.(jpe?g|png|webp|gif|pdf)$/i;
+const GROUPES = ".galerie-ecrans, .galerie-cartes, .tel-ecrans, .visuels, .planches, .formation-contenu, .recommandations, .savoir-etre";
+let vListe = [], vIndex = 0, vDeclencheur = null;
+
+const estVisionnable = (a) => a && !a.hasAttribute("download") && VISIONNABLE.test(a.getAttribute("href") || "");
+
+// Légende : titre donné par le lien, sinon le texte alternatif de l'image (titre et légende), sinon la légende de la figure.
+function infosLien(a) {
+  const href = a.getAttribute("href");
+  const pdf = /\.pdf$/i.test(href);
+  const fc = a.closest("figure")?.querySelector("figcaption");
+  const legendeFigure = fc && !a.closest(".recommandation")
+    ? [...fc.childNodes].map((n) => n.textContent.trim()).filter(Boolean).join(" : ")
+    : "";
+  return {
+    src: pdf ? href.replace(/\.pdf$/i, "-page.jpg") : href,
+    pdf: pdf ? href : null,
+    legende: a.dataset.titre || a.querySelector("img")?.alt || legendeFigure || "",
+  };
+}
+
+function montrerImage() {
+  const it = vListe[vIndex];
+  visionneuse.classList.remove("zoome");
+  V("v-img").src = it.src;
+  V("v-img").alt = it.legende;
+  V("v-texte").textContent = it.legende;
+  V("v-compteur").textContent = vListe.length > 1 ? `${vIndex + 1} / ${vListe.length}` : "";
+  V("v-actions").innerHTML = it.pdf ? `<a href="${it.pdf}" download>Télécharger le PDF</a>` : "";
+  V("v-prec").hidden = V("v-suiv").hidden = vListe.length < 2;
+}
+
+function ouvrirVisionneuse(a) {
+  // Les autres images de la même galerie (visibles : les filtres de l'atlas en masquent), sans doublon
+  const groupe = a.closest(GROUPES);
+  const liens = groupe ? [...groupe.querySelectorAll("a[href]")].filter((x) => estVisionnable(x) && x.getClientRects().length) : [a];
+  const vus = new Set();
+  vListe = liens.filter((x) => !vus.has(x.getAttribute("href")) && vus.add(x.getAttribute("href"))).map(infosLien);
+  vIndex = Math.max(0, vListe.findIndex((it) => (it.pdf || it.src) === a.getAttribute("href")));
+  vDeclencheur = a;
+  montrerImage();
+  document.documentElement.classList.add("v-ouverte");
+  visionneuse.showModal();
+}
+
+const changerImage = (pas) => {
+  if (vListe.length < 2) return;
+  vIndex = (vIndex + pas + vListe.length) % vListe.length;
+  montrerImage();
+};
+
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]");
+  if (!estVisionnable(a) || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  e.preventDefault();
+  ouvrirVisionneuse(a);
+});
+V("v-fermer").addEventListener("click", () => visionneuse.close());
+V("v-prec").addEventListener("click", () => changerImage(-1));
+V("v-suiv").addEventListener("click", () => changerImage(1));
+// Clic à côté de l'image (sur le fond assombri) : fermer
+visionneuse.addEventListener("click", (e) => {
+  if (e.target === visionneuse || e.target === V("v-scene")) visionneuse.close();
+});
+visionneuse.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") changerImage(-1);
+  if (e.key === "ArrowRight") changerImage(1);
+});
+// Clic sur une grande image (carte, capture) : taille réelle, qu'on parcourt en faisant défiler ; second clic : retour
+V("v-img").addEventListener("click", (e) => {
+  const img = e.currentTarget, cadre = V("v-image");
+  if (!visionneuse.classList.contains("zoome") && img.naturalWidth < img.clientWidth * 1.2) return;
+  const rx = e.offsetX / img.clientWidth, ry = e.offsetY / img.clientHeight;
+  visionneuse.classList.toggle("zoome");
+  if (visionneuse.classList.contains("zoome")) {
+    cadre.scrollLeft = rx * img.naturalWidth - cadre.clientWidth / 2;
+    cadre.scrollTop = ry * img.naturalHeight - cadre.clientHeight / 2;
+  }
+});
+visionneuse.addEventListener("close", () => {
+  document.documentElement.classList.remove("v-ouverte");
+  V("v-img").removeAttribute("src");           // arrête aussi les animations (démo Vision AR)
+  vDeclencheur?.focus({ preventScroll: true });
 });
 
 remplirPied();

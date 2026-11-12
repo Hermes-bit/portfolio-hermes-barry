@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <!-- ?v= : numéro de version à changer à chaque mise en ligne. Sans lui, les navigateurs
        gardent l'ancienne copie des CSS et JS en mémoire et n'affichent pas les modifications. -->
-  <link rel="stylesheet" href="css/style.css?v=20261112-7">
-  <link rel="stylesheet" href="css/carte.css?v=20261112-7">
+  <link rel="stylesheet" href="css/style.css?v=20261112-9">
+  <link rel="stylesheet" href="css/carte.css?v=20261112-9">
 </head>
 <body>
 
@@ -43,17 +43,37 @@
   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </button>
 
+<!-- Visionneuse : images et documents s'ouvrent ici, par-dessus le site assombri (voir app.js) -->
+<dialog class="visionneuse" id="visionneuse" aria-label="Visionneuse">
+  <button class="v-fermer" id="v-fermer" type="button" aria-label="Fermer" title="Fermer (Échap)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <button class="v-nav v-prec" id="v-prec" type="button" aria-label="Image précédente" title="Précédente (←)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <button class="v-nav v-suiv" id="v-suiv" type="button" aria-label="Image suivante" title="Suivante (→)">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <div class="v-scene" id="v-scene">
+    <figure class="v-cadre">
+      <div class="v-image" id="v-image"><img id="v-img" alt=""></div>
+      <figcaption class="v-legende"><span id="v-compteur"></span><span id="v-texte"></span></figcaption>
+      <div class="v-actions" id="v-actions"></div>
+    </figure>
+  </div>
+</dialog>
+
 <!-- Leaflet 1.9.4 (copie locale) -->
 <script src="vendor/leaflet/leaflet.js"></script>
 <!-- Fond de carte : régions, départements et contour de la France -->
-<script src="js/fond-carte-france.js?v=20261112-7"></script>
+<script src="js/fond-carte-france.js?v=20261112-9"></script>
 <!-- Contour du Burkina Faso (carte de situation du projet GéoBurkina) -->
-<script src="js/fond-carte-burkina.js?v=20261112-7"></script>
+<script src="js/fond-carte-burkina.js?v=20261112-9"></script>
 <!-- Contenu : profil, projets, compétences, lieux du parcours -->
-<script src="js/donnees.js?v=20261112-7"></script>
+<script src="js/donnees.js?v=20261112-9"></script>
 <!-- Carte du parcours -->
-<script src="js/carte.js?v=20261112-7"></script>
+<script src="js/carte.js?v=20261112-9"></script>
 <!-- Pages et navigation -->
-<script src="js/app.js?v=20261112-7"></script>
+<script src="js/app.js?v=20261112-9"></script>
 </body>
 </html>

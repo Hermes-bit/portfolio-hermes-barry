@@ -586,6 +586,69 @@ body { padding-bottom: var(--hauteur-pied, 56px); }
 .haut svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 .haut:hover { background: var(--navy-accent); color: var(--navy); }
 
+/* ---------- Visionneuse (images et documents) ----------
+   Ouverte par-dessus le site, qui reste visible derrière, assombri et légèrement flou. */
+html.v-ouverte { overflow: hidden; }
+.visionneuse {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #EDF1F6;
+  font-family: var(--sans);
+  overflow: hidden;
+}
+.visionneuse::backdrop { background: rgba(6, 10, 18, .76); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.v-scene { width: 100%; height: 100%; display: grid; place-items: center; padding: 76px 88px 24px; }
+.v-cadre { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 100%; }
+.v-image { max-width: min(1500px, calc(100vw - 176px)); max-height: calc(100vh - 210px); max-height: calc(100dvh - 210px); border-radius: 6px; overflow: hidden; box-shadow: 0 24px 70px rgba(0, 0, 0, .55); }
+.v-image img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(1500px, calc(100vw - 176px));
+  max-height: calc(100vh - 210px);
+  max-height: calc(100dvh - 210px);
+  border: 0;
+  border-radius: 0;
+  cursor: zoom-in;
+}
+/* Taille réelle : on parcourt l'image en faisant défiler le cadre */
+.visionneuse.zoome .v-image { width: min(1500px, calc(100vw - 176px)); height: calc(100vh - 210px); height: calc(100dvh - 210px); overflow: auto; }
+.visionneuse.zoome .v-image img { max-width: none; max-height: none; cursor: zoom-out; }
+.v-legende { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 12px; max-width: 900px; margin: 0; text-align: center; color: #E6EBF2; font-size: .98rem; line-height: 1.5; }
+#v-compteur { color: #9FB0C4; font-weight: 600; font-variant-numeric: tabular-nums; }
+#v-compteur:empty { display: none; }
+.v-actions:empty { display: none; }
+.v-actions a { display: inline-block; padding: 8px 18px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, .45); color: #FFFFFF; font-weight: 600; text-decoration: none; }
+.v-actions a:hover { background: #FFFFFF; color: #13202F; }
+/* Bouton fermer : un cercle blanc avec un X ; flèches précédente / suivante en cercles discrets */
+.v-fermer, .v-nav { position: fixed; z-index: 2; display: grid; place-items: center; width: 50px; height: 50px; padding: 0; border-radius: 50%; cursor: pointer; }
+.v-fermer { top: 18px; right: 18px; border: 0; background: #FFFFFF; color: #13202F; box-shadow: 0 6px 20px rgba(0, 0, 0, .35); }
+.v-fermer:hover { background: var(--navy-accent); }
+.v-nav { top: 50%; transform: translateY(-50%); border: 1px solid rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .12); color: #FFFFFF; }
+.v-nav:hover { background: rgba(255, 255, 255, .28); }
+.v-prec { left: 18px; }
+.v-suiv { right: 18px; }
+.v-fermer svg, .v-nav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+/* Téléphone : flèches plus petites sur les bords, à mi-hauteur ; plus de place pour la légende */
+@media (max-width: 700px) {
+  .v-scene { padding: 76px 12px 20px; }
+  .v-image, .v-image img, .visionneuse.zoome .v-image { max-width: calc(100vw - 24px); }
+  .v-image, .v-image img { max-height: calc(100vh - 280px); max-height: calc(100dvh - 280px); }
+  .visionneuse.zoome .v-image { width: calc(100vw - 24px); height: calc(100vh - 280px); height: calc(100dvh - 280px); }
+  .v-nav { width: 40px; height: 40px; background: rgba(6, 10, 18, .6); }
+  .v-prec { left: 6px; }
+  .v-suiv { right: 6px; }
+  .v-legende { font-size: .9rem; }
+}
+
 /* Rappel affiché uniquement en local (voir rappelLocal dans app.js) */
 .rappel-local {
   position: fixed;
