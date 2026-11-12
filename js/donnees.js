@@ -190,6 +190,7 @@ const PROJETS = [
     ],
     actions: [
       "J'ai rassemblé les couches nécessaires à l'analyse, puis je les ai croisées pour faire ressortir les zones favorables : le plan de prévention du risque inondation (PPRi), les zonages du PLUi et les sites Natura 2000.",
+      "Les données sont stockées dans une base PostgreSQL avec l'extension PostGIS, que j'administrais avec pgAdmin : une table par type d'énergie, reliée aux communes.",
       "J'ai produit un atlas de cartes des ZAEnR destiné aux élus et aux communes.",
       "J'ai participé à la mise en place du SIG mutualisé sur QGIS Cloud, et j'y ai intégré des flux WMTS : le cadastre de la collectivité, le PLUi et les fonds de l'IGN.",
       "J'ai aussi travaillé sur les cartes de randonnée pédestre de l'office du tourisme.",
@@ -258,7 +259,7 @@ const PROJETS = [
       "La principale difficulté est venue de la mise en place du SIG de la collectivité : les besoins exprimés étaient difficiles à traduire en solution technique.",
       "Pour avancer, je faisais valider chaque étape par ma tutrice lors de réunions planifiées à l'avance, avant de passer à la suivante. J'ai aussi échangé directement avec les maires qui voulaient parler des zones d'accélération. Enfin, toutes les données ont été centralisées sur QGIS Cloud, pour que les agents travaillent à partir des mêmes données de référence.",
     ],
-    outils: ["QGIS", "QGIS Cloud", "ArcGIS Pro", "PostGIS", "GEO (Business Geografic)", "WMS / WFS / WMTS"],
+    outils: ["QGIS", "QGIS Cloud", "ArcGIS Pro", "PostgreSQL / PostGIS", "pgAdmin", "GEO (Business Geografic)", "WMS / WFS / WMTS"],
   },
   {
     id: "sncf",
