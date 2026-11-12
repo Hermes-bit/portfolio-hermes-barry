@@ -543,7 +543,7 @@ const SAVOIR_ETRE = [
    dans app.js (ILLUSTRATIONS_INTERETS), d'après son id. badge : petite étiquette sur l'illustration. */
 const CENTRES_INTERET = [
   { id: "lecture", titre: "Lecture", texte: "Des romans à suspense et des thrillers psychologiques, des polars, des drames et des histoires poignantes. Je lis aussi des livres de développement personnel, pour travailler les points que je veux améliorer." },
-  { id: "basket", titre: "Basket-ball", badge: "Niveau pré-national", texte: "J'ai joué au niveau pré-national. Le basket m'a beaucoup appris sur l'intégration dans un groupe et sur l'esprit d'équipe." },
+  { id: "basket", titre: "Basket-ball", badge: "Niveau pré-national", texte: "J'ai joué au niveau pré-national à Lille, au LMBC. Le basket m'a beaucoup appris sur l'intégration dans un groupe et sur l'esprit d'équipe." },
   { id: "musique", titre: "Musique et podcasts", texte: "J'aime écouter de la musique et des podcasts." },
   { id: "decouvertes", titre: "Rencontres et découvertes", texte: "J'aime faire de nouvelles connaissances et découvrir de nouvelles activités." },
 ];
