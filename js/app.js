@@ -262,7 +262,9 @@ function galerieSection(g) {
     </figure>`;
   const contenu = g.format === "carte"
     ? `<div class="galerie-cartes">${g.images.map(carte).join("")}</div>`
-    : `<div class="galerie-ecrans">${g.images.map(ecran).join("")}</div>`;
+    : g.format === "planche"   // schémas (MCD, MPD…) : présentation papier, en colonnes pour des hauteurs différentes
+      ? `<div class="galerie-planches">${g.images.map(carte).join("")}</div>`
+      : `<div class="galerie-ecrans">${g.images.map(ecran).join("")}</div>`;
   return `<section class="galerie"><h2>${g.titre}</h2>${g.intro ? `<p class="galerie-intro">${g.intro}</p>` : ""}${contenu}</section>`;
 }
 
@@ -623,7 +625,7 @@ boutonHaut.addEventListener("click", () => {
 const visionneuse = document.getElementById("visionneuse");
 const V = (id) => document.getElementById(id);
 const VISIONNABLE = /^assets\/.+\.(jpe?g|png|webp|gif|pdf)$/i;
-const GROUPES = ".galerie-ecrans, .galerie-cartes, .tel-ecrans, .visuels, .planches, .formation-contenu, .recommandations, .savoir-etre";
+const GROUPES = ".galerie-ecrans, .galerie-cartes, .galerie-planches, .tel-ecrans, .visuels, .planches, .formation-contenu, .recommandations, .savoir-etre";
 let vListe = [], vIndex = 0, vDeclencheur = null;
 
 const estVisionnable = (a) => a && !a.hasAttribute("download") && VISIONNABLE.test(a.getAttribute("href") || "");

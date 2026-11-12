@@ -35,7 +35,8 @@ const PROFIL = {
      numérotées dans l'ordre du tableau, avec titre (court, sous l'écran) et légende (liste en dessous).
    galeries : sections d'images séparées, chacune { titre, intro, format, images: [{ src, titre, legende, vignette? }] }.
      format "ecran" : captures présentées dans une fenêtre de navigateur (titre dans la barre) ;
-     format "carte" : cartes présentées comme des planches (vignette = version allégée affichée dans la page).
+     format "carte" : cartes présentées comme des planches (vignette = version allégée affichée dans la page) ;
+     format "planche" : même présentation papier, en colonnes (schémas de tailles différentes : MCD, MPD…).
    vignette : image de la carte du projet (liste des projets) quand il n'y a pas de couverture.
      Ajouter fond: "#couleur" pour afficher l'image entière (un logo par exemple) sur ce fond, sans recadrage.
    perso : true pour un projet personnel (rubrique « Projets personnels » de la page Projets).
@@ -60,7 +61,8 @@ const PROJETS = [
     periode: "2026",
     lieu: "Agglomération de Losse-en-Gelaisse (cas d'étude)",
     ll: null,
-    couverture: { src: "assets/projets/accessibilite-application.jpg", legende: "L'application en ligne : tronçons colorés selon leur score d'accessibilité" },
+    couverture: null,
+    vignette: { src: "assets/projets/accessibilite-application.jpg" },
     resume: "Une base PostGIS conforme au standard CNIG Accessibilité et une application web en ligne pour consulter l'état des cheminements autour des arrêts de transport.",
     liens: [
       { texte: "Ouvrir l'application", url: "https://hermes-bit.github.io/Accessibilite_cnig_dieppe/?config=apps/cnig_accessibilite.xml", note: "Une fenêtre de connexion s'ouvre d'abord : la fermer (×) pour consulter la carte en invité." },
@@ -77,9 +79,25 @@ const PROJETS = [
       "Une vue SQL donne à chaque tronçon un score d'accessibilité calculé à partir de la pente, du dévers, de la largeur utile, du revêtement et du nombre d'obstacles. Sur la carte, il apparaît en vert, orange ou rouge.",
       "Les 13 couches sont servies en GeoJSON par une API Flask avec authentification, puis affichées dans mviewer. L'ensemble tourne dans des conteneurs Docker derrière Nginx, et GitHub Actions déploie chaque nouvelle version.",
     ],
-    visuels: [
-      { src: "assets/projets/accessibilite-demo.webp", legende: "L'application en fonctionnement : vue d'ensemble, zoom sur le centre-ville, puis la fiche d'un tronçon (type, largeur utile, pente, dévers, revêtement, niveau d'accès et nombre d'obstacles)." },
-      { src: "assets/projets/accessibilite-mcd.png", legende: "Le modèle conceptuel de données, en formalisme Merise : nœuds, tronçons de cheminement, obstacles, ERP et places de stationnement PMR. Les entrées et ascenseurs sont des cas particuliers de nœuds ; les traversées, escaliers et rampes, des cas particuliers de tronçons." },
+    galeries: [
+      {
+        titre: "L'application en ligne",
+        intro: "L'application mviewer publiée en ligne : chaque tronçon prend la couleur de son score d'accessibilité, et un clic ouvre sa fiche.",
+        format: "ecran",
+        images: [
+          { src: "assets/projets/accessibilite-application.jpg", titre: "Carte des cheminements", legende: "L'application en ligne : les tronçons colorés selon leur score d'accessibilité." },
+          { src: "assets/projets/accessibilite-demo.webp", titre: "L'application en action", legende: "L'application en fonctionnement : vue d'ensemble, zoom sur le centre-ville, puis la fiche d'un tronçon (type, largeur utile, pente, dévers, revêtement, niveau d'accès et nombre d'obstacles)." },
+        ],
+      },
+      {
+        titre: "Le modèle de données",
+        intro: "Le standard CNIG traduit en modèle conceptuel (Merise), puis en tables PostgreSQL / PostGIS. Cliquez sur un schéma pour le lire en grand.",
+        format: "planche",
+        images: [
+          { src: "assets/projets/accessibilite-mcd.png", vignette: "assets/projets/accessibilite-mcd-vignette.jpg", titre: "Modèle conceptuel (MCD)", legende: "Nœuds, tronçons de cheminement, obstacles, ERP et places de stationnement PMR. Les entrées et ascenseurs sont des cas particuliers de nœuds ; les traversées, escaliers et rampes, des cas particuliers de tronçons." },
+          { src: "assets/projets/accessibilite-mpd.png", vignette: "assets/projets/accessibilite-mpd-vignette.jpg", titre: "Modèle physique (MPD)", legende: "Les tables du schéma cnig_accessibilite, leurs clés et les listes de valeurs du standard. Les géométries sont en Lambert-93 (EPSG:2154), avec un index spatial GiST sur chaque table." },
+        ],
+      },
     ],
     resultat: [
       "La base contient 712 tronçons, 765 nœuds et 3 017 obstacles. L'application est en ligne : on y consulte les couches et le score de chaque tronçon, et les utilisateurs connectés peuvent calculer un itinéraire ou signaler un problème sur le terrain.",
@@ -303,12 +321,26 @@ const PROJETS = [
       "Les données sont stockées en WGS84 ; le WFS les reprojette à la demande en UTM 30N ou 31N. On les télécharge en GeoJSON, en Shapefile ou en GeoPackage. Le GeoPackage est préparé à l'avance, ce qui évite un traitement à la volée sur les connexions lentes. Des extraits de données mondiales (WorldCover, Copernicus DEM, WorldPop, CHIRPS…) sont aussi découpés sur l'emprise du pays.",
       "Un back-office permet de gérer le portail sans écrire de code : thèmes, fiches de métadonnées, ajout d'une source WFS, style des couches (le SLD est généré pour GeoServer), import de fichiers. Un tableau CSV ou Excel qui contient une colonne de territoire devient une carte choroplèthe, par jointure avec les limites administratives.",
     ],
-    visuels: [
-      { src: "assets/projets/geoburkina-accueil.jpg", legende: "L'accueil du portail : la carte en fond, et une fenêtre qui présente ce qu'on peut y faire (parcourir les données, créer des cartes, télécharger en GeoJSON, Shapefile ou GeoPackage)." },
-      { src: "assets/projets/geoburkina-catalogue.jpg", legende: "Le catalogue : chaque jeu de données a son aperçu cartographique, son résumé et sa source." },
-      { src: "assets/projets/geoburkina-mcd-catalogue.png", legende: "Le modèle conceptuel du catalogue et de la moisson : le jeu de données est relié à sa source, à ses thèmes (principal et secondaires), à son état de synchronisation, à son journal, à ses objets géographiques et à la surcharge de sa fiche ISO." },
-      { src: "assets/projets/geoburkina-mcd-administration.png", legende: "Les entités du back-office (utilisateurs, actions, territoires, paramètres, jeton SIG, inscriptions), indépendantes du catalogue." },
-      { src: "assets/projets/geoburkina-regles-de-gestion.png", legende: "Les onze règles de gestion dont découlent les cardinalités du schéma." },
+    galeries: [
+      {
+        titre: "Le portail",
+        intro: "La version de démonstration du portail, qui tourne en local sous Docker : l'accueil, puis le catalogue des jeux de données.",
+        format: "ecran",
+        images: [
+          { src: "assets/projets/geoburkina-accueil.jpg", titre: "Accueil du portail", legende: "L'accueil du portail : la carte en fond, et une fenêtre qui présente ce qu'on peut y faire (parcourir les données, créer des cartes, télécharger en GeoJSON, Shapefile ou GeoPackage)." },
+          { src: "assets/projets/geoburkina-catalogue.jpg", titre: "Catalogue", legende: "Le catalogue : chaque jeu de données a son aperçu cartographique, son résumé et sa source." },
+        ],
+      },
+      {
+        titre: "Le modèle de données",
+        intro: "Le modèle conceptuel du catalogue et du back-office, et les onze règles de gestion dont découlent ses cardinalités.",
+        format: "planche",
+        images: [
+          { src: "assets/projets/geoburkina-mcd-catalogue.png", titre: "Catalogue et moisson", legende: "Le jeu de données est relié à sa source, à ses thèmes (principal et secondaires), à son état de synchronisation, à son journal, à ses objets géographiques et à la surcharge de sa fiche ISO." },
+          { src: "assets/projets/geoburkina-mcd-administration.png", titre: "Back-office", legende: "Les entités du back-office (utilisateurs, actions, territoires, paramètres, jeton SIG, inscriptions), indépendantes du catalogue." },
+          { src: "assets/projets/geoburkina-regles-de-gestion.png", titre: "Règles de gestion", legende: "Les onze règles de gestion dont découlent les cardinalités du schéma." },
+        ],
+      },
     ],
     resultat: [
       "Le portail fonctionne entièrement en local. Le catalogue compte 48 jeux de données, classés en 14 thèmes.",
