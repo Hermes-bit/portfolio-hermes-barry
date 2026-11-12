@@ -490,7 +490,13 @@ const COMPETENCES = [
   {
     titre: "Conduite de projet",
     lignes: [
-      ["Méthode", "Recueil des besoins, cahiers des charges, maîtrise d'œuvre, suivi des livrables"],
+      // Méthodes du bloc « Piloter des projets de géomatique » (validé) et appliquées dans les projets du site
+      ["Cadrage", "Recueil des besoins, note de cadrage, cahiers des charges technique et fonctionnel"],
+      ["Pilotage", "Planification, budget, gestion des risques, comités de pilotage, reporting"],
+      ["Qualité", "Plan d'assurance qualité, validation de chaque étape avec le commanditaire, suivi des livrables"],
+      ["Organisation", "Relation entre maîtrise d'ouvrage et maîtrise d'œuvre"],
+      ["Accompagnement", "Formation et accompagnement des utilisateurs du SIG"],
+      ["Veille", "Technique et réglementaire : LOM, loi d'accélération des énergies renouvelables, standard CNIG, directive INSPIRE"],
       ["Bureautique", "Word, Excel, PowerPoint, SharePoint"],
     ],
   },
