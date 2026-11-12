@@ -586,7 +586,7 @@ const FORMATIONS = [
     ],
   },
   {
-    titre: "Études de géographie et aménagement",
+    titre: "Études de géographie et aménagement du territoire",
     organisme: "Université Paris 8, Saint-Denis",
     periode: "2019 – 2023",
     intro: "Une formation universitaire à l'analyse des territoires :",
@@ -622,7 +622,7 @@ const PLACES = [
   {
     id: "p8", kind: "edu", org: "Université Paris 8", city: "Saint-Denis (93)",
     ll: [48.9449, 2.3627], off: [-40, -36], region: "Île-de-France", dates: "2019 – 2023",
-    role: "Études de géographie et aménagement",
+    role: "Études de géographie et aménagement du territoire",
     missions: ["Fondamentaux de la géographie", "Bases de l'aménagement du territoire"],
   },
   {
