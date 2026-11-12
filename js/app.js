@@ -203,7 +203,7 @@ function sectionFormations() {
   };
   return `<section class="bloc formations">
     <h2>Formation</h2>
-    <p class="chapo">Une licence de géographie à l'université, puis deux titres de géomatique préparés en alternance à l'IDGEO.</p>
+    <p class="chapo">Des études de géographie à l'université, puis deux titres de géomatique préparés en alternance à l'IDGEO.</p>
     ${FORMATIONS.map(formation).join("")}
   </section>`;
 }

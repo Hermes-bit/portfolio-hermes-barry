@@ -586,7 +586,7 @@ const FORMATIONS = [
     ],
   },
   {
-    titre: "Licence Géographie et aménagement",
+    titre: "Études de géographie et aménagement",
     organisme: "Université Paris 8, Saint-Denis",
     periode: "2019 – 2023",
     intro: "Une formation universitaire à l'analyse des territoires :",
@@ -594,9 +594,9 @@ const FORMATIONS = [
       ["Géographie et aménagement", "Organisation des territoires et inégalités spatiales, enjeux environnementaux, acteurs et étapes d'une opération d'aménagement."],
       ["Méthodes", "Statistiques, cartographie et premiers pas en SIG, enquêtes de terrain (entretiens, questionnaires) pour établir un diagnostic territorial, stages de terrain dès la première année."],
     ],
-    validationDetail: "Spécialisation suivie en fin de licence : Géographie et aménagement du territoire.",
+    validationDetail: "Parcours suivi : Géographie et aménagement du territoire.",
     liens: [
-      { texte: "Fiche de compétences de la licence (PDF)", url: "https://www.univ-paris8.fr/IMG/pdf/fiche_comp_lic_ge_ographie_2017.pdf" },
+      { texte: "Programme de la formation (PDF)", url: "https://www.univ-paris8.fr/IMG/pdf/fiche_comp_lic_ge_ographie_2017.pdf" },
     ],
   },
 ];
@@ -622,7 +622,7 @@ const PLACES = [
   {
     id: "p8", kind: "edu", org: "Université Paris 8", city: "Saint-Denis (93)",
     ll: [48.9449, 2.3627], off: [-40, -36], region: "Île-de-France", dates: "2019 – 2023",
-    role: "Licence Géographie et aménagement",
+    role: "Études de géographie et aménagement",
     missions: ["Fondamentaux de la géographie", "Bases de l'aménagement du territoire"],
   },
   {
