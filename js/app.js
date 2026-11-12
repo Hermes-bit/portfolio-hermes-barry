@@ -282,14 +282,15 @@ function atlasParType(planches) {
 
   const cartes = types
     .flatMap((t) => planches.filter((pl) => pl.type === t).sort((a, b) => a.commune.localeCompare(b.commune, "fr")))
-    .map((pl) => `<figure data-type-enr="${pl.type}">
-      <a href="${pl.src}" target="_blank" rel="noopener"><img src="${pl.vignette || pl.src}" alt="Carte des zones d'accélération de ${pl.commune} : ${pl.type.toLowerCase()}" loading="lazy"></a>
+    // Même présentation que les cartes d'exemple (planches imprimées : .carte-planche, .carte-papier)
+    .map((pl) => `<figure class="carte-planche" data-type-enr="${pl.type}">
+      <a class="carte-papier" href="${pl.src}" target="_blank" rel="noopener" title="Ouvrir la carte en grand"><img src="${pl.vignette || pl.src}" alt="Carte des zones d'accélération de ${pl.commune} : ${pl.type.toLowerCase()}" loading="lazy"></a>
       <figcaption><b>${pl.commune}</b><span>${pastille(pl.type)}${pl.type}</span></figcaption>
     </figure>`)
     .join("");
 
   return `<div class="atlas">
-    <p>Quelques planches de l'atlas destiné aux communes, classées par type d'énergie. Un clic sur une carte l'ouvre en taille réelle.</p>
+    <p class="galerie-intro">Quelques planches de l'atlas remis aux communes, une par type d'énergie. Les boutons filtrent les planches par type ; un clic sur une carte l'ouvre en grand.</p>
     ${boutons}
     <div class="planches">${cartes}</div>
   </div>`;

@@ -176,18 +176,33 @@ const PROJETS = [
       "J'ai participé à la mise en place du SIG mutualisé sur QGIS Cloud, et j'y ai intégré des flux WMTS : le cadastre de la collectivité, le PLUi et les fonds de l'IGN.",
       "J'ai aussi travaillé sur les cartes de randonnée pédestre de l'office du tourisme.",
     ],
-    visuels: [
-      { src: "assets/projets/zaenr-qgis-potentiel-eolien.jpg", legende: "Dans QGIS, les zones favorables au développement de l'éolien sur le territoire de la communauté de communes." },
-      { src: "assets/projets/zaenr-qgis-secteurs.jpg", legende: "Le projet QGIS de l'analyse : le territoire découpé en cinq secteurs, et les groupes de couches utilisés (enjeux rédhibitoires, contraintes, infrastructures, besoins de chaleur)." },
-      { src: "assets/projets/zaenr-qgis-types-enr.jpg", legende: "Une couche par type d'énergie, nommée comme la table correspondante de la base (type_pv, type_geothermie, methanisation…)." },
-      { src: "assets/projets/zaenr-qgis-couche-finale.jpg", legende: "La couche finale des zones d'accélération : 4 355 entités classées selon 12 types d'énergie renouvelable." },
-      { src: "assets/projets/zaenr-mcd.jpg", legende: "Le modèle conceptuel de la base : chaque type d'énergie est relié aux communes. À droite, le script SQL de création des tables." },
-      { src: "assets/projets/zaenr-geo-generateur.jpg", legende: "La carte des zones d'accélération montée dans GEO Générateur, avec ses couches classées par type d'énergie." },
-      { src: "assets/projets/zaenr-portail-enr.jpg", legende: "Le Portail EnR de la CCOV ouvre sur deux applications : la consultation des ZAEnR et la saisie des nouvelles énergies renouvelables." },
-      { src: "assets/projets/zaenr-application-accueil.jpg", legende: "L'application de consultation : le panneau d'accueil explique comment parcourir les zones d'accélération. Au survol d'une zone, une infobulle indique le type d'énergie." },
-      { src: "assets/projets/zaenr-application-fiche-commune.jpg", legende: "Recherche d'une commune : sa fiche (code postal, code INSEE, secteur) s'ouvre à gauche et la commune est mise en évidence sur la carte." },
-      { src: "assets/projets/zaenr-application-saisie.jpg", legende: "L'application de saisie, destinée aux gestionnaires du portail EnR." },
-      { src: "assets/projets/zaenr-application-requeteur.jpg", legende: "Le requêteur de l'application de saisie : on combine des critères ET / OU sur les champs de la table des communes." },
+    // Deux galeries de captures (l'analyse, puis le portail et ses applications) ; l'atlas suit (champ atlas)
+    galeries: [
+      {
+        titre: "L'analyse et la base de données",
+        intro: "Le croisement des couches dans QGIS jusqu'à la couche finale des zones d'accélération, puis le modèle de la base qui les stocke.",
+        format: "ecran",
+        images: [
+          { src: "assets/projets/zaenr-qgis-potentiel-eolien.jpg", titre: "QGIS : potentiel éolien", legende: "Dans QGIS, les zones favorables au développement de l'éolien sur le territoire de la communauté de communes." },
+          { src: "assets/projets/zaenr-qgis-secteurs.jpg", titre: "QGIS : secteurs et groupes de couches", legende: "Le projet QGIS de l'analyse : le territoire découpé en cinq secteurs, et les groupes de couches utilisés (enjeux rédhibitoires, contraintes, infrastructures, besoins de chaleur)." },
+          { src: "assets/projets/zaenr-qgis-types-enr.jpg", titre: "QGIS : une couche par énergie", legende: "Une couche par type d'énergie, nommée comme la table correspondante de la base (type_pv, type_geothermie, methanisation…)." },
+          { src: "assets/projets/zaenr-qgis-couche-finale.jpg", titre: "QGIS : couche finale", legende: "La couche finale des zones d'accélération : 4 355 entités classées selon 12 types d'énergie renouvelable." },
+          { src: "assets/projets/zaenr-mcd.jpg", titre: "Modèle de données et script SQL", legende: "Le modèle conceptuel de la base : chaque type d'énergie est relié aux communes. À droite, le script SQL de création des tables." },
+        ],
+      },
+      {
+        titre: "Le portail EnR et ses applications",
+        intro: "La carte montée dans GEO Générateur, puis le portail EnR et ses deux applications : la consultation des zones d'accélération, et la saisie, réservée aux gestionnaires du portail.",
+        format: "ecran",
+        images: [
+          { src: "assets/projets/zaenr-geo-generateur.jpg", titre: "GEO Générateur", legende: "La carte des zones d'accélération montée dans GEO Générateur, avec ses couches classées par type d'énergie." },
+          { src: "assets/projets/zaenr-portail-enr.jpg", titre: "Portail EnR", legende: "Le Portail EnR de la CCOV ouvre sur deux applications : la consultation des ZAEnR et la saisie des nouvelles énergies renouvelables." },
+          { src: "assets/projets/zaenr-application-accueil.jpg", titre: "Consultation : accueil", legende: "L'application de consultation : le panneau d'accueil explique comment parcourir les zones d'accélération. Au survol d'une zone, une infobulle indique le type d'énergie." },
+          { src: "assets/projets/zaenr-application-fiche-commune.jpg", titre: "Consultation : fiche d'une commune", legende: "Recherche d'une commune : sa fiche (code postal, code INSEE, secteur) s'ouvre à gauche et la commune est mise en évidence sur la carte." },
+          { src: "assets/projets/zaenr-application-saisie.jpg", titre: "Saisie", legende: "L'application de saisie, destinée aux gestionnaires du portail EnR." },
+          { src: "assets/projets/zaenr-application-requeteur.jpg", titre: "Saisie : requêteur", legende: "Le requêteur de l'application de saisie : on combine des critères ET / OU sur les champs de la table des communes." },
+        ],
+      },
     ],
     atlas: [
       { type: "Méthanisation", commune: "Punerot", src: "assets/projets/zaenr-atlas-punerot-methanisation.jpg", vignette: "assets/projets/zaenr-atlas-punerot-methanisation-vignette.jpg" },
