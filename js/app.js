@@ -516,7 +516,7 @@ const PAGES = {
         <section>
           <h2>Données personnelles</h2>
           <p>Ce site ne collecte aucune donnée personnelle&nbsp;: pas de cookie, pas de mesure d'audience, pas de formulaire.</p>
-          <p>Seuls des tiers voient passer votre adresse IP&nbsp;: GitHub, qui héberge le site et la conserve pour des raisons de sécurité (${lien("https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement", "déclaration de confidentialité")}), et, si vous choisissez le fond OpenStreetMap ou un fond IGN sur la carte du parcours, le serveur qui fournit ces images.</p>
+          <p>Seuls des tiers voient passer votre adresse IP&nbsp;: GitHub, qui héberge le site et la conserve pour des raisons de sécurité (${lien("https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement", "déclaration de confidentialité")}), et, si vous choisissez le fond OpenStreetMap ou un fond IGN sur la carte du parcours, les serveurs qui fournissent ces images et les limites administratives (Fondation OpenStreetMap, IGN).</p>
         </section>
         <section>
           <h2>Documents publiés</h2>
@@ -534,7 +534,7 @@ const PAGES = {
           <h2>Fonds de carte</h2>
           <p>La carte du parcours et les cartes de situation des projets sont dessinées à partir de&nbsp;:</p>
           <ul>
-            <li>contours de la France&nbsp;: IGN, Admin Express (${lien("https://www.etalab.gouv.fr/licence-ouverte-open-licence/", "Licence Ouverte 2.0")})&nbsp;;</li>
+            <li>limites de la France (régions, départements, communes)&nbsp;: IGN, Admin Express (${lien("https://www.etalab.gouv.fr/licence-ouverte-open-licence/", "Licence Ouverte 2.0")})&nbsp;;</li>
             <li>contour du Burkina Faso&nbsp;: ${lien("https://www.geoboundaries.org/", "geoBoundaries")}, Banque mondiale (${lien("https://creativecommons.org/licenses/by/4.0/deed.fr", "CC BY 4.0")}).</li>
           </ul>
         </section>

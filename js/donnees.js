@@ -224,16 +224,6 @@ const PROJETS = [
         ],
       },
       {
-        titre: "Les besoins de chaleur",
-        intro: "Mes premières cartes de géomaticien : les besoins de chaleur du tertiaire, estimés secteur par secteur, avec ce qui peut y répondre (méthaniseurs existants, réseau de gaz, zones éligibles à la géothermie de minime importance).",
-        format: "carte",
-        images: [
-          { src: "assets/projets/zaenr-chaleur-secteur-nord.jpg", vignette: "assets/projets/zaenr-chaleur-secteur-nord-vignette.jpg", titre: "Secteur nord", legende: "De Domrémy-la-Pucelle à Harmonville : besoins de chaleur du tertiaire, trois méthaniseurs existants et le réseau de gaz qui traverse le secteur." },
-          { src: "assets/projets/zaenr-chaleur-secteur-est.jpg", vignette: "assets/projets/zaenr-chaleur-secteur-est-vignette.jpg", titre: "Secteur est", legende: "D'Harchéchamp à Dommartin-sur-Vraine : besoins de chaleur du tertiaire, méthaniseurs existants, réseau de gaz et une zone éligible à la géothermie de minime importance." },
-          { src: "assets/projets/zaenr-chaleur-secteur-ouest.jpg", vignette: "assets/projets/zaenr-chaleur-secteur-ouest-vignette.jpg", titre: "Secteur ouest", legende: "De Trampot à Liffol-le-Grand, où se concentrent les besoins de chaleur du secteur, près d'un méthaniseur existant et du réseau de gaz." },
-        ],
-      },
-      {
         titre: "Le portail EnR et ses applications",
         intro: "La carte montée dans GEO Générateur, puis le portail EnR et ses deux applications : la consultation des zones d'accélération, et la saisie, réservée aux gestionnaires du portail.",
         format: "ecran",
@@ -460,7 +450,7 @@ const PROJETS = [
       "On peut répondre sans créer de compte. Le participant choisit un domaine (santé, transport, papiers, eau et électricité…), raconte la dernière difficulté qu'il a rencontrée, dit à quelle fréquence elle revient, lui donne une note de gravité et explique comment il se débrouille aujourd'hui. Il indique aussi sa région, sa province et sa commune.",
     ],
     actions: [
-      "J'ai construit le référentiel territorial à partir des contours geoBoundaries (domaine public) : 13 régions, 45 provinces et 351 communes. Chaque unité garde ses codes de jointure (HASC, GID de GADM, identifiant geoBoundaries, code ISO des régions), ce qui permet de relier les réponses aux couches GADM ou geoBoundaries dans un SIG. Les contours sont compressés (coordonnées entières, codées par écarts successifs) dans un fichier de 230 Ko.",
+      "J'ai construit le référentiel territorial à partir des contours de geoBoundaries : 13 régions, 45 provinces et 351 communes (licence CC BY 4.0 de la Banque mondiale pour les régions et les provinces, domaine public pour les communes). Chaque unité garde ses codes de jointure (HASC, GID de GADM, identifiant geoBoundaries, code ISO des régions), ce qui permet de relier les réponses aux couches GADM ou geoBoundaries dans un SIG. Les contours sont compressés (coordonnées entières, codées par écarts successifs) dans un fichier de 230 Ko.",
       "Aucune position GPS n'est collectée. Une réponse est placée au point intérieur du polygone de la commune choisie (son pôle d'inaccessibilité), ou de la province si la commune manque. Ce point tombe toujours dans le polygone, ce que ne garantit pas le centroïde d'une commune de forme irrégulière : une jointure spatiale dans QGIS retrouve donc la bonne commune.",
       "Sur la carte du tableau de bord, les réponses d'une même commune sont dispersées à l'intérieur de ses limites sans les toucher, ou disposées en spirale autour du centre quand la place manque. La taille des étiquettes dépend de l'échelle affichée (pays, région ou province). Une étiquette qui en chevaucherait une autre est d'abord déplacée, puis réduite, et n'est pas dessinée si elle ne trouve toujours pas de place.",
       "Les exports sont pensés pour QGIS : les réponses en GeoJSON (un point par réponse) ou en CSV avec latitude, longitude et WKT en WGS 84, les limites administratives en GeoJSON avec le nombre de réponses par unité, et le référentiel des 409 unités avec leurs codes. Un classeur Excel réunit le tout, avec une feuille qui précise le système de coordonnées et les clés de jointure.",

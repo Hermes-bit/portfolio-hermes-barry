@@ -5,7 +5,8 @@
      officielle de la France métropolitaine. Aucune requête vers un service extérieur ;
    - OpenStreetMap, photos aériennes et Plan IGN : des tuiles en Web Mercator (EPSG:3857),
      chargées seulement si le visiteur les choisit. La carte est alors reconstruite dans
-     cette projection, à la même place et à la même échelle. */
+     cette projection, à la même place et à la même échelle. Les limites des régions, des
+     départements et des communes y sont tracées par-dessus (voir « Limites administratives »). */
 
 const ETIQUETTES_REGIONS = [
   ["Hauts-de-France", 49.95, 2.75], ["Normandie", 49.05, 0.1], ["Bretagne", 48.1, -2.9],
@@ -126,6 +127,103 @@ const FONDS = {
 let fondActif = "simple";
 let lieuActif = null; // lieu dont la fiche est ouverte : elle reste ouverte quand on change de fond
 
+/* ---------- Limites administratives sur les fonds en tuiles ----------
+   - Vue large (zoom < 10) : régions et départements du fond de la carte simple (js/fond-carte-france.js).
+   - En zoomant : les communes de la vue, demandées au service WFS de l'IGN (Admin Express COG CARTO,
+     version « petite échelle » puis version détaillée à partir du zoom 13).
+     Les limites de départements et de régions sont déduites des communes : deux communes voisines
+     partagent exactement les mêmes sommets, et un côté commun à deux communes de départements
+     (ou de régions) différents est une limite de département (ou de région). */
+const ZOOM_COMMUNES = 10;
+const ZOOM_COMMUNES_DETAILLEES = 13;
+const STYLES_LIMITES = {
+  commune: { weight: 1, halo: 3, dashArray: "5 4", opacity: 0.9 },
+  departement: { weight: 1.4, halo: 3.5, opacity: 1 },
+  region: { weight: 2.8, halo: 6.5, opacity: 1 },
+};
+const COULEUR_LIMITES = "#5B2A86"; // violet : la couleur habituelle des limites administratives
+const urlCommunes = (jeu, b) => "https://data.geopf.fr/wfs/ows?SERVICE=WFS&VERSION=2.0.0&REQUEST=GetFeature"
+  + `&TYPENAMES=${jeu}:commune&PROPERTYNAME=geometrie,code_insee_du_departement,code_insee_de_la_region`
+  + "&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=5000"
+  + `&BBOX=${[b.getSouth(), b.getWest(), b.getNorth(), b.getEast()].map((v) => v.toFixed(4)).join(",")},urn:ogc:def:crs:EPSG::4326`;
+let limites = null; // état des limites de la carte affichée (fonds en tuiles seulement)
+
+// Chaque niveau est tracé deux fois : un liseré blanc dessous, pour rester lisible sur les photos aériennes.
+function tracerLimite(groupe, niveau, ajouter) {
+  const s = STYLES_LIMITES[niveau];
+  ajouter({ color: "#FFFFFF", weight: s.halo, opacity: 0.6, fill: false, interactive: false }).addTo(groupe);
+  ajouter({ color: COULEUR_LIMITES, weight: s.weight, opacity: s.opacity, dashArray: s.dashArray, fill: false, interactive: false }).addTo(groupe);
+}
+
+// Communes (GeoJSON) → segments classés par niveau : { commune: [...], departement: [...], region: [...] }.
+function limitesDepuisCommunes(geojson) {
+  const cote = new Map();
+  for (const f of geojson.features) {
+    const dep = f.properties.code_insee_du_departement;
+    const reg = f.properties.code_insee_de_la_region;
+    const polygones = f.geometry.type === "MultiPolygon" ? f.geometry.coordinates : [f.geometry.coordinates];
+    for (const anneau of polygones.flat()) {
+      for (let i = 1; i < anneau.length; i++) {
+        const a = anneau[i - 1];
+        const b = anneau[i];
+        const ka = `${a[0].toFixed(6)},${a[1].toFixed(6)}`;
+        const kb = `${b[0].toFixed(6)},${b[1].toFixed(6)}`;
+        const cle = ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+        const deja = cote.get(cle);
+        if (!deja) cote.set(cle, { a, b, dep, reg, niveau: "commune" });
+        else if (deja.reg !== reg) deja.niveau = "region";
+        else if (deja.dep !== dep) deja.niveau = "departement";
+      }
+    }
+  }
+  const lignes = { commune: [], departement: [], region: [] };
+  for (const s of cote.values()) lignes[s.niveau].push([[s.a[1], s.a[0]], [s.b[1], s.b[0]]]);
+  return lignes;
+}
+
+function initLimites() {
+  const etat = { vueLarge: L.layerGroup(), communes: L.layerGroup(), jeu: null, emprise: null, controleur: null };
+  [[FR.d, "departement"], [FR.r, "region"]].forEach(([donnees, niveau]) =>
+    tracerLimite(etat.vueLarge, niveau, (style) => L.geoJSON(donnees, { style, interactive: false })));
+  limites = etat;
+  carte.on("moveend", majLimites);
+  majLimites();
+}
+
+function majLimites() {
+  const etat = limites;
+  if (!etat || !carte) return;
+  const montrer = (couche, oui) => (oui ? couche.addTo(carte) : couche.remove());
+  if (carte.getZoom() < ZOOM_COMMUNES) {
+    montrer(etat.communes, false);
+    montrer(etat.vueLarge, true);
+    return;
+  }
+  // Tant que les premières communes ne sont pas arrivées, la vue large reste affichée.
+  montrer(etat.communes, Boolean(etat.jeu));
+  montrer(etat.vueLarge, !etat.jeu);
+  const jeu = carte.getZoom() >= ZOOM_COMMUNES_DETAILLEES ? "ADMINEXPRESS-COG-CARTO.LATEST" : "ADMINEXPRESS-COG-CARTO-PE.LATEST";
+  const vue = carte.getBounds();
+  if (etat.jeu === jeu && etat.emprise.contains(vue)) return; // déjà chargé
+  if (etat.controleur) etat.controleur.abort();
+  const controleur = new AbortController();
+  etat.controleur = controleur;
+  const emprise = vue.pad(0.2); // une marge autour de la vue : un petit déplacement ne relance pas la requête
+  fetch(urlCommunes(jeu, emprise), { signal: controleur.signal })
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`WFS ${r.status}`))))
+    .then((geojson) => {
+      if (limites !== etat || etat.controleur !== controleur) return; // la carte a changé entre-temps
+      const lignes = limitesDepuisCommunes(geojson);
+      etat.communes.clearLayers();
+      ["commune", "departement", "region"].forEach((niveau) => {
+        if (lignes[niveau].length) tracerLimite(etat.communes, niveau, (style) => L.polyline(lignes[niveau], style));
+      });
+      Object.assign(etat, { jeu, emprise, controleur: null });
+      majLimites();
+    })
+    .catch(() => {}); // service indisponible ou requête annulée : la carte reste utilisable sans les communes
+}
+
 /* ---------- Éléments HTML ---------- */
 
 // Rond pour une alternance, carré pour une formation, avec le numéro chronologique.
@@ -224,6 +322,8 @@ function initCarte(vue) {
 
   if (tuiles) {
     L.tileLayer(fond.tuiles, { maxZoom: 18, attribution: fond.credit }).addTo(carte);
+    carte.attributionControl.addAttribution(`Limites : ${SOURCE_IGN}, Admin Express`);
+    initLimites();
   } else {
     carte.attributionControl.addAttribution(fond.credit);
     // Fond : aplat des régions (pour mettre en valeur la région du lieu choisi), limites des
@@ -290,6 +390,8 @@ function changerFond(id) {
 }
 
 function fermerCarte() {
+  if (limites && limites.controleur) limites.controleur.abort();
+  limites = null;
   if (carte) {
     carte.remove();
     carte = null;
