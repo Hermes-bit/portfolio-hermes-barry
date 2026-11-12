@@ -31,7 +31,8 @@ const PROFIL = {
    (visuels, resultat, difficulte, liens) peuvent être retirés : la section
    correspondante disparaît.
    visuels : soit { src, legende } pour une image, soit "[[...]]" pour une image à ajouter.
-     Ajouter format: "telephone" pour une capture de téléphone (en portrait, affichée côte à côte).
+     Ajouter format: "telephone" pour une capture de téléphone : elles sont réunies dans une vitrine,
+     numérotées dans l'ordre du tableau, avec titre (court, sous l'écran) et légende (liste en dessous).
    vignette : image de la carte du projet (liste des projets) quand il n'y a pas de couverture.
      Ajouter fond: "#couleur" pour afficher l'image entière (un logo par exemple) sur ce fond, sans recadrage.
    perso : true pour un projet personnel (rubrique « Projets personnels » de la page Projets).
@@ -320,11 +321,12 @@ const PROJETS = [
       "Le modèle est exporté au format ONNX et tourne directement dans le navigateur du téléphone. L'appli ne retient que les obstacles situés dans le couloir de marche, estime leur distance d'après leur position dans l'image et les annonce à la voix. Chaque nouvelle version est mesurée sur un jeu de test qui ne change jamais, avec un objectif : détecter au moins 90 % des potelets.",
     ],
     visuels: [
-      { src: "assets/projets/vision-ar-demo.webp", format: "telephone", legende: "La démo en ligne, avec une position simulée à Gennevilliers : choix du profil fauteuil roulant, recherche d'une destination, puis l'itinéraire le plus accessible (1,2 km, aucune marche, pente maximale de 2,8 %)." },
-      { src: "assets/projets/vision-ar-itineraire.jpg", format: "telephone", legende: "Le choix de l'itinéraire avec un profil fauteuil roulant : 380 m, aucune marche, pente maximale de 2,8 %. L'application signale aussi 50 m sur la chaussée et trois traversées sans feu sonore connu." },
-      { src: "assets/projets/vision-ar-parametres.jpg", format: "telephone", legende: "Les paramètres : profil de mobilité, consignes à la voix (deux voix Piper ou celle du téléphone) et vibrations de direction." },
-      { src: "assets/projets/vision-ar-demarrage.jpg", format: "telephone", legende: "L'écran de démarrage, pendant la préparation du plan." },
-      { src: "assets/projets/vision-ar-guidage.jpg", format: "telephone", legende: "Le guidage, en mode démonstration : le trajet défile tout seul et, sans caméra, la rue est remplacée par un sol quadrillé. Le ruban de flèches montre le chemin ; la consigne (tourner à droite dans 16 m), les marches, l'heure d'arrivée et la distance sont en haut, le plan en bas." },
+      // Dans l'ordre du parcours : l'animation, puis démarrage → réglages → itinéraire → guidage
+      { src: "assets/projets/vision-ar-demo.webp", format: "telephone", titre: "Démo animée", legende: "La démo en ligne, avec une position simulée à Gennevilliers : choix du profil fauteuil roulant, recherche d'une destination, puis l'itinéraire le plus accessible (1,2 km, aucune marche, pente maximale de 2,8 %)." },
+      { src: "assets/projets/vision-ar-demarrage.jpg", format: "telephone", titre: "Démarrage", legende: "L'écran de démarrage, pendant la préparation du plan." },
+      { src: "assets/projets/vision-ar-parametres.jpg", format: "telephone", titre: "Réglages", legende: "Les paramètres : profil de mobilité, consignes à la voix (deux voix Piper ou celle du téléphone) et vibrations de direction." },
+      { src: "assets/projets/vision-ar-itineraire.jpg", format: "telephone", titre: "Itinéraire", legende: "Le choix de l'itinéraire avec un profil fauteuil roulant : 380 m, aucune marche, pente maximale de 2,8 %. L'application signale aussi 50 m sur la chaussée et trois traversées sans feu sonore connu." },
+      { src: "assets/projets/vision-ar-guidage.jpg", format: "telephone", titre: "Guidage", legende: "Le guidage, en mode démonstration : le trajet défile tout seul et, sans caméra, la rue est remplacée par un sol quadrillé. Le ruban de flèches montre le chemin ; la consigne (tourner à droite dans 16 m), les marches, l'heure d'arrivée et la distance sont en haut, le plan en bas." },
     ],
     resultat: [
       "J'ai testé l'application sur le terrain, à Gennevilliers. Les essais ont fait apparaître des bugs, qui restent à corriger.",
@@ -374,8 +376,8 @@ const PROJETS = [
       "Un second volet, écrit en Python, doit ensuite analyser les réponses avec une chaîne d'agents d'IA (LangGraph et l'API Claude) : modération, regroupement des idées proches, rattachement à la commune, priorisation. Aux étapes clés, rien n'avance sans une décision humaine. Ce volet est testé sur des réponses simulées, mais il n'est pas encore relié à la base.",
     ],
     visuels: [
-      { src: "assets/projets/ideomes-accueil.jpg", format: "telephone", legende: "L'accueil de l'application sur téléphone. Répondre prend environ cinq minutes, et on peut rester anonyme." },
-      { src: "assets/projets/ideomes-localisation.jpg", format: "telephone", legende: "Le participant indique où il habite : la liste des provinces dépend de la région choisie, celle des communes dépend de la province." },
+      { src: "assets/projets/ideomes-accueil.jpg", format: "telephone", titre: "Accueil", legende: "L'accueil de l'application sur téléphone. Répondre prend environ cinq minutes, et on peut rester anonyme." },
+      { src: "assets/projets/ideomes-localisation.jpg", format: "telephone", titre: "Localisation", legende: "Le participant indique où il habite : la liste des provinces dépend de la région choisie, celle des communes dépend de la province." },
     ],
     resultat: [
       "Le questionnaire, la carte et les exports sont développés, et l'application a été publiée sur GitHub Pages. La chaîne d'analyse est écrite mais pas encore branchée sur la base.",

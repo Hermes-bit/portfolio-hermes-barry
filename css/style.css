@@ -356,6 +356,66 @@ figcaption { margin-top: 8px; font-size: .95rem; color: var(--muted); }
 .visuels { display: grid; gap: 20px; margin-top: 28px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .visuels > * { grid-column: 1 / -1; }          /* par défaut, une image occupe toute la largeur */
 .visuels > .telephone { grid-column: auto; }   /* les captures de téléphone se rangent côte à côte */
+/* Vitrine des captures de téléphone (galerieTelephones dans app.js) */
+.galerie-tel {
+  margin-top: 32px;
+  padding: 32px 28px 28px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--surface);
+}
+/* Les écrans sur une ligne ; s'ils ne tiennent pas (téléphone), on les fait défiler du doigt */
+.tel-ecrans {
+  list-style: none;
+  margin: 0;
+  padding: 16px 12px 12px;   /* place pour la pastille numérotée et l'écran qui se soulève au survol */
+  display: flex;
+  gap: clamp(14px, 1.8vw, 30px);
+  justify-content: safe center;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+/* Les écrans se partagent la largeur (130 à 210 px) ; en dessous de 130 px, on les fait défiler */
+.tel-ecrans li { flex: 1 1 0; min-width: 130px; max-width: 210px; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.tel-cadre {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 6px;
+  border-radius: 28px;
+  background: #0A111C;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .10), 0 14px 30px rgba(9, 20, 35, .28);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tel-cadre:hover { transform: translateY(-6px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .14), 0 22px 40px rgba(9, 20, 35, .34); }
+.tel-cadre img { display: block; width: 100%; aspect-ratio: 9 / 19.5; object-fit: cover; object-position: top; border: 0; border-radius: 22px; }
+@media (prefers-reduced-motion: reduce) { .tel-cadre, .tel-cadre:hover { transition: none; transform: none; } }
+/* Numéro en pastille sur le coin de l'écran, titre centré dessous ; les mêmes numéros repèrent les légendes */
+.tel-num { position: absolute; z-index: 1; top: -10px; left: -10px; box-shadow: 0 0 0 3px var(--surface); }
+.tel-titre { font-weight: 600; font-size: .98rem; line-height: 1.3; text-align: center; }
+.tel-num, .tel-legendes i {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--surface);
+  font-style: normal;
+  font-size: .8rem;
+  font-weight: 700;
+}
+.tel-ecrans .tel-num { width: 30px; height: 30px; font-size: .9rem; }
+.tel-legendes { list-style: none; margin: 28px 0 0; padding: 24px 0 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 14px 32px; }
+.tel-legendes li { display: flex; gap: 12px; align-items: flex-start; }
+.tel-legendes i { margin-top: 2px; }
+.tel-legendes p { margin: 0; max-width: none; color: var(--muted); font-size: .97rem; }
+.tel-legendes b { color: var(--ink); }
+
 /* Atlas des ZAEnR, classé par type d'énergie (atlasParType dans app.js) */
 .filtres-enr { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
 .filtres-enr button {

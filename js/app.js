@@ -223,6 +223,24 @@ function visuel(v) {
   return `<figure${v.format === "telephone" ? ' class="telephone"' : ""}><a href="${v.src}" target="_blank" rel="noopener"><img src="${v.src}" alt="${v.legende}" loading="lazy"></a><figcaption>${v.legende}</figcaption></figure>`;
 }
 
+// Vitrine des captures de téléphone (visuels au format "telephone") : les écrans alignés dans un cadre
+// de téléphone, numérotés avec un titre court, puis les légendes complètes en liste numérotée.
+function galerieTelephones(liste) {
+  if (!liste.length) return "";
+  const ecran = (v, i) => `<li>
+      <a class="tel-cadre" href="${v.src}" target="_blank" rel="noopener" title="Agrandir">
+        <i class="tel-num">${i + 1}</i>
+        <img src="${v.src}" alt="${v.titre ? `${v.titre} : ` : ""}${v.legende}" loading="lazy">
+      </a>
+      ${v.titre ? `<span class="tel-titre">${v.titre}</span>` : ""}
+    </li>`;
+  const legende = (v, i) => `<li><i>${i + 1}</i><p>${v.titre ? `<b>${v.titre}.</b> ` : ""}${v.legende}</p></li>`;
+  return `<div class="galerie-tel">
+    <ol class="tel-ecrans">${liste.map(ecran).join("")}</ol>
+    <ol class="tel-legendes">${liste.map(legende).join("")}</ol>
+  </div>`;
+}
+
 // Planches de l'atlas des ZAEnR, regroupées par type d'énergie (ordre alphabétique),
 // puis par commune. Un bouton par type permet de n'afficher que ses planches
 // (le clic est géré plus bas, dans « Interactions »).
@@ -350,7 +368,10 @@ function pageProjet(p) {
   const precedent = PROJETS[(i - 1 + PROJETS.length) % PROJETS.length];
   const suivant = PROJETS[(i + 1) % PROJETS.length];
   const section = (titre, contenu) => (contenu ? `<section><h2>${titre}</h2>${contenu}</section>` : "");
-  const visuels = (p.visuels || []).map(visuel).join("");
+  // Les captures de téléphone vont dans la vitrine ; les autres images gardent la grille habituelle.
+  const estTelephone = (v) => typeof v === "object" && v.format === "telephone";
+  const visuels = (p.visuels || []).filter((v) => !estTelephone(v)).map(visuel).join("");
+  const galerie = galerieTelephones((p.visuels || []).filter(estTelephone));
   const outils = textes(p.outils);
   const liens = (p.liens || [])
     .map((l) => `<a class="btn ${l === p.liens[0] ? "principal" : "secondaire"}" href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`)
@@ -379,6 +400,7 @@ function pageProjet(p) {
       ${section("Contexte", paragraphes(p.contexte))}
       ${section("Ce que j'ai fait", paragraphes(p.actions))}
       ${visuels ? `<div class="visuels">${visuels}</div>` : ""}
+      ${galerie}
       ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
       ${section("Résultat", paragraphes(p.resultat))}
       ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
