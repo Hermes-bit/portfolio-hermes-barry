@@ -373,6 +373,7 @@ const PROJETS = [
     resume: "Une application qui calcule l'itinéraire selon l'effort réel (pentes, marches, bordures de trottoir) et guide la personne dans l'image de la caméra, à la voix ou en vibrations. Les obstacles sont repérés par un modèle de détection que j'entraîne moi-même.",
     liens: [
       { texte: "Ouvrir la démo", url: "https://hermes-bit.github.io/vision-ar-demo/", note: "La démo est faite pour un téléphone. Le guidage suit le GPS : il ne fonctionne vraiment que sur place, à Gennevilliers." },
+      { texte: "Voir le code de la démo sur GitHub", url: "https://github.com/Hermes-bit/vision-ar-demo" },
     ],
     contexte: [
       "Vision AR s'adresse aux personnes en fauteuil roulant, malvoyantes ou malentendantes. L'itinéraire tient compte de ce qui rend un trajet difficile : pentes, dévers, marches, bordures de trottoir, revêtement. Les consignes s'affichent à l'écran ou dans des lunettes connectées (INMO Air 3, Rokid), et passent aussi par la voix et les vibrations.",
@@ -538,6 +539,19 @@ const SAVOIR_ETRE = [
   { qualite: "Travail en équipe", extrait: "parfaitement intégré dans une équipe pluridisciplinaire", lettre: "hub-pnr" },
   { qualite: "Qualités relationnelles", extrait: "unanimement apprécié pour sa bienveillance, sa simplicité et ses qualités relationnelles", lettre: "hub-pnr" },
 ];
+
+/* Cartothèque (page #cartotheque).
+   La page réunit automatiquement les cartes déjà présentes dans les projets (galeries au format "carte"
+   et atlas des ZAEnR). Pour ajouter une NOUVELLE carte, il suffit d'ajouter une ligne ici :
+     { src: "assets/cartes/ma-carte.jpg",            // la carte en grand (ouverte au clic)
+       vignette: "assets/cartes/ma-carte-vignette.jpg", // facultatif : version allégée (environ 1200 px de large)
+       titre: "Titre de la carte",
+       legende: "Ce que montre la carte, les données utilisées.",
+       serie: "Cartes personnelles",                   // nom du filtre (bouton) sous lequel la ranger
+       annee: "2026",                                  // facultatif
+       projet: "vision-ar" }                           // facultatif : id du projet lié (lien « Voir le projet »)
+*/
+const CARTES = [];
 
 /* Centres d'intérêt (page d'accueil, sous le savoir-être). L'illustration de chaque carte est dessinée
    dans app.js (ILLUSTRATIONS_INTERETS), d'après son id. badge : petite étiquette sur l'illustration. */

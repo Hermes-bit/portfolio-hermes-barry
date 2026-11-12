@@ -307,6 +307,49 @@ function galerieSection(g) {
   return `<section class="galerie"><h2>${g.titre}</h2>${g.intro ? `<p class="galerie-intro">${g.intro}</p>` : ""}${contenu}</section>`;
 }
 
+/* Page « Cartothèque » : toutes les cartes du portfolio au même endroit.
+   Elles viennent des projets (galeries au format "carte", atlas des ZAEnR) et de la liste CARTES
+   (nouvelles cartes). Les boutons filtrent par série ; un clic ouvre la carte dans la visionneuse. */
+function cartesDuPortfolio() {
+  const cartes = [];
+  PROJETS.forEach((p) => {
+    (p.galeries || []).filter((g) => g.format === "carte").forEach((g) =>
+      g.images.forEach((im) => cartes.push({ ...im, serie: p.titreCourt, projet: p.id })));
+    (p.atlas || []).forEach((pl) => cartes.push({
+      src: pl.src, vignette: pl.vignette,
+      titre: `${pl.commune} : ${pl.type.toLowerCase()}`,
+      legende: "Planche de l'atlas des zones d'accélération des énergies renouvelables remis aux communes.",
+      serie: p.titreCourt, projet: p.id,
+    }));
+  });
+  return cartes.concat(CARTES.map((c) => ({ serie: "Cartes personnelles", ...c })));
+}
+
+function pageCartotheque() {
+  const cartes = cartesDuPortfolio();
+  const series = [...new Set(cartes.map((c) => c.serie))];
+  const boutons = series.length < 2 ? "" : `<div class="filtres-enr" role="group" aria-label="Filtrer les cartes par série">
+    <button type="button" data-filtre-enr="" aria-pressed="true">Toutes <span>${cartes.length}</span></button>
+    ${series.map((s) => `<button type="button" data-filtre-enr="${s}" aria-pressed="false">${s} <span>${cartes.filter((c) => c.serie === s).length}</span></button>`).join("")}
+  </div>`;
+  const carte = (c) => {
+    const projet = c.projet && PROJETS.find((p) => p.id === c.projet);
+    return `<figure class="carte-planche" data-type-enr="${c.serie}">
+      <a class="carte-papier" href="${c.src}" target="_blank" rel="noopener" title="Ouvrir la carte en grand"><img src="${c.vignette || c.src}" alt="${c.titre} : ${c.legende}" loading="lazy"></a>
+      <figcaption><b>${c.titre}</b><span>${c.legende}${c.annee ? ` (${c.annee})` : ""}</span>
+        ${projet ? `<a class="carto-projet" href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}</figcaption>
+    </figure>`;
+  };
+  return `<div class="wrap"><section class="bloc">
+    <h1 class="titre-page">Cartothèque</h1>
+    <p class="chapo">Les cartes présentées dans mes projets, réunies au même endroit. Cliquez sur une carte pour l'ouvrir en grand ; les boutons filtrent par projet.</p>
+    <div class="atlas cartotheque">
+      ${boutons}
+      <div class="planches">${cartes.map(carte).join("")}</div>
+    </div>
+  </section></div>`;
+}
+
 // Planches de l'atlas des ZAEnR, regroupées par type d'énergie (ordre alphabétique),
 // puis par commune. Un bouton par type permet de n'afficher que ses planches
 // (le clic est géré plus bas, dans « Interactions »).
@@ -408,6 +451,10 @@ const PAGES = {
       <p class="chapo">Des projets que je mène de mon côté, en dehors de l'alternance et de la formation.</p>
       <div class="grille-projets">${perso.map(carteProjet).join("")}</div>
     </section>` : ""}</div>`;
+  },
+
+  cartotheque() {
+    return pageCartotheque();
   },
 
   parcours() {
