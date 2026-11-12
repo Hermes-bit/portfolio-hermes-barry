@@ -408,7 +408,7 @@ const PAGES = {
         <div>
           <h1>${PROFIL.nom}</h1>
           <p class="hero-poste">${PROFIL.poste}, formé en alternance à l'IDGEO (Bac+5)</p>
-          <p class="hero-intro">Fraîchement diplômé de l'IDGEO et impatient de commencer ma carrière, je recherche un poste de géomaticien ou de chef de projet SIG.
+          <p class="hero-intro">Fraîchement diplômé de l'IDGEO et impatient de commencer ma carrière, je recherche un poste de géomaticien ou de chef de projet en géomatique.
             Mon métier consiste à transformer des données géographiques en outils utiles pour décider et aménager le territoire.
             Pendant mes alternances à la Région Nouvelle-Aquitaine, chez SNCF Réseau et à la Communauté de communes de l'Ouest Vosgien,
             j'ai surtout travaillé sur des bases PostGIS et sur l'automatisation des mises à jour de données.
@@ -482,7 +482,7 @@ const PAGES = {
     const tel = PROFIL.telephone.replace(/\s/g, "");
     return `<div class="wrap"><section class="bloc">
       <h1 class="titre-page">Contact</h1>
-      <p class="chapo">Je cherche un poste de géomaticien ou de chef de projet SIG, en Île-de-France ou ailleurs.
+      <p class="chapo">Je cherche un poste de géomaticien ou de chef de projet en géomatique, en Île-de-France ou ailleurs.
         Le plus simple est de m'écrire.</p>
       <dl class="coordonnees">
         <div><dt>E-mail</dt><dd><a id="email" href="mailto:${PROFIL.email}">${PROFIL.email}</a><button class="copier" type="button" data-copier="email">Copier</button></dd></div>
@@ -492,6 +492,65 @@ const PAGES = {
         <div><dt>CV</dt><dd><a href="${PROFIL.cv}" download>Télécharger (PDF)</a></dd></div>
         <div><dt>Secteur</dt><dd>${PROFIL.zone}</dd></div>
       </dl>
+    </section></div>`;
+  },
+
+  // Mentions légales (LCEN, art. 6) et données personnelles (RGPD). Lien dans le pied de page.
+  "mentions-legales"() {
+    const lien = (url, texte) => `<a href="${url}" target="_blank" rel="noopener">${texte}</a>`;
+    return `<div class="wrap"><section class="bloc">
+      <h1 class="titre-page">Mentions légales</h1>
+      <p class="chapo">Qui édite ce site, qui l'héberge, et ce que deviennent vos données quand vous le consultez.</p>
+      <div class="mentions">
+        <section>
+          <h2>Éditeur</h2>
+          <p>Ce site est mon portfolio personnel, sans activité commerciale. J'en suis l'éditeur et le directeur de la publication.</p>
+          <p><b>${PROFIL.nom}</b><br><a href="mailto:${PROFIL.email}">${PROFIL.email}</a></p>
+        </section>
+        <section>
+          <h2>Hébergeur</h2>
+          <p>Le site est hébergé par GitHub Pages, un service de&nbsp;:</p>
+          <p><b>GitHub, Inc.</b><br>88 Colin P. Kelly Jr. Street<br>San Francisco, CA 94107, États-Unis<br>Téléphone&nbsp;: +1 877 448 4820<br>${lien("https://github.com", "github.com")}</p>
+        </section>
+        <section>
+          <h2>Documents publiés</h2>
+          <p>Les lettres de recommandation et les certificats sont publiés dans leur version originale. Si vous figurez dans l'un de ces documents et souhaitez qu'il soit modifié ou retiré, écrivez-moi&nbsp;: je le ferai sans délai.</p>
+        </section>
+        <section>
+          <h2>Données personnelles</h2>
+          <p>Ce site ne dépose aucun cookie, ne mesure pas l'audience et ne contient aucun formulaire. Les polices de caractères sont hébergées sur le site&nbsp;: votre navigateur n'interroge ni Google ni aucun autre service.</p>
+          <p>GitHub enregistre l'adresse IP des visiteurs pour des raisons de sécurité, comme l'indique sa ${lien("https://docs.github.com/fr/pages/getting-started-with-github-pages/about-github-pages#data-collection", "documentation")}. Voir aussi sa ${lien("https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement", "déclaration de confidentialité")}.</p>
+          <p>Si vous m'écrivez, votre message sert uniquement à vous répondre et je ne le transmets à personne. Vous pouvez me demander par e-mail d'accéder à vos données, de les corriger ou de les supprimer. Vous pouvez aussi ${lien("https://www.cnil.fr/fr/adresser-une-plainte", "adresser une réclamation à la CNIL")}.</p>
+        </section>
+        <section>
+          <h2>Logiciels et polices</h2>
+          <ul>
+            <li>Carte interactive&nbsp;: Leaflet 1.9.4, ©&nbsp;Vladimir Agafonkin, ${lien("vendor/leaflet/LICENSE.txt", "licence BSD à 2 clauses")}.</li>
+            <li>Police&nbsp;: Source Sans 3, ©&nbsp;Adobe, ${lien("assets/polices/OFL.txt", "SIL Open Font License 1.1")}.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Propriété intellectuelle</h2>
+          <ul>
+            <li>Les textes, les photos et mes cartes personnelles sont de moi. Merci de me demander avant de les reprendre.</li>
+            <li>Les captures et les cartes réalisées pendant mes alternances, pour la Région Nouvelle-Aquitaine et la Communauté de communes de l'Ouest Vosgien, sont présentées comme références professionnelles. Ces structures en conservent les droits.</li>
+            <li>Les cartes et les données de SNCF Réseau sont sa propriété&nbsp;: aucune n'est diffusée ici.</li>
+            <li>Les logos et les marques appartiennent à leurs propriétaires. Ils servent seulement à identifier les structures où j'ai travaillé ou étudié.</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Sources des données</h2>
+          <p>Les principales sources des cartes de ce site&nbsp;:</p>
+          <ul>
+            <li>IGN&nbsp;: Admin Express, RGE ALTI&nbsp;;</li>
+            <li>Inventaire national du patrimoine naturel (INPN)&nbsp;;</li>
+            <li>plan cadastral (DGFiP, cadastre.gouv.fr)&nbsp;;</li>
+            <li>OpenStreetMap&nbsp;: ©&nbsp;les contributeurs OpenStreetMap, ${lien("https://www.openstreetmap.org/copyright", "licence ODbL")}&nbsp;;</li>
+            <li>HDX, geoBoundaries, GADM et UCDP pour le Burkina Faso.</li>
+          </ul>
+        </section>
+      </div>
+      <p class="maj">Mentions mises à jour le 12 novembre 2026.</p>
     </section></div>`;
   },
 };
@@ -641,7 +700,9 @@ function afficher() {
   });
   document.getElementById("menu").classList.remove("ouvert");
   document.getElementById("burger").setAttribute("aria-expanded", "false");
-  document.title = projet ? `${projet.titreCourt} | ${PROFIL.nom}` : `${PROFIL.nom} | ${PROFIL.poste}`;
+  document.title = projet ? `${projet.titreCourt} | ${PROFIL.nom}`
+    : page === "mentions-legales" ? `Mentions légales | ${PROFIL.nom}`
+    : `${PROFIL.nom} | ${PROFIL.poste}`;
   window.scrollTo(0, 0);
 
   if (page === "accueil") requestAnimationFrame(dessinerCourbes);
@@ -651,7 +712,7 @@ function afficher() {
 function remplirPied() {
   document.getElementById("cv-entete").href = PROFIL.cv;
   document.getElementById("pied").innerHTML = `<div class="wrap">
-    <span>© ${new Date().getFullYear()} ${PROFIL.nom}</span>
+    <span>© ${new Date().getFullYear()} ${PROFIL.nom} · <a href="#mentions-legales">Mentions légales</a></span>
     <span class="pied-liens">
       <a href="mailto:${PROFIL.email}">${PROFIL.email}</a>
       <a href="${PROFIL.linkedin}" target="_blank" rel="noopener">LinkedIn</a>

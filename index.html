@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Hermès Barry | Géomaticien – chef de projet SIG</title>
-  <meta name="description" content="Hermès Barry, géomaticien et chef de projet SIG : projets SIG (PostGIS, ETL, web SIG), parcours et contact.">
+  <title>Hermès Barry | Géomaticien – chef de projet en géomatique</title>
+  <meta name="description" content="Hermès Barry, géomaticien et chef de projet en géomatique : projets SIG (PostGIS, ETL, web SIG), parcours et contact.">
   <!-- Aperçu affiché quand on partage le lien (LinkedIn, messageries…). Les adresses doivent être complètes.
        Après un changement de l'image, demander à LinkedIn de relire la page : https://www.linkedin.com/post-inspector/ -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="Hermès Barry, géomaticien">
-  <meta property="og:title" content="Hermès Barry | Géomaticien – chef de projet SIG">
+  <meta property="og:title" content="Hermès Barry | Géomaticien – chef de projet en géomatique">
   <meta property="og:description" content="Géomaticien diplômé de l'IDGEO (Bac+5) : bases PostGIS, web SIG, cartographie et analyse spatiale. Paris et périphérie, disponible dès maintenant.">
   <meta property="og:url" content="https://hermes-bit.github.io/portfolio-hermes-barry/">
   <meta property="og:image" content="https://hermes-bit.github.io/portfolio-hermes-barry/assets/apercu-partage.jpg">
@@ -22,20 +22,19 @@
   <link rel="icon" href="assets/favicon-32.png?v=2" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/favicon-64.png?v=2" sizes="64x64" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap">
+  <!-- Police hébergée sur le site (voir css/style.css) : chargée en avance pour éviter un changement de police visible -->
+  <link rel="preload" href="assets/polices/source-sans-3-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <!-- ?v= : numéro de version à changer à chaque mise en ligne. Sans lui, les navigateurs
        gardent l'ancienne copie des CSS et JS en mémoire et n'affichent pas les modifications. -->
-  <link rel="stylesheet" href="css/style.css?v=20261112-30">
-  <link rel="stylesheet" href="css/carte.css?v=20261112-30">
+  <link rel="stylesheet" href="css/style.css?v=20261112-31">
+  <link rel="stylesheet" href="css/carte.css?v=20261112-31">
 </head>
 <body>
 
 <header class="entete">
   <div class="wrap">
-    <a class="nom" href="#accueil">Hermès Barry<small>Géomaticien – chef de projet SIG</small></a>
+    <a class="nom" href="#accueil">Hermès Barry<small>Géomaticien – chef de projet en géomatique</small></a>
     <nav class="menu" id="menu" aria-label="Navigation principale">
       <a href="#accueil" data-nav="accueil">Accueil</a>
       <a href="#projets" data-nav="projets">Projets</a>
@@ -80,14 +79,14 @@
 <!-- Leaflet 1.9.4 (copie locale) -->
 <script src="vendor/leaflet/leaflet.js"></script>
 <!-- Fond de carte : régions, départements et contour de la France -->
-<script src="js/fond-carte-france.js?v=20261112-30"></script>
+<script src="js/fond-carte-france.js?v=20261112-31"></script>
 <!-- Contour du Burkina Faso (carte de situation du projet GéoBurkina) -->
-<script src="js/fond-carte-burkina.js?v=20261112-30"></script>
+<script src="js/fond-carte-burkina.js?v=20261112-31"></script>
 <!-- Contenu : profil, projets, compétences, lieux du parcours -->
-<script src="js/donnees.js?v=20261112-30"></script>
+<script src="js/donnees.js?v=20261112-31"></script>
 <!-- Carte du parcours -->
-<script src="js/carte.js?v=20261112-30"></script>
+<script src="js/carte.js?v=20261112-31"></script>
 <!-- Pages et navigation -->
-<script src="js/app.js?v=20261112-30"></script>
+<script src="js/app.js?v=20261112-31"></script>
 </body>
 </html>

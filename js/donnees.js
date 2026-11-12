@@ -7,7 +7,7 @@
 
 const PROFIL = {
   nom: "Hermès Barry",
-  poste: "Géomaticien – chef de projet SIG", // poste recherché, comme sur le CV (en-tête, accueil, titre de l'onglet)
+  poste: "Géomaticien – chef de projet en géomatique", // poste recherché (en-tête, accueil, titre de l'onglet)
   photo: "assets/photo.jpg",
   cv: "assets/CV-Hermes-Barry.pdf",
   email: "hermesbarry58@gmail.com",
