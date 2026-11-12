@@ -408,7 +408,7 @@ const PAGES = {
         <div>
           <h1>${PROFIL.nom}</h1>
           <p class="hero-poste">${PROFIL.poste}, formé en alternance à l'IDGEO (Bac+5)</p>
-          <p class="hero-intro">Fraîchement diplômé de l'IDGEO et impatient de commencer ma carrière, je recherche un poste de géomaticien ou de technicien SIG.
+          <p class="hero-intro">Fraîchement diplômé de l'IDGEO et impatient de commencer ma carrière, je recherche un poste de géomaticien ou de chef de projet SIG.
             Mon métier consiste à transformer des données géographiques en outils utiles pour décider et aménager le territoire.
             Pendant mes alternances à la Région Nouvelle-Aquitaine, chez SNCF Réseau et à la Communauté de communes de l'Ouest Vosgien,
             j'ai surtout travaillé sur des bases PostGIS et sur l'automatisation des mises à jour de données.
@@ -482,7 +482,7 @@ const PAGES = {
     const tel = PROFIL.telephone.replace(/\s/g, "");
     return `<div class="wrap"><section class="bloc">
       <h1 class="titre-page">Contact</h1>
-      <p class="chapo">Je cherche un poste de géomaticien, en Île-de-France ou ailleurs.
+      <p class="chapo">Je cherche un poste de géomaticien ou de chef de projet SIG, en Île-de-France ou ailleurs.
         Le plus simple est de m'écrire.</p>
       <dl class="coordonnees">
         <div><dt>E-mail</dt><dd><a id="email" href="mailto:${PROFIL.email}">${PROFIL.email}</a><button class="copier" type="button" data-copier="email">Copier</button></dd></div>

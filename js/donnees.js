@@ -7,7 +7,7 @@
 
 const PROFIL = {
   nom: "Hermès Barry",
-  poste: "Géomaticien", // poste recherché (en-tête, accueil, titre de l'onglet)
+  poste: "Géomaticien – chef de projet SIG", // poste recherché, comme sur le CV (en-tête, accueil, titre de l'onglet)
   photo: "assets/photo.jpg",
   cv: "assets/CV-Hermes-Barry.pdf",
   email: "hermesbarry58@gmail.com",
@@ -113,8 +113,8 @@ const PROJETS = [
     logo: { src: "assets/logos/region-nouvelle-aquitaine.png", nom: "Région Nouvelle-Aquitaine", surBlanc: true },
     titreCourt: "Hub de données des Parcs naturels régionaux",
     titre: "Un hub de données commun aux Parcs naturels régionaux de Nouvelle-Aquitaine",
-    cadre: "Région Nouvelle-Aquitaine",
-    role: "Chef de projet géomatique (alternance)",
+    cadre: "Région Nouvelle-Aquitaine (Unité Données – Information Géographique)",
+    role: "Chef de projet en géomatique (alternance)",
     periode: "Sept. 2025 – oct. 2026",
     lieu: "Poitiers (86)",
     ll: [46.58, 0.34],
@@ -128,7 +128,7 @@ const PROJETS = [
     ],
     actions: [
       "J'ai recueilli les besoins et rédigé les cahiers des charges technique et fonctionnel.",
-      "J'ai conçu le modèle de la base commune sous PostgreSQL / PostGIS. Il s'articule autour d'une donnée centrale des PNR (contours des parcs et grille communale) ; chaque indicateur y est rattaché par un champ commun qui identifie le parc.",
+      "J'ai conçu le modèle de la base commune sous PostgreSQL / PostGIS. Il s'articule autour d'une donnée centrale des PNR (contours des parcs et grille communale) ; chaque indicateur y est rattaché par un champ commun qui identifie le parc. J'ai aussi écrit les contrôles qualité des données en SQL.",
       "Les indicateurs ne viennent pas des parcs : nous les avons calculés nous-mêmes, avec des traitements FME dans Data Interoperability, l'extension ETL d'ArcGIS Pro.",
       "La mise à jour est automatique. Les données démographiques arrivent directement par l'API Melodi de l'INSEE ; les autres sont récupérées dans le référentiel interne de la Région, stocké dans une géodatabase d'entreprise (SDE).",
       "Les données sont diffusées sur le portail ArcGIS Enterprise de la Région, réservé aux agents. Un site Enterprise Sites présente l'ensemble des parcs, et chaque parc a son application Experience Builder, organisée en quatre pages : fiche d'identité, démographie, environnement et économie.",
@@ -189,10 +189,10 @@ const PROJETS = [
       "La communauté de communes regroupe 70 communes autour de Neufchâteau, soit 24 512 habitants sur 729 km².",
     ],
     actions: [
-      "J'ai rassemblé les couches nécessaires à l'analyse, puis je les ai croisées pour faire ressortir les zones favorables : le plan de prévention du risque inondation (PPRi), les zonages du PLUi et les sites Natura 2000.",
+      "J'ai rassemblé les couches nécessaires à l'analyse, puis je les ai croisées pour faire ressortir les zones favorables : le plan de prévention du risque inondation (PPRi), les zonages du PLUi, les sites Natura 2000 et la topographie.",
       "Les données sont stockées dans une base PostgreSQL avec l'extension PostGIS, que j'administrais avec pgAdmin : une table par type d'énergie, reliée aux communes.",
       "J'ai produit un atlas de cartes des ZAEnR destiné aux élus et aux communes.",
-      "J'ai participé à la mise en place du SIG mutualisé sur QGIS Cloud, et j'y ai intégré des flux WMTS : le cadastre de la collectivité, le PLUi et les fonds de l'IGN.",
+      "J'ai participé à la mise en place du SIG mutualisé sur QGIS Cloud : j'y ai intégré des flux WMTS (le cadastre de la collectivité, le PLUi et les fonds de l'IGN) et j'ai digitalisé les zones du PLUi.",
       "J'ai aussi travaillé sur les cartes de randonnée pédestre de l'office du tourisme.",
       "Enfin, j'ai réalisé les cartes de la construction des city-stades : elles ont donné aux agents de la CCOV une vue d'ensemble des communes choisies pour les travaux.",
     ],
@@ -259,7 +259,7 @@ const PROJETS = [
       "La principale difficulté est venue de la mise en place du SIG de la collectivité : les besoins exprimés étaient difficiles à traduire en solution technique.",
       "Pour avancer, je faisais valider chaque étape par ma tutrice lors de réunions planifiées à l'avance, avant de passer à la suivante. J'ai aussi échangé directement avec les maires qui voulaient parler des zones d'accélération. Enfin, toutes les données ont été centralisées sur QGIS Cloud, pour que les agents travaillent à partir des mêmes données de référence.",
     ],
-    outils: ["QGIS", "QGIS Cloud", "PostgreSQL / PostGIS", "pgAdmin", "GEO (Business Geografic)", "WMS / WFS / WMTS"],
+    outils: ["QGIS", "QGIS Cloud", "PostgreSQL / PostGIS", "pgAdmin", "GEO (Business Geografic)", "Flux WMTS"],
   },
   {
     id: "sncf",
@@ -267,7 +267,7 @@ const PROJETS = [
     titreCourt: "Données et cartographie pour le développement durable",
     titre: "Données et cartographie pour le Pôle Développement Durable",
     cadre: "SNCF Réseau (direction territoriale Occitanie)",
-    role: "Assistant d'études géomatique et data (alternance)",
+    role: "Alternant chef de projet en géomatique",
     periode: "Janv. – juin 2025",
     lieu: "Montpellier (34)",
     ll: [43.61, 3.88],
@@ -276,14 +276,15 @@ const PROJETS = [
     vignette: { src: "assets/projets/sncf-vignette.png", fond: "#FFFFFF", legende: "Logo de SNCF Réseau" },
     resume: "Pour le Pôle Développement Durable de SNCF Réseau en Occitanie, j'ai modélisé les données de collisions faune-flore du réseau et créé le référentiel géographique des obligations légales de débroussaillement (OLD), puis mis en page les cartes du projet.",
     contexte: [
-      "J'étais en alternance au Pôle Prospective et Émergences de la direction territoriale Occitanie de SNCF Réseau, sur un poste d'assistant d'études géomatique et data.",
+      "J'étais en alternance au Pôle Prospective et Émergences de la direction territoriale Occitanie de SNCF Réseau, comme alternant chef de projet en géomatique.",
       "Le Pôle Développement Durable, en maîtrise d'ouvrage, avait besoin de données géographiques exploitables. J'étais côté maîtrise d'œuvre, chargé de concevoir et de livrer la partie géomatique.",
       "Le projet portait sur deux sujets, à l'échelle de tout le réseau d'Occitanie : les collisions faune-flore et les obligations légales de débroussaillement (OLD).",
       "Les cartes et les données produites sont la propriété de SNCF Réseau : je ne peux pas les montrer ici.",
     ],
     actions: [
       "J'ai précisé le besoin avec le Pôle Développement Durable, puis modélisé les données de collisions faune-flore sur l'ensemble du réseau occitan. Je les ai intégrées dans ArcGIS Enterprise avec ArcMap, sous forme de couches que les équipes de terrain peuvent exploiter.",
-      "J'ai conçu et déployé le référentiel géographique des OLD sur tout le territoire occitan. C'était la première fois que ces données étaient structurées dans le SIG de l'entreprise.",
+      "J'ai conçu et déployé le référentiel géographique des OLD sur tout le territoire occitan. C'était la première fois que ces données étaient structurées dans le SIG de l'entreprise ; le référentiel a été présenté en comité de direction (CODIR).",
+      "En binôme, j'ai travaillé sur la localisation des ouvrages par points kilométriques (PK) et sur les données des installations électriques du réseau.",
       "J'ai mis en page les cartes dans ArcGIS Pro et fait leur finition graphique dans Illustrator ou Inkscape.",
       "J'ai publié des cartes web d'études sur ArcGIS Portal.",
       "Je suivais l'avancement du projet et j'en faisais le reporting sur SharePoint. Je versionnais aussi les scripts de traitement.",
@@ -495,20 +496,19 @@ const COMPETENCES = [
   {
     titre: "SIG et bases de données",
     lignes: [
-      ["SIG", "QGIS, ArcGIS Pro, ArcMap, GEO (Business Geografic)"],
-      ["Bases de données", "PostgreSQL / PostGIS, SQL, Oracle"],
-      ["Administration", "pgAdmin, DBeaver"],
-      ["ETL", "FME, KNIME, Data Interoperability, GDAL / ogr2ogr"],
-      ["Mise en page", "Inkscape, Illustrator, Photoshop"],
+      ["SIG", "QGIS, ArcGIS Pro, ArcMap, ArcGIS Enterprise (Portal, Sites), GEO (Business Geografic)"],
+      ["Bases de données", "PostgreSQL / PostGIS, SQL, Oracle, géodatabase d'entreprise (SDE), pgAdmin, DBeaver"],
+      ["ETL et automatisation", "FME (Data Interoperability), KNIME, GDAL / ogr2ogr, Python, modeleur QGIS"],
+      ["Cartographie, DAO et graphisme", "Atlas QGIS, sémiologie, AutoCAD (DWG, DXF), Illustrator, Inkscape, Photoshop"],
     ],
   },
   {
     titre: "Web SIG et développement",
     lignes: [
-      ["Serveurs cartographiques", "GeoServer, QGIS Server, MapServer"],
-      ["Catalogues", "GeoNetwork, ArcGIS Portal"],
-      ["Applications web", "OpenLayers, Leaflet, mviewer, Lizmap, MapStore, ArcGIS Hub, Experience Builder"],
-      ["Langages", "Python (Flask), SQL, JavaScript, HTML / CSS, PHP"],
+      ["Serveurs et catalogues", "GeoServer, QGIS Server, MapServer, GeoNetwork"],
+      ["Applications web", "Lizmap, mviewer, MapStore, OpenLayers, Leaflet, Experience Builder"],
+      ["Flux et normes", "WMS, WFS, WMTS, CSW ; INSPIRE, ISO 19139, CNIG"],
+      ["Développement", "Python (Flask), JavaScript, HTML / CSS, PHP"],
       ["Déploiement", "Docker, Nginx, Git, GitHub Actions"],
     ],
   },
@@ -606,7 +606,7 @@ const FORMATIONS = [
     periode: "2024 – 2026",
     certification: "Titre à finalité professionnelle de niveau 7, inscrit au RNCP (n° 39877) et certifié par l'OPCO Atlas.",
     alternance: "Préparé en alternance, chez SNCF Réseau puis à la Région Nouvelle-Aquitaine.",
-    obtenu: "Les quatre blocs de compétences sont validés : certificats délivrés le 15 octobre 2026.",
+    obtenu: "Titre obtenu : les quatre blocs de compétences sont validés (certificats délivrés le 15 octobre 2026).",
     intro: "La formation est découpée en quatre blocs de compétences, chacun validé séparément :",
     // Intitulés repris des certificats de compétences ; 3e valeur : le certificat en PDF
     contenu: [
@@ -628,6 +628,7 @@ const FORMATIONS = [
     periode: "2023 – 2024",
     certification: "Titre professionnel du ministère du Travail, de niveau 5, inscrit au RNCP (n° 37103).",
     alternance: "Préparé en alternance à la Communauté de communes de l'Ouest Vosgien.",
+    obtenu: "Titre obtenu.",
     intro: "Le programme se déroule en modules, chacun suivi d'une période en entreprise :",
     contenu: [
       ["Les fondamentaux du SIG", "QGIS et ArcGIS Pro, systèmes de coordonnées, cartographie et sémiologie, acquisition de données (GNSS, télédétection, photogrammétrie), open data et OpenStreetMap, métadonnées (INSPIRE, GeoNetwork)."],
@@ -699,20 +700,20 @@ const PLACES = [
     id: "ccov", kind: "pro", org: "Communauté de communes de l'Ouest Vosgien", city: "Neufchâteau (88)",
     ll: [48.3556, 5.6966], off: [0, 0], region: "Grand Est", dates: "Sept. 2023 – oct. 2024",
     role: "Technicien géomatique (alternance)",
-    missions: ["Analyse spatiale pour les zones d'accélération des EnR", "Atlas cartographique des ZAEnR", "Base de données SIG mutualisée", "Intégration de flux WMS, WFS et WMTS", "Cartes de randonnée pour l'office du tourisme", "Cartes de la construction des city-stades"],
+    missions: ["Analyse spatiale pour les zones d'accélération des EnR", "Atlas cartographique des ZAEnR", "Base PostgreSQL / PostGIS et SIG mutualisé sur QGIS Cloud", "Intégration de flux WMTS et digitalisation du PLUi", "Portail EnR sous GEO (Business Geografic)", "Cartes de randonnée pour l'office du tourisme", "Cartes de la construction des city-stades"],
     project: "zaenr",
   },
   {
     id: "sncf", kind: "pro", org: "SNCF Réseau", city: "Montpellier (34)",
     ll: [43.6108, 3.8767], off: [0, 0], region: "Occitanie", dates: "Janv. – juin 2025",
-    role: "Assistant d'études géomatique et data (alternance)",
-    missions: ["Pôle Prospective et Émergences, pour le Pôle Développement Durable", "Modélisation et intégration de données ferroviaires", "Cartes et cartes web d'études", "Appui cartographique aux services de la direction territoriale"],
+    role: "Alternant chef de projet en géomatique",
+    missions: ["Maîtrise d'œuvre pour le Pôle Développement Durable", "Modélisation des données de collisions faune-flore", "Référentiel des obligations légales de débroussaillement (OLD), présenté en CODIR", "Localisation des ouvrages par points kilométriques (PK), en binôme", "Mise en page cartographique, cartes web et appui SIG aux agents"],
     project: "sncf",
   },
   {
     id: "rna", kind: "pro", org: "Région Nouvelle-Aquitaine", city: "Poitiers (86)",
     ll: [46.5802, 0.3404], off: [0, 0], region: "Nouvelle-Aquitaine", dates: "Sept. 2025 – oct. 2026",
-    role: "Chef de projet géomatique (alternance)",
+    role: "Chef de projet en géomatique (alternance)",
     missions: ["Pilotage du hub de données des Parcs naturels régionaux", "Cahiers des charges technique et fonctionnel", "Modèle de données et alimentation de la base", "Mise à jour automatique des données", "Cartes thématiques et interactives"],
     project: "hub-pnr",
   },
