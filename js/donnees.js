@@ -474,7 +474,7 @@ const COMPETENCES = [
       ["Bases de données", "PostgreSQL / PostGIS, SQL, Oracle"],
       ["Administration", "pgAdmin, DBeaver"],
       ["ETL", "FME, KNIME, Data Interoperability, GDAL / ogr2ogr"],
-      ["Mise en page", "Inkscape, Photoshop"],
+      ["Mise en page", "Inkscape, Illustrator, Photoshop"],
     ],
   },
   {
@@ -492,7 +492,7 @@ const COMPETENCES = [
     lignes: [
       // Méthodes du bloc « Piloter des projets de géomatique » (validé) et appliquées dans les projets du site
       ["Cadrage", "Recueil des besoins, note de cadrage, cahiers des charges technique et fonctionnel"],
-      ["Pilotage", "Planification, budget, gestion des risques, comités de pilotage, reporting"],
+      ["Pilotage", "Planification, budget (en formation, lors d'une étude de cas), gestion des risques, comités de pilotage, reporting"],
       ["Qualité", "Plan d'assurance qualité, validation de chaque étape avec le commanditaire, suivi des livrables"],
       ["Organisation", "Relation entre maîtrise d'ouvrage et maîtrise d'œuvre"],
       ["Accompagnement", "Formation et accompagnement des utilisateurs du SIG"],
