@@ -307,6 +307,23 @@ function galerieSection(g) {
   return `<section class="galerie"><h2>${g.titre}</h2>${g.intro ? `<p class="galerie-intro">${g.intro}</p>` : ""}${contenu}</section>`;
 }
 
+/* Vidéo de démonstration d'un projet (champ video) : le lecteur dans une fenêtre de navigateur,
+   et un bouton par chapitre qui fait sauter la vidéo au bon moment (voir « Interactions »). */
+function videoProjet(v) {
+  const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  const chapitres = (v.chapitres || []).map(([t, titre], i) =>
+    `<li><button type="button" data-chapitre="${t}" aria-pressed="${i === 0}"><b>${mmss(t)}</b>${i + 1}. ${titre}</button></li>`).join("");
+  return `<section class="galerie video-projet">
+    <h2>La démo en vidéo</h2>
+    ${v.intro ? `<p class="galerie-intro">${v.intro}</p>` : ""}
+    <div class="ecran-fenetre video-fenetre">
+      <span class="ecran-barre" aria-hidden="true"><i></i><i></i><i></i><span>${v.titre || ""}</span></span>
+      <video controls preload="metadata" playsinline poster="${v.affiche || ""}" src="${v.src}" aria-label="${v.titre || "Vidéo de démonstration"}"></video>
+    </div>
+    ${chapitres ? `<ol class="chapitres" aria-label="Chapitres de la vidéo">${chapitres}</ol>` : ""}
+  </section>`;
+}
+
 /* Page « Cartothèque » : toutes les cartes du portfolio au même endroit.
    Elles viennent des projets (galeries au format "carte", atlas des ZAEnR) et de la liste CARTES
    (nouvelles cartes). Les boutons filtrent par série ; un clic ouvre la carte dans la visionneuse. */
@@ -517,6 +534,7 @@ function pageProjet(p) {
       ${section("Ce que j'ai fait", paragraphes(p.actions))}
       ${visuels ? `<div class="visuels">${visuels}</div>` : ""}
       ${galerie}
+      ${p.video ? videoProjet(p.video) : ""}
       ${(p.galeries || []).map(galerieSection).join("")}
       ${section("L'atlas des zones d'accélération", atlasParType(p.atlas))}
       ${section("Résultat", paragraphes(p.resultat))}
@@ -678,6 +696,13 @@ document.addEventListener("click", (e) => {
     atlas.querySelectorAll("[data-filtre-enr]").forEach((b) => b.setAttribute("aria-pressed", b === filtre));
     atlas.querySelectorAll("[data-type-enr]").forEach((f) => (f.hidden = type !== "" && f.dataset.typeEnr !== type));
   }
+  // Chapitre d'une vidéo de démonstration : aller au moment indiqué et lancer la lecture
+  const chapitre = e.target.closest("[data-chapitre]");
+  if (chapitre) {
+    const video = chapitre.closest(".video-projet").querySelector("video");
+    video.currentTime = Number(chapitre.dataset.chapitre);
+    video.play().catch(() => {});
+  }
   if (e.target.closest("#burger")) {
     const menu = document.getElementById("menu");
     menu.classList.toggle("ouvert");
@@ -691,6 +716,16 @@ window.addEventListener("resize", () => {
   redimension = setTimeout(dessinerCourbes, 150);
 });
 window.addEventListener("hashchange", afficher);
+
+// Pendant la lecture d'une vidéo de démonstration, le bouton du chapitre en cours est mis en avant.
+// (timeupdate ne remonte pas jusqu'au document : on l'écoute en phase de capture.)
+document.addEventListener("timeupdate", (e) => {
+  const section = e.target.closest?.(".video-projet");
+  if (!section) return;
+  const boutons = [...section.querySelectorAll("[data-chapitre]")];
+  const courant = boutons.filter((b) => Number(b.dataset.chapitre) <= e.target.currentTime + 0.5).pop();
+  boutons.forEach((b) => b.setAttribute("aria-pressed", b === courant));
+}, true);
 
 // Pied de page fixe : sa hauteur (qui change si les liens passent sur deux lignes) est réservée en bas de la page.
 const pied = document.getElementById("pied");

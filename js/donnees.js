@@ -195,7 +195,20 @@ const PROJETS = [
       "J'ai aussi travaillé sur les cartes de randonnée pédestre de l'office du tourisme.",
       "Enfin, j'ai réalisé les cartes de la construction des city-stades : elles ont donné aux agents de la CCOV une vue d'ensemble des communes choisies pour les travaux.",
     ],
-    // Deux galeries de captures (l'analyse, puis le portail et ses applications) ; l'atlas suit (champ atlas)
+    // Vidéo de démonstration (avant les galeries) ; chapitres : [seconde de début, titre] repris de la vidéo
+    video: {
+      src: "assets/projets/zaenr-demo.mp4",
+      affiche: "assets/projets/zaenr-demo-affiche.jpg",
+      titre: "Démo : les zones d'accélération de l'Ouest Vosgien",
+      intro: "La démo complète, en 3 min 21 : de la préparation des données dans GEO Générateur jusqu'à la saisie des projets d'énergies renouvelables. Les boutons mènent directement à chaque partie.",
+      chapitres: [
+        [0, "Préparation des données et de l'application (GEO Générateur)"],
+        [55, "Portail EnR"],
+        [63, "Consultation des zones d'accélération"],
+        [142, "Saisie des projets d'énergies renouvelables"],
+      ],
+    },
+    // Galeries de captures et de cartes ; l'atlas suit (champ atlas)
     galeries: [
       {
         titre: "L'analyse et la base de données",

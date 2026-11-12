@@ -4,3 +4,6 @@ node_modules/
 
 # Notes perso (guide, questionnaire) : ne pas publier
 _notes/
+
+# Vidéo source déposée pour le projet ZAEnR (la version pour le web est dans assets/projets/zaenr-demo.mp4)
+video_projet_ZAEnR/
