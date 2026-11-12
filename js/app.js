@@ -188,9 +188,10 @@ const ILLUSTRATIONS_INTERETS = {
   basket: () => `<svg class="terrain" viewBox="0 0 200 110" aria-hidden="true"><path d="M4 106V4h192v102M100 4v102"/><circle cx="100" cy="55" r="18"/><path d="M4 33h34v44H4M196 33h-34v44h34"/></svg>
     <span class="ombre-ballon"></span>
     <svg class="ballon" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M6 50h88M50 6v88M20 18c15 13 15 51 0 64M80 18c-15 13-15 51 0 64"/></svg>`,
-  // Un égaliseur de neuf barres et une note
+  // Une note (musique), un égaliseur de neuf barres et un micro (podcasts)
   musique: () => `<svg class="note" viewBox="0 0 40 50" aria-hidden="true"><path d="M14 40V8l22-5v31"/><ellipse cx="9" cy="40" rx="7" ry="5.5"/><ellipse cx="31" cy="35" rx="7" ry="5.5"/></svg>
-    <div class="egaliseur">${[45, 75, 55, 95, 65, 85, 40, 70, 50].map((h, i) => `<i style="--h:${h}%;--d:${(i % 4) * -0.18}s"></i>`).join("")}</div>`,
+    <div class="egaliseur">${[45, 75, 55, 95, 65, 85, 40, 70, 50].map((h, i) => `<i style="--h:${h}%;--d:${(i % 4) * -0.18}s"></i>`).join("")}</div>
+    <svg class="micro" viewBox="0 0 40 56" aria-hidden="true"><rect x="12" y="2" width="16" height="30" rx="8"/><path d="M5 24a15 15 0 0 0 30 0M20 39v10M11 52h18"/></svg>`,
   // Un itinéraire en pointillés entre trois repères (clin d'œil de géomaticien)
   decouvertes: () => `<svg class="itineraire" viewBox="0 0 220 120" aria-hidden="true">
       <path class="trace" d="M30 98C60 42 90 112 112 72S170 32 190 54"/>
