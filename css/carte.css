@@ -268,7 +268,8 @@
 .kind { font-size: .8rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
 .kind.pro { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
 .kind.edu { background: rgba(183, 114, 14, .14); color: #8F5A0B; }
-@media (prefers-color-scheme: dark) { .kind.edu { color: #E8A93C; } }
+:root[data-theme="dark"] .kind.edu { color: #E8A93C; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .kind.edu { color: #E8A93C; } }
 @media (prefers-reduced-motion: reduce) {
   .frise-carte, .frise-noeud .forme { transition: none; }
   .place:hover .frise-carte { transform: none; }

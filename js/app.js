@@ -469,7 +469,7 @@ const PAGES = {
           <h2>Projets</h2>
           <a href="#projets">Voir les ${PROJETS.length} projets →</a>
         </div>
-        <div class="grille-projets">${PROJETS.slice(0, 3).map(carteProjet).join("")}</div>
+        <div class="grille-projets vedette">${PROJETS.slice(0, 3).map(carteProjet).join("")}</div>
       </section>
 
       ${sectionRecommandations()}
@@ -639,11 +639,23 @@ function pageProjet(p) {
   </div>`;
 }
 
-/* ---------- Courbes de niveau du bandeau d'accueil ----------
-   On fabrique un relief fictif (somme de quelques « bosses » gaussiennes),
-   puis on trace ses isolignes avec l'algorithme des marching squares. */
+/* ---------- Relief du bandeau d'accueil ----------
+   Un relief fictif (somme de quelques « bosses » gaussiennes) dont on trace les courbes de niveau
+   avec l'algorithme des marching squares.
+   À l'arrivée, le relief monte : les courbes naissent au sommet des collines puis s'étendent.
+   Avec une souris, une petite colline suit le pointeur et les courbes la contournent. */
 
-function dessinerCourbes() {
+const MOUVEMENT_REDUIT = matchMedia("(prefers-reduced-motion: reduce)");
+const SOURIS = matchMedia("(hover: hover) and (pointer: fine)");
+const RELIEF = {
+  canvas: null, ctx: null, largeur: 0, hauteur: 0, bosses: [], couleurs: [],
+  montee: 1, debut: 0, boucle: 0,
+  curseur: { x: 0, y: 0, z: 0 }, cible: { x: 0, y: 0, z: 0 },
+};
+const COLLINE_CURSEUR = { hauteur: 0.8, rayon: 120 };
+
+// (Re)prépare le relief : taille du canevas, bosses, couleurs du thème. intro = faire monter le relief.
+function preparerRelief(intro) {
   const canvas = document.getElementById("courbes");
   if (!canvas) return;
   const { width, height } = canvas.getBoundingClientRect();
@@ -652,7 +664,7 @@ function dessinerCourbes() {
   canvas.width = width * ratio;
   canvas.height = height * ratio;
   const ctx = canvas.getContext("2d");
-  ctx.scale(ratio, ratio);
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
   // Générateur pseudo-aléatoire à graine fixe : le relief est le même à chaque visite.
   let graine = 11;
@@ -663,13 +675,66 @@ function dessinerCourbes() {
     rayon: 100 + aleatoire() * 200,
     hauteur: 0.6 + aleatoire(),
   }));
-  const altitude = (x, y) =>
-    bosses.reduce((z, b) => z + b.hauteur * Math.exp(-((x - b.x) ** 2 + (y - b.y) ** 2) / (2 * b.rayon * b.rayon)), 0);
+
+  // Couleurs du thème (clair ou sombre), définies dans style.css
+  const styles = getComputedStyle(document.documentElement);
+  const couleurs = [
+    styles.getPropertyValue("--courbe").trim() || "rgba(14,107,87,.10)",
+    styles.getPropertyValue("--courbe-forte").trim() || "rgba(14,107,87,.30)",
+  ];
+
+  Object.assign(RELIEF, { canvas, ctx, largeur: width, hauteur: height, bosses, couleurs });
+  if (intro && !MOUVEMENT_REDUIT.matches) {
+    RELIEF.montee = 0;
+    RELIEF.debut = performance.now();
+  } else {
+    RELIEF.montee = 1;
+  }
+  animerRelief();
+}
+
+// Une image par rafraîchissement de l'écran, tant que quelque chose bouge (montée, colline du pointeur).
+function animerRelief() {
+  if (RELIEF.boucle) return;
+  RELIEF.boucle = requestAnimationFrame((t) => {
+    RELIEF.boucle = 0;
+    if (!RELIEF.canvas || !RELIEF.canvas.isConnected) return;
+    let encore = false;
+    if (RELIEF.montee < 1) {
+      const p = Math.min(1, Math.max(0, (t - RELIEF.debut) / 1800));
+      RELIEF.montee = 1 - (1 - p) ** 3;
+      encore = p < 1;
+    }
+    const c = RELIEF.curseur, v = RELIEF.cible;
+    const ecart = Math.abs(v.x - c.x) + Math.abs(v.y - c.y) + 400 * Math.abs(v.z - c.z);
+    if (ecart > 0.6) {
+      c.x += (v.x - c.x) * 0.14;
+      c.y += (v.y - c.y) * 0.14;
+      c.z += (v.z - c.z) * 0.1;
+      encore = true;
+    } else {
+      Object.assign(c, v);
+    }
+    tracerRelief();
+    if (encore) animerRelief();
+  });
+}
+
+function tracerRelief() {
+  const { ctx, largeur, hauteur, bosses, couleurs, montee, curseur } = RELIEF;
+  ctx.clearRect(0, 0, largeur, hauteur);
+  const r2 = 2 * COLLINE_CURSEUR.rayon ** 2;
+  const altitude = (x, y) => {
+    let z = 0;
+    for (const b of bosses) z += b.hauteur * Math.exp(-((x - b.x) ** 2 + (y - b.y) ** 2) / (2 * b.rayon * b.rayon));
+    if (curseur.z > 0.002) z += curseur.z * Math.exp(-((x - curseur.x) ** 2 + (y - curseur.y) ** 2) / r2);
+    return z * montee;
+  };
 
   // Altitude calculée aux nœuds d'une grille de PAS pixels.
   const PAS = 12;
-  const nx = Math.ceil(width / PAS) + 2;
-  const ny = Math.ceil(height / PAS) + 2;
+  const nx = Math.ceil(largeur / PAS) + 2;
+  const ny = Math.ceil(hauteur / PAS) + 2;
   const grille = [];
   for (let j = 0; j < ny; j++) {
     grille[j] = [];
@@ -678,16 +743,13 @@ function dessinerCourbes() {
 
   // Pour chaque niveau, chaque case de la grille est classée selon les coins
   // situés au-dessus du niveau (16 cas), ce qui donne le ou les segments à tracer.
-  // Couleurs du thème (clair ou sombre), définies dans style.css
-  const styles = getComputedStyle(document.documentElement);
-  const couleur = styles.getPropertyValue("--courbe").trim() || "rgba(14,107,87,.10)";
-  const couleurForte = styles.getPropertyValue("--courbe-forte").trim() || "rgba(14,107,87,.30)";
-  const niveaux = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2, 1.35];
+  // Niveaux tous les 0,15 jusqu'à 3 : même sur un sommet, la colline du pointeur fait naître des courbes.
+  const niveaux = Array.from({ length: 20 }, (_, n) => 0.15 * (n + 1));
   niveaux.forEach((niveau, n) => {
     const maitresse = n % 4 === 3; // une courbe sur quatre est plus marquée
     ctx.beginPath();
     ctx.lineWidth = maitresse ? 1.2 : 0.8;
-    ctx.strokeStyle = maitresse ? couleurForte : couleur;
+    ctx.strokeStyle = maitresse ? couleurs[1] : couleurs[0];
     for (let j = 0; j < ny - 1; j++) {
       for (let i = 0; i < nx - 1; i++) {
         const a = grille[j][i], b = grille[j][i + 1], c = grille[j + 1][i + 1], d = grille[j + 1][i];
@@ -715,6 +777,20 @@ function dessinerCourbes() {
   });
 }
 
+// La colline du pointeur : elle suit la souris dans le bandeau et s'affaisse quand on en sort.
+document.addEventListener("pointermove", (e) => {
+  const canvas = RELIEF.canvas;
+  if (!canvas || !canvas.isConnected || !SOURIS.matches || MOUVEMENT_REDUIT.matches || e.pointerType !== "mouse") return;
+  const r = canvas.getBoundingClientRect();
+  const x = e.clientX - r.left, y = e.clientY - r.top;
+  const dedans = x >= 0 && y >= 0 && x <= r.width && y <= r.height;
+  if (!dedans && RELIEF.cible.z === 0 && RELIEF.curseur.z === 0) return;
+  // La colline naît sous le pointeur au lieu de glisser depuis l'endroit où elle a disparu
+  if (dedans && RELIEF.curseur.z < 0.02) Object.assign(RELIEF.curseur, { x, y });
+  RELIEF.cible = dedans ? { x, y, z: COLLINE_CURSEUR.hauteur } : { ...RELIEF.curseur, z: 0 };
+  animerRelief();
+}, { passive: true });
+
 /* ---------- Navigation ---------- */
 
 const app = document.getElementById("app");
@@ -737,11 +813,68 @@ function afficher() {
     : page === "mentions-legales" ? `Mentions légales | ${PROFIL.nom}`
     : page === "recommandations" ? `Recommandations | ${PROFIL.nom}`
     : `${PROFIL.nom} | ${PROFIL.poste}`;
+  document.documentElement.dataset.page = projet ? "projet" : page; // barre de lecture des projets (style.css)
   window.scrollTo(0, 0);
+  majProgression();
 
-  if (page === "accueil") requestAnimationFrame(dessinerCourbes);
+  if (page === "accueil") requestAnimationFrame(() => preparerRelief(true));
   if (page === "parcours") requestAnimationFrame(initCarte);
+  revelerAuDefilement();
 }
+
+// Changement de page : fondu enchaîné quand le navigateur sait le faire (View Transitions)
+function naviguer() {
+  if (!document.startViewTransition || MOUVEMENT_REDUIT.matches) return afficher();
+  document.startViewTransition(afficher);
+}
+
+/* ---------- Apparition au fil du défilement ----------
+   Les cartes et encadrés montent en se dévoilant quand ils entrent dans l'écran ; dans une même grille,
+   les voisins arrivent l'un après l'autre. Rien n'est masqué si les animations sont réduites. */
+const A_REVELER = [
+  ".grille-projets > .projet", ".competences > div", ".langues", ".recommandations > .recommandation",
+  ".savoir-etre > li", ".interets > li", ".lettres > .lettre", ".formation", ".frise > li",
+  ".mentions > section", ".coordonnees", ".galerie-tel", ".galerie-cartes > *", ".planches > *",
+].join(", ");
+let observateur = null;
+
+function revelerAuDefilement() {
+  observateur?.disconnect();
+  if (!("IntersectionObserver" in window) || MOUVEMENT_REDUIT.matches) return;
+  observateur = new IntersectionObserver((entrees) => {
+    entrees.forEach(({ target, isIntersecting }) => {
+      if (!isIntersecting) return;
+      observateur.unobserve(target);
+      target.classList.add("revele");
+      // Une fois arrivé, l'élément retrouve ses transitions habituelles (survol)
+      target.addEventListener("transitionend", () => {
+        target.classList.remove("a-reveler", "revele");
+        target.style.removeProperty("--retard");
+      }, { once: true });
+    });
+  }, { rootMargin: "0px 0px -6% 0px" });
+  app.querySelectorAll(A_REVELER).forEach((el) => {
+    const rang = [...el.parentElement.children].indexOf(el) % 4;
+    el.style.setProperty("--retard", `${rang * 90}ms`);
+    el.classList.add("a-reveler");
+    observateur.observe(el);
+  });
+}
+
+// Barre de lecture (pages de projet) : part de la page déjà lue
+function majProgression() {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  document.documentElement.style.setProperty("--lu", total > 0 ? Math.min(1, window.scrollY / total).toFixed(4) : 0);
+}
+
+// Bouton clair / sombre : le choix est gardé dans ce navigateur (localStorage), sinon on suit l'appareil
+document.getElementById("theme").addEventListener("click", () => {
+  const racine = document.documentElement;
+  const sombre = racine.dataset.theme ? racine.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  racine.dataset.theme = sombre ? "light" : "dark";
+  try { localStorage.setItem("theme", racine.dataset.theme); } catch (e) {}
+  preparerRelief(false); // les courbes prennent les couleurs du nouveau thème
+});
 
 function remplirPied() {
   document.getElementById("cv-entete").href = PROFIL.cv;
@@ -820,11 +953,11 @@ document.addEventListener("click", (e) => {
 let redimension;
 window.addEventListener("resize", () => {
   clearTimeout(redimension);
-  redimension = setTimeout(dessinerCourbes, 150);
+  redimension = setTimeout(() => preparerRelief(false), 150);
 });
 // Passage du thème clair au thème sombre (ou l'inverse) : les courbes changent de couleur
-matchMedia("(prefers-color-scheme: dark)").addEventListener("change", dessinerCourbes);
-window.addEventListener("hashchange", afficher);
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => preparerRelief(false));
+window.addEventListener("hashchange", naviguer);
 
 // Pendant la lecture d'une vidéo de démonstration, le bouton du chapitre en cours est mis en avant.
 // (timeupdate ne remonte pas jusqu'au document : on l'écoute en phase de capture.)
@@ -845,7 +978,10 @@ new ResizeObserver(() => document.documentElement.style.setProperty("--hauteur-e
 
 // Bouton « revenir en haut » : visible dès qu'on a fait défiler la page de 400 px.
 const boutonHaut = document.getElementById("haut");
-window.addEventListener("scroll", () => (boutonHaut.hidden = window.scrollY < 400), { passive: true });
+window.addEventListener("scroll", () => {
+  boutonHaut.hidden = window.scrollY < 400;
+  majProgression();
+}, { passive: true });
 boutonHaut.addEventListener("click", () => {
   const doux = !matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.scrollTo({ top: 0, behavior: doux ? "smooth" : "auto" });

@@ -28,8 +28,11 @@
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <!-- ?v= : numéro de version à changer à chaque mise en ligne. Sans lui, les navigateurs
        gardent l'ancienne copie des CSS et JS en mémoire et n'affichent pas les modifications. -->
-  <link rel="stylesheet" href="css/style.css?v=20261113-4">
-  <link rel="stylesheet" href="css/carte.css?v=20261113-4">
+  <link rel="stylesheet" href="css/style.css?v=20261113-6">
+  <link rel="stylesheet" href="css/carte.css?v=20261113-6">
+  <!-- Thème choisi avec le bouton clair / sombre (mémorisé dans ce navigateur) : appliqué avant l'affichage,
+       pour éviter un éclair de l'autre thème. Sans choix, le site suit le réglage de l'appareil. -->
+  <script>try { var t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
 </head>
 <body>
 
@@ -44,9 +47,14 @@
       <a href="#recommandations" data-nav="recommandations">Recommandations</a>
       <a href="#contact" data-nav="contact">Contact</a>
     </nav>
+    <button class="theme" id="theme" type="button" aria-label="Changer de thème (clair ou sombre)" title="Thème clair ou sombre">
+      <svg class="lune" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5a8.5 8.5 0 1 0 10.7 10.7z"/></svg>
+      <svg class="soleil" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+    </button>
     <a class="cv-entete" id="cv-entete" href="assets/CV-Hermes-Barry.pdf" download>CV (PDF)</a>
     <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
   </div>
+  <span class="progression" id="progression" aria-hidden="true"></span>
 </header>
 
 <main id="app"></main>
@@ -81,14 +89,14 @@
 <!-- Leaflet 1.9.4 (copie locale) -->
 <script src="vendor/leaflet/leaflet.js"></script>
 <!-- Fond de carte : régions, départements et contour de la France -->
-<script src="js/fond-carte-france.js?v=20261113-4"></script>
+<script src="js/fond-carte-france.js?v=20261113-6"></script>
 <!-- Contour du Burkina Faso (carte de situation du projet GéoBurkina) -->
-<script src="js/fond-carte-burkina.js?v=20261113-4"></script>
+<script src="js/fond-carte-burkina.js?v=20261113-6"></script>
 <!-- Contenu : profil, projets, compétences, lieux du parcours -->
-<script src="js/donnees.js?v=20261113-4"></script>
+<script src="js/donnees.js?v=20261113-6"></script>
 <!-- Carte du parcours -->
-<script src="js/carte.js?v=20261113-4"></script>
+<script src="js/carte.js?v=20261113-6"></script>
 <!-- Pages et navigation -->
-<script src="js/app.js?v=20261113-4"></script>
+<script src="js/app.js?v=20261113-6"></script>
 </body>
 </html>

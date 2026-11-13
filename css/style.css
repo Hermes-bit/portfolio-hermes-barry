@@ -67,8 +67,30 @@
   --maxw: 1560px;
   --gouttiere: clamp(20px, 4vw, 56px);
 }
+/* Thème sombre : celui de l'appareil, sauf si le visiteur a choisi avec le bouton de l'en-tête
+   (data-theme sur <html>, posé par le petit script en tête d'index.html). Les deux blocs sont identiques. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] {
+  --bg: #0F161F;
+  --surface: #16202C;
+  --ink: #EDE9E0;
+  --muted: #A9B2BD;
+  --line: #273342;
+  --accent: #7FD8B8;
+  --repere: #FF8A5C;
+  --navy: #0A1017;
+  --navy-2: #121B26;
+  --todo-bg: #5A4710;
+  --todo-ink: #FFE9A8;
+  --ochre: #F2B65A;
+  --ochre-bg: #2A2112;
+  --courbe: rgba(127, 216, 184, .07);
+  --courbe-forte: rgba(127, 216, 184, .22);
+  --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -18px rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #0F161F;
     --surface: #16202C;
     --ink: #EDE9E0;
@@ -163,6 +185,43 @@ mark.todo {
   transition: background-color .15s ease;
 }
 .cv-entete:hover { background: var(--accent); }
+/* Bouton clair / sombre : la lune en thème clair, le soleil en thème sombre */
+.theme {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color .15s ease, transform .3s ease;
+}
+.theme:hover { border-color: var(--ink); transform: rotate(-15deg); }
+.theme svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.theme .soleil { display: none; }
+:root[data-theme="dark"] .theme .soleil { display: block; }
+:root[data-theme="dark"] .theme .lune { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme .soleil { display: block; }
+  :root:not([data-theme="light"]) .theme .lune { display: none; }
+}
+/* Barre de lecture des pages de projet : un trait sous l'en-tête qui avance avec le défilement */
+.progression {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--repere));
+  transform: scaleX(var(--lu, 0));
+  transform-origin: left;
+}
+:root[data-page="projet"] .progression { display: block; }
 .burger {
   display: none;
   background: none;
@@ -285,9 +344,37 @@ mark.todo {
   border: 6px solid var(--surface);
   box-shadow: var(--ombre);
 }
+/* Arrivée sur l'accueil : le texte monte par étapes, le portrait apparaît */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-grille > div:first-child > *, .hero-portrait { animation: monte .9s cubic-bezier(.2, .7, .2, 1) both; }
+  .hero-poste { animation-delay: .1s; }
+  .hero-intro { animation-delay: .2s; }
+  .hero-infos { animation-delay: .3s; }
+  .hero .boutons { animation-delay: .4s; }
+  .hero-portrait { animation-name: apparait; animation-duration: 1.1s; animation-delay: .25s; }
+}
+@keyframes monte { from { opacity: 0; transform: translateY(22px); } }
+@keyframes apparait { from { opacity: 0; transform: scale(.92); } }
 @media (prefers-reduced-motion: reduce) {
   .hero-portrait::before, .hero-infos div:first-child dd::before { animation: none; }
 }
+
+/* Apparition au fil du défilement (classes posées par app.js, seulement si les animations sont permises) */
+.a-reveler {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .7s ease var(--retard, 0ms), transform .7s cubic-bezier(.2, .7, .2, 1) var(--retard, 0ms);
+}
+.a-reveler.revele { opacity: 1; transform: none; }
+
+/* Transitions entre les pages (navigateurs qui gèrent les « view transitions ») :
+   l'en-tête et le pied restent en place, le contenu se fond */
+.entete { view-transition-name: entete; }
+.pied { view-transition-name: pied; }
+::view-transition-old(root) { animation: .2s ease both fondu-sortie; }
+::view-transition-new(root) { animation: .45s cubic-bezier(.2, .7, .2, 1) both fondu-entree; }
+@keyframes fondu-sortie { to { opacity: 0; } }
+@keyframes fondu-entree { from { opacity: 0; transform: translateY(12px); } }
 
 .bloc { padding-top: clamp(64px, 7vw, 104px); }
 .bloc h2 { font-size: clamp(2.3rem, 4vw, 3.3rem); line-height: 1.02; margin-bottom: 28px; }
@@ -331,6 +418,41 @@ main { padding-bottom: 112px; min-height: 60vh; }
 .projet-image img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
 .projet:hover .projet-image img:not(.contenir) { transform: scale(1.04); }
 .projet-image img.contenir { position: absolute; inset: 0; object-fit: contain; }
+/* Au survol, des coins de cadrage se posent sur l'image, comme un viseur */
+.projet-image::after {
+  --c: rgba(255, 255, 255, .95);
+  content: "";
+  position: absolute;
+  inset: 8px;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / 20px 2px no-repeat,
+    linear-gradient(var(--c), var(--c)) top left / 2px 20px no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / 20px 2px no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / 2px 20px no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / 20px 2px no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / 2px 20px no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / 20px 2px no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / 2px 20px no-repeat;
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, .55));
+  transition: opacity .25s ease, inset .35s cubic-bezier(.2, .7, .2, 1);
+}
+.projet:hover .projet-image::after, .projet:focus-visible .projet-image::after { opacity: 1; inset: 16px; }
+
+/* Accueil : le premier projet à la une, en bandeau (image à gauche, texte à droite), les deux suivants dessous */
+@media (min-width: 700px) {
+  .grille-projets.vedette { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vedette > .projet:first-child { grid-column: 1 / -1; }
+}
+@media (min-width: 1100px) {
+  .vedette > .projet:first-child { flex-direction: row; align-items: stretch; }
+  .vedette > .projet:first-child .projet-image { flex: 0 0 58%; margin: 10px 0 10px 10px; }
+  .vedette > .projet:first-child .projet-texte { justify-content: center; gap: 14px; padding: 40px clamp(32px, 3.5vw, 56px); }
+  .vedette > .projet:first-child .projet-lien { margin-top: 10px; }
+  .vedette > .projet:first-child h3 { font-size: clamp(2.4rem, 3.2vw, 3.3rem); }
+  .vedette > .projet:first-child p { font-size: 1.1rem; }
+}
 .projet-texte { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .projet-cadre { font-size: .92rem; line-height: 1.4; color: var(--muted); display: flex; align-items: center; gap: 10px; }
 @media (prefers-reduced-motion: reduce) { .projet, .projet:hover, .projet-image img { transition: none; transform: none !important; } }
@@ -1029,4 +1151,10 @@ html.v-ouverte { overflow: hidden; }
   .projets-voisins { grid-template-columns: 1fr; }
   .projets-voisins a:last-child { text-align: left; }
   .nom small { display: none; }
+  /* En-tête de téléphone : nom, thème, CV et menu tiennent sur une ligne */
+  .entete .wrap { gap: 8px; }
+  .nom { font-size: 1.4rem; white-space: nowrap; }
+  .theme { width: 36px; height: 36px; }
+  .cv-entete { padding: 7px 12px; }
+  .burger { padding: 7px 12px; }
 }
