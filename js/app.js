@@ -191,6 +191,7 @@ function pageRecommandations() {
     </article>`;
   };
   return `<div class="wrap"><section class="bloc">
+    <a class="retour-page" href="#accueil" data-retour>← Retour</a>
     <h1 class="titre-page">Recommandations</h1>
     <p class="chapo">Mes deux tuteurs d'alternance ont écrit une lettre de recommandation. Voici ce qu'ils disent de mon travail, cité mot pour mot ; les lettres originales sont à lire ou à télécharger en PDF.</p>
     <div class="lettres">${RECOMMANDATIONS.map(lettre).join("")}</div>
@@ -767,6 +768,18 @@ function rappelLocal() {
 }
 
 /* ---------- Interactions ---------- */
+
+// Bouton « ← Retour » : revient à la page vue juste avant sur le site ; si on arrive directement
+// sur la page (lien partagé, favori), il mène à l'accueil (son href).
+let pagesVues = 0;
+window.addEventListener("hashchange", () => pagesVues++);
+document.addEventListener("click", (e) => {
+  const retour = e.target.closest("[data-retour]");
+  if (retour && pagesVues > 0) {
+    e.preventDefault();
+    history.back();
+  }
+});
 
 document.addEventListener("click", (e) => {
   const bouton = e.target.closest("[data-copier]");
