@@ -459,7 +459,7 @@ const PAGES = {
             <a class="btn secondaire" href="#contact">Me contacter</a>
           </div>
         </div>
-        <img class="hero-photo" src="${PROFIL.photo}" alt="Portrait d'${PROFIL.nom}">
+        <div class="hero-portrait"><img class="hero-photo" src="${PROFIL.photo}" alt="Portrait d'${PROFIL.nom}"></div>
       </div>
     </section>
 
@@ -678,12 +678,16 @@ function dessinerCourbes() {
 
   // Pour chaque niveau, chaque case de la grille est classée selon les coins
   // situés au-dessus du niveau (16 cas), ce qui donne le ou les segments à tracer.
+  // Couleurs du thème (clair ou sombre), définies dans style.css
+  const styles = getComputedStyle(document.documentElement);
+  const couleur = styles.getPropertyValue("--courbe").trim() || "rgba(14,107,87,.10)";
+  const couleurForte = styles.getPropertyValue("--courbe-forte").trim() || "rgba(14,107,87,.30)";
   const niveaux = [0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1.05, 1.2, 1.35];
   niveaux.forEach((niveau, n) => {
     const maitresse = n % 4 === 3; // une courbe sur quatre est plus marquée
     ctx.beginPath();
     ctx.lineWidth = maitresse ? 1.2 : 0.8;
-    ctx.strokeStyle = maitresse ? "rgba(69,201,163,.30)" : "rgba(255,255,255,.07)";
+    ctx.strokeStyle = maitresse ? couleurForte : couleur;
     for (let j = 0; j < ny - 1; j++) {
       for (let i = 0; i < nx - 1; i++) {
         const a = grille[j][i], b = grille[j][i + 1], c = grille[j + 1][i + 1], d = grille[j + 1][i];
@@ -818,6 +822,8 @@ window.addEventListener("resize", () => {
   clearTimeout(redimension);
   redimension = setTimeout(dessinerCourbes, 150);
 });
+// Passage du thème clair au thème sombre (ou l'inverse) : les courbes changent de couleur
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", dessinerCourbes);
 window.addEventListener("hashchange", afficher);
 
 // Pendant la lecture d'une vidéo de démonstration, le bouton du chapitre en cours est mis en avant.
