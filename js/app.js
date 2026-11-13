@@ -639,20 +639,46 @@ function pageProjet(p) {
   </div>`;
 }
 
-/* ---------- Relief du bandeau d'accueil ----------
-   Un relief fictif (somme de quelques « bosses » gaussiennes) dont on trace les courbes de niveau
-   avec l'algorithme des marching squares.
-   À l'arrivée, le relief monte : les courbes naissent au sommet des collines puis s'étendent.
-   Avec une souris, une petite colline suit le pointeur et les courbes la contournent. */
+/* ---------- Relief du bandeau d'accueil : une carte topographique imaginaire ----------
+   Le relief (somme de « bosses » gaussiennes) est dessiné à la manière d'une carte IGN : estompage
+   (ombrage éclairé du nord-ouest), courbes de niveau tous les 10 m (algorithme des marching squares),
+   courbes maîtresses tous les 50 m avec leur cote, points cotés, cours d'eau qui suivent la plus grande pente,
+   carroyage kilométrique Lambert-93 centré sur Paris, sentier balisé jusqu'au repère du portrait,
+   flèche du nord et échelle. À l'arrivée, le relief monte puis l'habillage apparaît. Avec une souris,
+   une petite colline suit le pointeur, avec ses coordonnées et son altitude, comme dans un SIG.
+   Le terrain est calculé une seule fois ; à chaque image, on n'ajoute que la colline du pointeur. */
 
 const MOUVEMENT_REDUIT = matchMedia("(prefers-reduced-motion: reduce)");
 const SOURIS = matchMedia("(hover: hover) and (pointer: fine)");
 const RELIEF = {
-  canvas: null, ctx: null, largeur: 0, hauteur: 0, bosses: [], couleurs: [],
-  montee: 1, debut: 0, boucle: 0,
-  curseur: { x: 0, y: 0, z: 0 }, cible: { x: 0, y: 0, z: 0 },
+  canvas: null, ctx: null, largeur: 0, hauteur: 0, bosses: [], couleurs: {}, grilles: {},
+  montee: 1, habillage: 1, debut: 0, boucle: 0,
+  curseur: { x: 0, y: 0, z: 0 }, cible: { x: 0, y: 0, z: 0 }, pointeur: null,
+  carte: null, // cotes, points cotés, cours d'eau, zones à laisser libres : calculés une fois le relief au repos
 };
 const COLLINE_CURSEUR = { hauteur: 0.8, rayon: 120 };
+const PAS_COURBES = 12;            // maille de la grille des courbes de niveau (px)
+const PAS_ESTOMPAGE = 8;           // maille de l'ombrage, plus fine
+const PAS_NIVEAU = 0.15;           // écart entre deux courbes, en unités du relief
+const EQUIDISTANCE = 10;           // le même écart, en mètres
+const NIVEAUX = Array.from({ length: 20 }, (_, n) => PAS_NIVEAU * (n + 1));
+const METRES_PAR_PIXEL = 6;
+const CENTRE_L93 = { x: 652000, y: 6862000 }; // centre du bandeau : Paris, en Lambert-93
+const POLICE = '"Source Sans 3", "Segoe UI", sans-serif';
+const POLICE_CHIFFRES = '"Cascadia Mono", Consolas, Menlo, "DejaVu Sans Mono", monospace';
+
+const enMetres = (z) => Math.round((z / PAS_NIVEAU) * EQUIDISTANCE);
+const lambert = (x, y) => ({
+  x: CENTRE_L93.x + (x - RELIEF.largeur / 2) * METRES_PAR_PIXEL,
+  y: CENTRE_L93.y - (y - RELIEF.hauteur / 2) * METRES_PAR_PIXEL,
+});
+const kilometres = (m) => Math.round(m).toLocaleString("fr-FR");
+
+function altitudeTerrain(x, y) {
+  let z = 0;
+  for (const b of RELIEF.bosses) z += b.hauteur * Math.exp(-((x - b.x) ** 2 + (y - b.y) ** 2) / (2 * b.rayon * b.rayon));
+  return z;
+}
 
 // (Re)prépare le relief : taille du canevas, bosses, couleurs du thème. intro = faire monter le relief.
 function preparerRelief(intro) {
@@ -678,32 +704,43 @@ function preparerRelief(intro) {
 
   // Couleurs du thème (clair ou sombre), définies dans style.css
   const styles = getComputedStyle(document.documentElement);
-  const couleurs = [
-    styles.getPropertyValue("--courbe").trim() || "rgba(14,107,87,.10)",
-    styles.getPropertyValue("--courbe-forte").trim() || "rgba(14,107,87,.30)",
-  ];
+  const lire = (nom, defaut) => styles.getPropertyValue(nom).trim() || defaut;
+  const couleurs = {
+    courbe: lire("--courbe", "rgba(146,98,52,.17)"),
+    maitresse: lire("--courbe-forte", "rgba(146,98,52,.42)"),
+    cote: lire("--courbe-texte", "rgba(128,82,38,.9)"),
+    eau: lire("--eau", "rgba(46,124,186,.6)"),
+    carroyage: lire("--carroyage", "rgba(23,33,45,.34)"),
+    encre: lire("--ink", "#17212D"),
+    sentier: lire("--repere", "#C43E14"),
+    fond: lire("--bg", "#F4F1EA"),
+    ombrage: lire("--ombrage", "70, 48, 26").split(",").map(Number),
+    lumiere: lire("--lumiere", "255, 253, 246").split(",").map(Number),
+    forceOmbre: Number(lire("--ombrage-force", ".45")),
+    forceLumiere: Number(lire("--lumiere-force", ".5")),
+  };
 
-  Object.assign(RELIEF, { canvas, ctx, largeur: width, hauteur: height, bosses, couleurs });
+  Object.assign(RELIEF, { canvas, ctx, largeur: width, hauteur: height, bosses, couleurs, grilles: {}, carte: null });
   if (intro && !MOUVEMENT_REDUIT.matches) {
-    RELIEF.montee = 0;
-    RELIEF.debut = performance.now();
+    Object.assign(RELIEF, { montee: 0, habillage: 0, debut: performance.now() });
   } else {
-    RELIEF.montee = 1;
+    Object.assign(RELIEF, { montee: 1, habillage: 1 });
   }
   animerRelief();
 }
 
-// Une image par rafraîchissement de l'écran, tant que quelque chose bouge (montée, colline du pointeur).
+// Une image par rafraîchissement de l'écran, tant que quelque chose bouge (montée, habillage, colline du pointeur).
 function animerRelief() {
   if (RELIEF.boucle) return;
   RELIEF.boucle = requestAnimationFrame((t) => {
     RELIEF.boucle = 0;
     if (!RELIEF.canvas || !RELIEF.canvas.isConnected) return;
     let encore = false;
-    if (RELIEF.montee < 1) {
-      const p = Math.min(1, Math.max(0, (t - RELIEF.debut) / 1800));
-      RELIEF.montee = 1 - (1 - p) ** 3;
-      encore = p < 1;
+    if (RELIEF.habillage < 1) {
+      const ecoule = Math.max(0, t - RELIEF.debut);
+      RELIEF.montee = 1 - (1 - Math.min(1, ecoule / 1800)) ** 3;
+      RELIEF.habillage = Math.min(1, Math.max(0, (ecoule - 1500) / 1000));
+      encore = RELIEF.habillage < 1;
     }
     const c = RELIEF.curseur, v = RELIEF.cible;
     const ecart = Math.abs(v.x - c.x) + Math.abs(v.y - c.y) + 400 * Math.abs(v.z - c.z);
@@ -720,61 +757,411 @@ function animerRelief() {
   });
 }
 
-function tracerRelief() {
-  const { ctx, largeur, hauteur, bosses, couleurs, montee, curseur } = RELIEF;
-  ctx.clearRect(0, 0, largeur, hauteur);
-  const r2 = 2 * COLLINE_CURSEUR.rayon ** 2;
-  const altitude = (x, y) => {
-    let z = 0;
-    for (const b of bosses) z += b.hauteur * Math.exp(-((x - b.x) ** 2 + (y - b.y) ** 2) / (2 * b.rayon * b.rayon));
-    if (curseur.z > 0.002) z += curseur.z * Math.exp(-((x - curseur.x) ** 2 + (y - curseur.y) ** 2) / r2);
-    return z * montee;
-  };
-
-  // Altitude calculée aux nœuds d'une grille de PAS pixels.
-  const PAS = 12;
-  const nx = Math.ceil(largeur / PAS) + 2;
-  const ny = Math.ceil(hauteur / PAS) + 2;
-  const grille = [];
-  for (let j = 0; j < ny; j++) {
-    grille[j] = [];
-    for (let i = 0; i < nx; i++) grille[j][i] = altitude(i * PAS, j * PAS);
+/* Altitudes aux nœuds d'une grille de « pas » pixels, avec une rangée de marge tout autour (pour les pentes).
+   base = le terrain seul, calculé une fois ; z = l'état affiché (terrain qui monte + colline du pointeur). */
+function champ(pas) {
+  let g = RELIEF.grilles[pas];
+  if (!g) {
+    const nx = Math.ceil(RELIEF.largeur / pas) + 2, ny = Math.ceil(RELIEF.hauteur / pas) + 2, l = nx + 2;
+    const base = new Float32Array(l * (ny + 2));
+    for (let j = -1; j <= ny; j++) for (let i = -1; i <= nx; i++) base[(j + 1) * l + i + 1] = altitudeTerrain(i * pas, j * pas);
+    g = RELIEF.grilles[pas] = { pas, nx, ny, l, base, z: new Float32Array(base.length) };
   }
-
-  // Pour chaque niveau, chaque case de la grille est classée selon les coins
-  // situés au-dessus du niveau (16 cas), ce qui donne le ou les segments à tracer.
-  // Niveaux tous les 0,15 jusqu'à 3 : même sur un sommet, la colline du pointeur fait naître des courbes.
-  const niveaux = Array.from({ length: 20 }, (_, n) => 0.15 * (n + 1));
-  niveaux.forEach((niveau, n) => {
-    const maitresse = n % 4 === 3; // une courbe sur quatre est plus marquée
-    ctx.beginPath();
-    ctx.lineWidth = maitresse ? 1.2 : 0.8;
-    ctx.strokeStyle = maitresse ? couleurs[1] : couleurs[0];
-    for (let j = 0; j < ny - 1; j++) {
-      for (let i = 0; i < nx - 1; i++) {
-        const a = grille[j][i], b = grille[j][i + 1], c = grille[j + 1][i + 1], d = grille[j + 1][i];
-        const cas = (a > niveau ? 8 : 0) | (b > niveau ? 4 : 0) | (c > niveau ? 2 : 0) | (d > niveau ? 1 : 0);
-        if (cas === 0 || cas === 15) continue;
-        // Position du niveau sur chaque côté de la case (interpolation linéaire)
-        const x = i * PAS, y = j * PAS, t = (p, q) => (niveau - p) / (q - p);
-        const haut = [x + PAS * t(a, b), y];
-        const droite = [x + PAS, y + PAS * t(b, c)];
-        const bas = [x + PAS * t(d, c), y + PAS];
-        const gauche = [x, y + PAS * t(a, d)];
-        const segments = {
-          1: [gauche, bas], 2: [bas, droite], 3: [gauche, droite], 4: [haut, droite],
-          5: [gauche, haut, bas, droite], 6: [haut, bas], 7: [gauche, haut], 8: [gauche, haut],
-          9: [haut, bas], 10: [haut, droite, gauche, bas], 11: [haut, droite], 12: [gauche, droite],
-          13: [bas, droite], 14: [gauche, bas],
-        }[cas];
-        for (let k = 0; k < segments.length; k += 2) {
-          ctx.moveTo(...segments[k]);
-          ctx.lineTo(...segments[k + 1]);
-        }
-      }
+  const { nx, ny, l, base, z } = g;
+  const { montee, curseur } = RELIEF;
+  for (let k = 0; k < base.length; k++) z[k] = base[k] * montee;
+  if (curseur.z > 0.002) {
+    const r2 = 2 * COLLINE_CURSEUR.rayon ** 2, portee = 3.2 * COLLINE_CURSEUR.rayon;
+    const i0 = Math.max(-1, Math.floor((curseur.x - portee) / pas)), i1 = Math.min(nx, Math.ceil((curseur.x + portee) / pas));
+    const j0 = Math.max(-1, Math.floor((curseur.y - portee) / pas)), j1 = Math.min(ny, Math.ceil((curseur.y + portee) / pas));
+    const h = curseur.z * montee;
+    for (let j = j0; j <= j1; j++) {
+      for (let i = i0; i <= i1; i++) z[(j + 1) * l + i + 1] += h * Math.exp(-((i * pas - curseur.x) ** 2 + (j * pas - curseur.y) ** 2) / r2);
     }
+  }
+  return g;
+}
+
+// Segments de courbe d'un niveau (marching squares) : chaque case est classée selon ses coins
+// situés au-dessus du niveau (16 cas), ce qui donne le ou les segments à tracer.
+function segmentsNiveau(g, valeurs, niveau, rappel) {
+  const { pas, nx, ny, l } = g;
+  for (let j = 0; j < ny - 1; j++) {
+    for (let i = 0; i < nx - 1; i++) {
+      const k = (j + 1) * l + i + 1;
+      const a = valeurs[k], b = valeurs[k + 1], c = valeurs[k + l + 1], d = valeurs[k + l];
+      const cas = (a > niveau ? 8 : 0) | (b > niveau ? 4 : 0) | (c > niveau ? 2 : 0) | (d > niveau ? 1 : 0);
+      if (cas === 0 || cas === 15) continue;
+      // Position du niveau sur chaque côté de la case (interpolation linéaire)
+      const x = i * pas, y = j * pas, t = (p, q) => (niveau - p) / (q - p);
+      const haut = [x + pas * t(a, b), y];
+      const droite = [x + pas, y + pas * t(b, c)];
+      const bas = [x + pas * t(d, c), y + pas];
+      const gauche = [x, y + pas * t(a, d)];
+      const segments = {
+        1: [gauche, bas], 2: [bas, droite], 3: [gauche, droite], 4: [haut, droite],
+        5: [gauche, haut, bas, droite], 6: [haut, bas], 7: [gauche, haut], 8: [gauche, haut],
+        9: [haut, bas], 10: [haut, droite, gauche, bas], 11: [haut, droite], 12: [gauche, droite],
+        13: [bas, droite], 14: [gauche, bas],
+      }[cas];
+      for (let s = 0; s < segments.length; s += 2) rappel(segments[s], segments[s + 1], i, j);
+    }
+  }
+}
+
+function tracerRelief() {
+  const { ctx, largeur, hauteur, couleurs, montee } = RELIEF;
+  ctx.clearRect(0, 0, largeur, hauteur);
+
+  // Courbes de niveau : une maîtresse (plus marquée) toutes les cinq, soit tous les 50 m
+  const g = champ(PAS_COURBES);
+  NIVEAUX.forEach((niveau, n) => {
+    const maitresse = (n + 1) % 5 === 0;
+    ctx.beginPath();
+    ctx.lineWidth = maitresse ? 1.3 : 0.8;
+    ctx.strokeStyle = maitresse ? couleurs.maitresse : couleurs.courbe;
+    segmentsNiveau(g, g.z, niveau, (p, q) => {
+      ctx.moveTo(p[0], p[1]);
+      ctx.lineTo(q[0], q[1]);
+    });
     ctx.stroke();
   });
+
+  if (RELIEF.habillage > 0) {
+    if (montee === 1 && !RELIEF.carte) RELIEF.carte = construireCarte();
+    if (RELIEF.carte) habillerCarte(RELIEF.carte);
+  }
+  // L'ombrage passe sous tout le reste (y compris sous les cotes, où les courbes sont interrompues)
+  estomper();
+}
+
+/* Estompage : chaque pente est éclairée par une lumière venant du nord-ouest (azimut 315°, hauteur 45°),
+   comme sur les cartes en relief. Les versants à l'ombre sont teintés, ceux au soleil éclaircis.
+   Calculé en basse résolution, puis agrandi avec lissage. */
+const CANEVAS_ESTOMPAGE = document.createElement("canvas");
+function estomper() {
+  const { ctx, couleurs } = RELIEF;
+  const g = champ(PAS_ESTOMPAGE);
+  const { pas, nx, ny, l, z } = g;
+  if (CANEVAS_ESTOMPAGE.width !== nx || CANEVAS_ESTOMPAGE.height !== ny) {
+    CANEVAS_ESTOMPAGE.width = nx;
+    CANEVAS_ESTOMPAGE.height = ny;
+  }
+  const cx = CANEVAS_ESTOMPAGE.getContext("2d");
+  const image = cx.createImageData(nx, ny);
+  const px = image.data;
+  const exageration = 70 / pas;
+  const plat = Math.SQRT1_2; // éclairement d'un terrain plat (lumière à 45°)
+  const [ro, vo, bo] = couleurs.ombrage, [rl, vl, bl] = couleurs.lumiere;
+  const fo = couleurs.forceOmbre * 255, fl = couleurs.forceLumiere * 255;
+  for (let j = 0; j < ny; j++) {
+    for (let i = 0; i < nx; i++) {
+      const k = (j + 1) * l + i + 1;
+      const dx = (z[k + 1] - z[k - 1]) * 0.5 * exageration;
+      const dy = (z[k + l] - z[k - l]) * 0.5 * exageration;
+      // Normale (-dx, -dy, 1) et lumière du nord-ouest (-0,5 ; -0,5 ; 0,707) dans le repère de l'écran (y vers le bas)
+      const eclairement = (0.5 * dx + 0.5 * dy + plat) / Math.sqrt(dx * dx + dy * dy + 1);
+      const p = (j * nx + i) * 4;
+      if (eclairement < plat) {
+        px[p] = ro; px[p + 1] = vo; px[p + 2] = bo; px[p + 3] = Math.min(255, (plat - eclairement) * fo);
+      } else {
+        px[p] = rl; px[p + 1] = vl; px[p + 2] = bl; px[p + 3] = Math.min(255, (eclairement - plat) * fl);
+      }
+    }
+  }
+  cx.putImageData(image, 0, 0);
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(CANEVAS_ESTOMPAGE, 0, 0, nx * pas, ny * pas);
+  ctx.restore();
+}
+
+/* Ce qui ne bouge pas une fois le relief monté : on le calcule une seule fois, sur le terrain sans la colline du pointeur. */
+function construireCarte() {
+  const { largeur: L, hauteur: H, canvas } = RELIEF;
+  const rc = canvas.getBoundingClientRect();
+  const cadre = (r, marge) => ({ x0: r.left - rc.left - marge, y0: r.top - rc.top - marge, x1: r.right - rc.left + marge, y1: r.bottom - rc.top + marge });
+  const hero = canvas.closest(".hero");
+
+  // Zones laissées libres : le texte (son étendue réelle, pas la colonne entière) et le portrait
+  const texte = [...hero.querySelectorAll(".hero-grille > div:first-child > *")].map((el) => {
+    const plage = document.createRange();
+    plage.selectNodeContents(el);
+    return cadre(plage.getBoundingClientRect(), 16);
+  });
+  const portraitEl = hero.querySelector(".hero-portrait");
+  const portrait = portraitEl ? cadre(portraitEl.getBoundingClientRect(), 34) : null;
+  const zones = portrait ? [...texte, portrait] : [...texte];
+  const libre = (x, y, marge = 0) => x > marge && y > marge && x < L - marge && y < H - marge
+    && !zones.some((z) => x > z.x0 - marge && x < z.x1 + marge && y > z.y0 - marge && y < z.y1 + marge);
+  const loin = (liste, x, y, d) => liste.every((p) => (p.x - x) ** 2 + (p.y - y) ** 2 > d * d);
+  const finTexte = Math.max(...texte.map((z) => z.x1));
+  const portraitADroite = portrait && portrait.x0 > finTexte;
+
+  // Flèche du nord en haut à droite ; échelle graphique sous le portrait (ou en bas à droite).
+  // Elles deviennent ensuite des zones libres, pour que rien ne s'écrive dessus.
+  const marge = Math.min(56, L * 0.05);
+  const nord = libre(L - marge - 10, 70) ? { x: L - marge - 24, y: 70 } : null;
+  const longueur = 1000 / METRES_PAR_PIXEL;
+  const yEchelle = portraitADroite ? Math.min(H - 34, portrait.y1 + 46) : H - 34;
+  const echelle = libre(L - marge - longueur, yEchelle) && libre(L - marge, yEchelle) ? { x: L - marge - longueur, y: yEchelle, longueur } : null;
+  if (nord) zones.push({ x0: nord.x - 24, y0: nord.y - 46, x1: nord.x + 24, y1: nord.y + 22 });
+  if (echelle) zones.push({ x0: echelle.x - 20, y0: echelle.y - 24, x1: echelle.x + longueur + 20, y1: echelle.y + 28 });
+
+  // Sommets : maxima locaux du terrain, du plus haut au plus bas
+  const g = champ(PAS_COURBES);
+  const { pas, nx, ny, l, base } = g;
+  const B = (i, j) => base[(j + 1) * l + i + 1];
+  const sommets = [];
+  for (let j = 1; j < ny - 1; j++) {
+    for (let i = 1; i < nx - 1; i++) {
+      const z = B(i, j);
+      let max = z > 0.5;
+      for (let dj = -1; dj <= 1 && max; dj++) for (let di = -1; di <= 1; di++) if ((di || dj) && B(i + di, j + dj) >= z) { max = false; break; }
+      if (max) sommets.push({ x: i * pas, y: j * pas, z });
+    }
+  }
+  sommets.sort((a, b) => b.z - a.z);
+  const pointsCotes = [];
+  for (const s of sommets) if (pointsCotes.length < 4 && libre(s.x, s.y, 26) && loin(pointsCotes, s.x, s.y, 160)) pointsCotes.push(s);
+  // Comme sur une carte, des points cotés aussi hors des sommets : tirés au hasard (graine fixe) dans les zones libres
+  let graine = 7;
+  const hasard = () => (graine = (graine * 16807) % 2147483647) / 2147483647;
+  for (let essai = 0; essai < 300 && pointsCotes.length < 5; essai++) {
+    const x = 30 + hasard() * (L - 60), y = 40 + hasard() * (H - 80);
+    if (libre(x, y, 30) && loin(pointsCotes, x, y, 190)) pointsCotes.push({ x, y, z: altitudeTerrain(x, y) });
+  }
+  pointsCotes.sort((a, b) => b.z - a.z);
+
+  // Cotes des courbes maîtresses : quelques morceaux de courbe dans les zones libres, bien espacés
+  const cotes = [];
+  NIVEAUX.forEach((niveau, n) => {
+    if ((n + 1) % 5 !== 0) return;
+    let surCeNiveau = 0;
+    segmentsNiveau(g, base, niveau, (p, q, i, j) => {
+      if (surCeNiveau >= 2 || cotes.length >= 9 || (i + j) % 5 !== 0) return;
+      const x = (p[0] + q[0]) / 2, y = (p[1] + q[1]) / 2;
+      if (!libre(x, y, 34) || !loin(cotes, x, y, 230) || !loin(pointsCotes, x, y, 90)) return;
+      let angle = Math.atan2(q[1] - p[1], q[0] - p[0]);
+      if (angle > Math.PI / 2) angle -= Math.PI;
+      if (angle < -Math.PI / 2) angle += Math.PI;
+      cotes.push({ x, y, angle, texte: String(enMetres(niveau)) });
+      surCeNiveau++;
+    });
+  });
+
+  // Cours d'eau : partent sous un sommet et descendent la plus grande pente jusqu'au bord ou au fond d'une cuvette
+  const pente = (x, y) => {
+    const e = 2;
+    return [(altitudeTerrain(x + e, y) - altitudeTerrain(x - e, y)) / (2 * e), (altitudeTerrain(x, y + e) - altitudeTerrain(x, y - e)) / (2 * e)];
+  };
+  const coursEau = [];
+  for (const s of sommets.slice(0, 5)) {
+    if (coursEau.length >= 2) break;
+    let x = s.x + 34, y = s.y + 22;
+    const trace = [];
+    for (let k = 0; k < 700; k++) {
+      if (!libre(x, y, -40)) break;
+      trace.push([x, y]);
+      const [gx, gy] = pente(x, y);
+      const n = Math.hypot(gx, gy);
+      if (n < 1e-6) break;
+      x -= (gx / n) * 4;
+      y -= (gy / n) * 4;
+    }
+    if (trace.length > 45 && coursEau.every((c) => loin(c.map(([px, py]) => ({ x: px, y: py })), trace[20][0], trace[20][1], 80))) coursEau.push(trace);
+  }
+
+  // Sentier balisé : monte du bas du bandeau jusqu'au repère vermillon du portrait (quand le portrait est à droite du texte)
+  let sentier = null;
+  if (portraitADroite && portrait.x0 > finTexte + 80 && L > 1000) {
+    const r = portraitEl.getBoundingClientRect();
+    const arrivee = { x: r.right - rc.left - r.width * 0.03 - 9, y: r.top - rc.top + r.height * 0.09 + 9 };
+    const depart = { x: (finTexte + portrait.x0) / 2 - 40, y: H + 10 };
+    const c1 = { x: depart.x + 70, y: H * 0.42 };
+    const c2 = { x: arrivee.x - 150, y: arrivee.y - 230 };
+    sentier = Array.from({ length: 140 }, (_, k) => {
+      const t = k / 139, u = 1 - t;
+      return [
+        u ** 3 * depart.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * arrivee.x,
+        u ** 3 * depart.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * arrivee.y,
+      ];
+    });
+  }
+
+  // Carroyage kilométrique Lambert-93 : positions des lignes de kilomètre rond
+  const pasKm = 1000 / METRES_PAR_PIXEL;
+  const coin = lambert(0, 0);
+  const premierX = Math.ceil(coin.x / 1000) * 1000;
+  const premierY = Math.floor(coin.y / 1000) * 1000;
+  const lignesX = [], lignesY = [];
+  for (let X = premierX, x = (premierX - coin.x) / METRES_PAR_PIXEL; x < L; X += 1000, x += pasKm) lignesX.push({ x, X });
+  for (let Y = premierY, y = (coin.y - premierY) / METRES_PAR_PIXEL; y < H; Y -= 1000, y += pasKm) lignesY.push({ y, Y });
+
+  return { libre, cotes, pointsCotes, coursEau, sentier, lignesX, lignesY, nord, echelle };
+}
+
+/* Dessine l'habillage de la carte par-dessus les courbes. */
+function habillerCarte(carte) {
+  const { ctx, couleurs, habillage, curseur, largeur: L } = RELIEF;
+  const colline = curseur.z > 0.05 ? curseur : null;
+  const horsColline = (x, y) => !colline || (x - colline.x) ** 2 + (y - colline.y) ** 2 > (COLLINE_CURSEUR.rayon * 1.7) ** 2;
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  // Cotes des courbes maîtresses, écrites dans le sens de la courbe, qui s'interrompt pour les laisser lire
+  ctx.font = `600 10px ${POLICE}`;
+  for (const c of carte.cotes) {
+    if (!horsColline(c.x, c.y)) continue;
+    const w = ctx.measureText(c.texte).width;
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.rotate(c.angle);
+    ctx.globalAlpha = habillage;
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillRect(-w / 2 - 4, -6, w + 8, 12);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = couleurs.cote;
+    ctx.fillText(c.texte, 0, 0.5);
+    ctx.restore();
+  }
+
+  // Cours d'eau : un trait bleu qui s'élargit vers l'aval
+  ctx.globalAlpha = habillage;
+  ctx.strokeStyle = couleurs.eau;
+  ctx.lineCap = "round";
+  for (const trace of carte.coursEau) {
+    for (let k = 1; k < trace.length; k++) {
+      ctx.lineWidth = 0.6 + 1.8 * (k / trace.length);
+      ctx.beginPath();
+      ctx.moveTo(...trace[k - 1]);
+      ctx.lineTo(...trace[k]);
+      ctx.stroke();
+    }
+  }
+
+  // Carroyage : croisillons, puis graduations et valeurs (km) en haut et à droite
+  ctx.strokeStyle = couleurs.carroyage;
+  ctx.fillStyle = couleurs.carroyage;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  for (const { x } of carte.lignesX) {
+    for (const { y } of carte.lignesY) {
+      if (!carte.libre(x, y, 8)) continue;
+      ctx.moveTo(x - 6, y); ctx.lineTo(x + 6, y);
+      ctx.moveTo(x, y - 6); ctx.lineTo(x, y + 6);
+    }
+  }
+  for (const { x } of carte.lignesX) { ctx.moveTo(x, 0); ctx.lineTo(x, 7); }
+  for (const { y } of carte.lignesY) { ctx.moveTo(L, y); ctx.lineTo(L - 7, y); }
+  ctx.stroke();
+  ctx.font = `9.5px ${POLICE_CHIFFRES}`;
+  for (const { x, X } of carte.lignesX) if (x > 30 && x < L - 60 && carte.libre(x, 17)) ctx.fillText(String(X / 1000), x, 17);
+  ctx.textAlign = "right";
+  for (const { y, Y } of carte.lignesY) if (y > 30 && carte.libre(L - 30, y - 8)) ctx.fillText(kilometres(Y / 1000), L - 11, y - 8);
+  ctx.textAlign = "center";
+
+  // Points cotés : un triangle pointé (point géodésique) pour le plus haut, un point pour les autres
+  ctx.fillStyle = couleurs.encre;
+  ctx.strokeStyle = couleurs.encre;
+  ctx.font = `600 10.5px ${POLICE}`;
+  carte.pointsCotes.forEach((s, rang) => {
+    if (!horsColline(s.x, s.y)) return;
+    ctx.globalAlpha = 0.62 * habillage;
+    if (rang === 0) {
+      ctx.beginPath();
+      ctx.moveTo(s.x, s.y - 6); ctx.lineTo(s.x + 5.5, s.y + 4); ctx.lineTo(s.x - 5.5, s.y + 4); ctx.closePath();
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(s.x, s.y + 0.8, 1.3, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.textAlign = "left";
+    ctx.fillText(String(enMetres(s.z)), s.x + 8, s.y - 7);
+    ctx.textAlign = "center";
+  });
+
+  // Sentier balisé (tirets vermillon) qui se dessine jusqu'au repère du portrait
+  if (carte.sentier) {
+    const n = Math.max(2, Math.round(carte.sentier.length * habillage));
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = couleurs.sentier;
+    ctx.lineWidth = 1.7;
+    ctx.setLineDash([7, 6]);
+    ctx.beginPath();
+    ctx.moveTo(...carte.sentier[0]);
+    for (let k = 1; k < n; k++) ctx.lineTo(...carte.sentier[k]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // Flèche du nord : une moitié pleine, l'autre en trait
+  if (carte.nord) {
+    const { x, y } = carte.nord;
+    ctx.globalAlpha = 0.6 * habillage;
+    ctx.fillStyle = ctx.strokeStyle = couleurs.encre;
+    ctx.lineWidth = 1.1;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 18); ctx.lineTo(x - 7, y + 10); ctx.lineTo(x, y + 4); ctx.closePath();
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(x, y - 18); ctx.lineTo(x + 7, y + 10); ctx.lineTo(x, y + 4); ctx.closePath();
+    ctx.stroke();
+    ctx.font = `700 11px ${POLICE}`;
+    ctx.fillText("N", x, y - 28);
+  }
+
+  // Échelle graphique : 1 km en quatre tronçons alternés, et la projection dessous
+  if (carte.echelle) {
+    const { x, y, longueur } = carte.echelle;
+    ctx.globalAlpha = 0.62 * habillage;
+    ctx.fillStyle = ctx.strokeStyle = couleurs.encre;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, longueur, 5);
+    for (let k = 0; k < 4; k += 2) ctx.fillRect(x + (k * longueur) / 4, y, longueur / 4, 5);
+    ctx.font = `9.5px ${POLICE_CHIFFRES}`;
+    ctx.fillText("0", x, y - 9);
+    ctx.fillText("500", x + longueur / 2, y - 9);
+    ctx.fillText("1 km", x + longueur, y - 9);
+    ctx.textAlign = "right";
+    ctx.fillText("Lambert-93 · équidistance 10 m", x + longueur, y + 18);
+    ctx.textAlign = "center";
+  }
+
+  // Pointeur : réticule, coordonnées Lambert-93 et altitude, comme l'outil d'identification d'un SIG
+  if (RELIEF.pointeur && RELIEF.cible.z > 0) {
+    const { x, y } = RELIEF.pointeur;
+    const z = altitudeTerrain(x, y) + curseur.z * Math.exp(-((x - curseur.x) ** 2 + (y - curseur.y) ** 2) / (2 * COLLINE_CURSEUR.rayon ** 2));
+    const p = lambert(x, y);
+    const texte = `X ${kilometres(p.x)}  Y ${kilometres(p.y)}  Z ${enMetres(z)} m`;
+    ctx.globalAlpha = 0.85;
+    ctx.strokeStyle = couleurs.encre;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x - 14, y); ctx.lineTo(x - 5, y); ctx.moveTo(x + 5, y); ctx.lineTo(x + 14, y);
+    ctx.moveTo(x, y - 14); ctx.lineTo(x, y - 5); ctx.moveTo(x, y + 5); ctx.lineTo(x, y + 14);
+    ctx.stroke();
+    ctx.font = `10px ${POLICE_CHIFFRES}`;
+    const w = ctx.measureText(texte).width + 14;
+    const bx = x + 16 + w > L ? x - 16 - w : x + 16;
+    ctx.fillStyle = couleurs.fond;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, y + 12, w, 20, 10);
+    else ctx.rect(bx, y + 12, w, 20);
+    ctx.fill();
+    ctx.fillStyle = couleurs.encre;
+    ctx.textAlign = "left";
+    ctx.fillText(texte, bx + 7, y + 22.5);
+  }
+  ctx.restore();
 }
 
 // La colline du pointeur : elle suit la souris dans le bandeau et s'affaisse quand on en sort.
@@ -787,6 +1174,7 @@ document.addEventListener("pointermove", (e) => {
   if (!dedans && RELIEF.cible.z === 0 && RELIEF.curseur.z === 0) return;
   // La colline naît sous le pointeur au lieu de glisser depuis l'endroit où elle a disparu
   if (dedans && RELIEF.curseur.z < 0.02) Object.assign(RELIEF.curseur, { x, y });
+  RELIEF.pointeur = dedans ? { x, y } : null;
   RELIEF.cible = dedans ? { x, y, z: COLLINE_CURSEUR.hauteur } : { ...RELIEF.curseur, z: 0 };
   animerRelief();
 }, { passive: true });

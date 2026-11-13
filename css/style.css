@@ -55,9 +55,17 @@
   --todo-ink: #4D3A00;
   --ochre: #9A5A00;
   --ochre-bg: #F8EBD6;
-  /* Courbes de niveau du bandeau d'accueil (lues par dessinerCourbes dans app.js) */
-  --courbe: rgba(14, 107, 87, .10);
-  --courbe-forte: rgba(14, 107, 87, .30);
+  /* Carte topographique du bandeau d'accueil (lues par preparerRelief dans app.js) : courbes en bistre, comme sur les cartes IGN */
+  --courbe: rgba(146, 98, 52, .17);
+  --courbe-forte: rgba(146, 98, 52, .42);
+  --courbe-texte: rgba(128, 82, 38, .9);
+  --eau: rgba(46, 124, 186, .6);
+  --carroyage: rgba(23, 33, 45, .34);
+  /* Estompage (ombrage du relief) : couleur des versants à l'ombre et au soleil, et leur force */
+  --ombrage: 70, 48, 26;
+  --ombrage-force: .42;
+  --lumiere: 255, 253, 246;
+  --lumiere-force: .55;
   --ombre: 0 1px 2px rgba(23, 33, 45, .05), 0 18px 40px -18px rgba(23, 33, 45, .28);
   --rayon: 16px;
   --sans: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
@@ -84,8 +92,15 @@
   --todo-ink: #FFE9A8;
   --ochre: #F2B65A;
   --ochre-bg: #2A2112;
-  --courbe: rgba(127, 216, 184, .07);
-  --courbe-forte: rgba(127, 216, 184, .22);
+  --courbe: rgba(222, 178, 128, .09);
+  --courbe-forte: rgba(222, 178, 128, .26);
+  --courbe-texte: rgba(226, 186, 140, .75);
+  --eau: rgba(110, 178, 230, .6);
+  --carroyage: rgba(237, 233, 224, .3);
+  --ombrage: 0, 0, 0;
+  --ombrage-force: .8;
+  --lumiere: 180, 200, 220;
+  --lumiere-force: .12;
   --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -18px rgba(0, 0, 0, .6);
   color-scheme: dark;
 }
@@ -104,8 +119,15 @@
     --todo-ink: #FFE9A8;
     --ochre: #F2B65A;
     --ochre-bg: #2A2112;
-    --courbe: rgba(127, 216, 184, .07);
-    --courbe-forte: rgba(127, 216, 184, .22);
+    --courbe: rgba(222, 178, 128, .09);
+    --courbe-forte: rgba(222, 178, 128, .26);
+    --courbe-texte: rgba(226, 186, 140, .75);
+    --eau: rgba(110, 178, 230, .6);
+    --carroyage: rgba(237, 233, 224, .3);
+    --ombrage: 0, 0, 0;
+    --ombrage-force: .8;
+    --lumiere: 180, 200, 220;
+    --lumiere-force: .12;
     --ombre: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -18px rgba(0, 0, 0, .6);
     color-scheme: dark;
   }
