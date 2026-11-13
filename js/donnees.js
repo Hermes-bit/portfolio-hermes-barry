@@ -65,7 +65,7 @@ const PROJETS = [
     vignette: { src: "assets/projets/accessibilite-application.jpg" },
     resume: "Une base PostGIS conforme au standard CNIG Accessibilité et une application web en ligne pour consulter l'état des cheminements autour des arrêts de transport.",
     liens: [
-      { texte: "Ouvrir l'application", url: "https://hermes-bit.github.io/Accessibilite_cnig_dieppe/?config=apps/cnig_accessibilite.xml", note: "Une fenêtre de connexion s'ouvre d'abord : la fermer (×) pour consulter la carte en invité." },
+      { texte: "Ouvrir l'application", url: "https://hermes-bit.github.io/Accessibilite_cnig_dieppe/?config=apps/cnig_accessibilite.xml" },
       { texte: "Voir le code sur GitHub", url: "https://github.com/Hermes-bit/Accessibilite_cnig_dieppe" },
     ],
     contexte: [
