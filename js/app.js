@@ -161,6 +161,42 @@ function sectionRecommandations() {
   </section>`;
 }
 
+/* Rubrique « Recommandations » (page #recommandations) : chaque lettre en entier ou presque,
+   avec la citation principale, les qualités qu'elle souligne (SAVOIR_ETRE), d'autres passages
+   et la lettre originale à lire ou à télécharger. */
+function pageRecommandations() {
+  const lettre = (r) => {
+    const lieu = PLACES.find((pl) => pl.project === r.projet);
+    const projet = PROJETS.find((p) => p.id === r.projet);
+    const qualites = SAVOIR_ETRE.filter((q) => q.lettre === r.projet);
+    const titre = `Lettre de recommandation de ${r.auteur} (${r.structure}), ${r.date}`;
+    const logo = lieu && LOGOS[lieu.id] ? `<span class="logo-lieu"><img src="${LOGOS[lieu.id]}" alt=""></span>` : "";
+    return `<article class="lettre">
+      <div class="lettre-texte">
+        <header class="lettre-entete">${logo}
+          <div><b>${r.auteur}</b><span>${r.fonction}</span><span>${r.structure}</span></div>
+        </header>
+        <blockquote class="lettre-citation"><p>${r.extrait}</p></blockquote>
+        ${qualites.length ? `<div class="lettre-qualites"><h3>Ce que la lettre souligne</h3>
+          <ul>${qualites.map((q) => `<li>${q.qualite}</li>`).join("")}</ul></div>` : ""}
+        ${(r.passages || []).length ? `<div class="lettre-passages"><h3>Dans la lettre aussi</h3>
+          ${r.passages.map((t) => `<blockquote><p>« ${t} »</p></blockquote>`).join("")}</div>` : ""}
+        <p class="lettre-contexte">${lieu ? `${lieu.role}, ${lieu.org}, ${lieu.dates.charAt(0).toLowerCase()}${lieu.dates.slice(1)}. ` : ""}Lettre du ${r.date}.</p>
+        ${projet ? `<a class="lien-projet" href="#${projet.id}">Voir le projet : ${projet.titreCourt.charAt(0).toLowerCase()}${projet.titreCourt.slice(1)} →</a>` : ""}
+      </div>
+      <div class="lettre-document">
+        <a class="lettre-feuille" href="${r.lettre}" target="_blank" rel="noopener" title="Lire la lettre" data-titre="${titre}"><img src="${r.apercu}" alt="La lettre de ${r.auteur}" loading="lazy"></a>
+        ${liensPdf(r.lettre, "Lire la lettre", titre)}
+      </div>
+    </article>`;
+  };
+  return `<div class="wrap"><section class="bloc">
+    <h1 class="titre-page">Recommandations</h1>
+    <p class="chapo">Mes deux tuteurs d'alternance ont écrit une lettre de recommandation. Voici ce qu'ils disent de mon travail, cité mot pour mot ; les lettres originales sont à lire ou à télécharger en PDF.</p>
+    <div class="lettres">${RECOMMANDATIONS.map(lettre).join("")}</div>
+  </section></div>`;
+}
+
 /* Section « Savoir-être » de l'accueil (données : SAVOIR_ETRE). Chaque citation renvoie à la lettre d'où elle vient. */
 function sectionSavoirEtre() {
   if (!SAVOIR_ETRE.length) return "";
@@ -478,6 +514,10 @@ const PAGES = {
     return pageParcours(); // défini dans carte.js
   },
 
+  recommandations() {
+    return pageRecommandations();
+  },
+
   contact() {
     const tel = PROFIL.telephone.replace(/\s/g, "");
     return `<div class="wrap"><section class="bloc">
@@ -553,7 +593,8 @@ function pageProjet(p) {
   const estTelephone = (v) => typeof v === "object" && v.format === "telephone";
   const visuels = (p.visuels || []).filter((v) => !estTelephone(v)).map(visuel).join("");
   const galerie = galerieTelephones((p.visuels || []).filter(estTelephone));
-  const outils = textes(p.outils);
+  const outils = textes(p.outils); // affichés en haut de la page, dans l'en-tête du projet
+  const recommandations = RECOMMANDATIONS.filter((r) => r.projet === p.id).map((r) => recommandation(r, false)).join("");
   const liens = (p.liens || [])
     .map((l) => `<a class="btn ${l === p.liens[0] ? "principal" : "secondaire"}" href="${l.url}" target="_blank" rel="noopener">${l.texte} ↗</a>`)
     .join("");
@@ -570,11 +611,12 @@ function pageProjet(p) {
       <div><dt>Lieu</dt><dd>${p.lieu}</dd></div>
       ${p.statut ? `<div><dt>État</dt><dd class="statut ${p.statut.classe}">${p.statut.libelle}${p.statut.detail ? `, ${p.statut.detail}` : ""}</dd></div>` : ""}
     </dl>
+    ${outils.length ? `<div class="outils-projet"><h2>Outils</h2><ul class="outils">${outils.map((o) => `<li>${o}</li>`).join("")}</ul></div>` : ""}
     ${liens ? `<div class="boutons">${liens}</div>${notes}` : ""}
   </div></div>
 
-  <!-- Sur grand écran : le récit à gauche, les outils et la recommandation dans une colonne à droite -->
-  <div class="wrap contenu-projet">
+  <!-- Sur grand écran, quand le projet a une recommandation : le récit à gauche, la recommandation à droite -->
+  <div class="wrap contenu-projet${recommandations ? " avec-cote" : ""}">
     <div class="projet-principal">
       ${p.couverture ? visuel(p.couverture).replace("<figure>", '<figure class="couverture">') : ""}
       ${p.statut && p.statut.texte ? section("Où en est le projet", paragraphes(p.statut.texte)).replace("<section>", `<section class="etat-projet ${p.statut.classe}">`) : ""}
@@ -588,10 +630,7 @@ function pageProjet(p) {
       ${section("Résultat", paragraphes(p.resultat))}
       ${section("Difficulté rencontrée", paragraphes(p.difficulte))}
     </div>
-    <aside class="projet-cote">
-      ${section("Outils", outils.length ? `<ul class="outils">${outils.map((o) => `<li>${o}</li>`).join("")}</ul>` : "")}
-      ${section("Recommandation", RECOMMANDATIONS.filter((r) => r.projet === p.id).map((r) => recommandation(r, false)).join(""))}
-    </aside>
+    ${recommandations ? `<aside class="projet-cote">${section("Recommandation", recommandations)}</aside>` : ""}
     <nav class="projets-voisins" aria-label="Autres projets">
       <a href="#${precedent.id}"><span>← Projet précédent</span>${precedent.titreCourt}</a>
       <a href="#${suivant.id}"><span>Projet suivant →</span>${suivant.titreCourt}</a>
@@ -691,6 +730,7 @@ function afficher() {
   document.getElementById("burger").setAttribute("aria-expanded", "false");
   document.title = projet ? `${projet.titreCourt} | ${PROFIL.nom}`
     : page === "mentions-legales" ? `Mentions légales | ${PROFIL.nom}`
+    : page === "recommandations" ? `Recommandations | ${PROFIL.nom}`
     : `${PROFIL.nom} | ${PROFIL.poste}`;
   window.scrollTo(0, 0);
 
@@ -801,7 +841,7 @@ boutonHaut.addEventListener("click", () => {
 const visionneuse = document.getElementById("visionneuse");
 const V = (id) => document.getElementById(id);
 const VISIONNABLE = /^assets\/.+\.(jpe?g|png|webp|gif|pdf)$/i;
-const GROUPES = ".galerie-ecrans, .galerie-cartes, .galerie-planches, .tel-ecrans, .visuels, .planches, .formation-contenu, .recommandations, .savoir-etre";
+const GROUPES = ".galerie-ecrans, .galerie-cartes, .galerie-planches, .tel-ecrans, .visuels, .planches, .formation-contenu, .recommandations, .lettres, .savoir-etre";
 let vListe = [], vIndex = 0, vDeclencheur = null;
 
 const estVisionnable = (a) => a && !a.hasAttribute("download") && VISIONNABLE.test(a.getAttribute("href") || "");

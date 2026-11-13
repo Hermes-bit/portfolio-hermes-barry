@@ -118,6 +118,7 @@ mark.todo {
 .menu a:hover { color: var(--on-navy); }
 .menu a[aria-current="page"] { color: var(--on-navy); background: rgba(255, 255, 255, .08); }
 .cv-entete {
+  white-space: nowrap;
   text-decoration: none;
   font-weight: 600;
   font-size: .95rem;
@@ -137,7 +138,7 @@ mark.todo {
   font: inherit;
   font-size: .95rem;
 }
-@media (max-width: 760px) {
+@media (max-width: 1100px) {
   .burger { display: block; }
   .menu {
     display: none;
@@ -297,6 +298,71 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .projet-cote .recommandation { padding: 22px; }
 .projet-cote .recommandation figcaption { flex-direction: column; }
 
+/* ---------- Rubrique « Recommandations » : une lettre par encadré ----------
+   À gauche le texte (citation principale, qualités, autres passages), à droite la lettre originale. */
+.lettres { display: grid; gap: 40px; }
+.lettre {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+  gap: 32px 56px;
+  align-items: start;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: clamp(24px, 4vw, 48px);
+}
+.lettre-texte { display: grid; gap: 28px; min-width: 0; }
+.lettre-entete { display: flex; align-items: center; gap: 16px; }
+.lettre-entete div { display: flex; flex-direction: column; gap: 2px; }
+.lettre-entete b { font-size: 1.2rem; }
+.lettre-entete span { color: var(--muted); font-size: .95rem; line-height: 1.4; }
+/* Citation principale : grands guillemets, texte en gras */
+.lettre-citation { position: relative; margin: 0; padding-left: 52px; }
+.lettre-citation::before {
+  content: "«";
+  position: absolute;
+  left: 0;
+  top: -12px;
+  font-size: 4.2rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--accent);
+}
+.lettre-citation p { font-size: clamp(1.15rem, 1.6vw, 1.4rem); line-height: 1.5; font-weight: 600; max-width: 70ch; }
+.lettre h3 { margin-bottom: 12px; font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lettre-qualites ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lettre-qualites li { padding: 5px 14px; border-radius: 999px; background: rgba(21, 122, 98, .1); color: var(--accent); font-weight: 600; font-size: .95rem; }
+.lettre-passages { display: grid; gap: 14px; }
+.lettre-passages h3 { margin-bottom: 0; }
+.lettre-passages blockquote { margin: 0; padding-left: 18px; border-left: 3px solid var(--line); }
+.lettre-passages p { line-height: 1.6; max-width: 75ch; }
+.lettre-contexte { color: var(--muted); font-size: .95rem; padding-top: 18px; border-top: 1px solid var(--line); }
+.lettre .lien-projet { margin-top: -16px; color: var(--accent); font-weight: 600; text-decoration: none; }
+.lettre .lien-projet:hover { text-decoration: underline; }
+/* La lettre originale, présentée comme une feuille posée sur la page */
+.lettre-document { display: grid; gap: 12px; justify-items: start; }
+.lettre-feuille {
+  display: block;
+  width: 100%;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 10px 28px -12px rgba(19, 32, 47, .35);
+  transform: rotate(1.2deg);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.lettre-feuille img { display: block; width: 100%; height: auto; border: 0; border-radius: 4px; }
+.lettre-feuille:hover, .lettre-feuille:focus-visible { transform: rotate(0) translateY(-4px); box-shadow: 0 16px 36px -14px rgba(19, 32, 47, .45); }
+.lettre-document .liens-pdf a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.lettre-document .liens-pdf a:hover { text-decoration: underline; }
+@media (prefers-reduced-motion: reduce) { .lettre-feuille { transition: none; } }
+@media (max-width: 900px) {
+  .lettre { grid-template-columns: minmax(0, 1fr); }
+  .lettre-document { max-width: 280px; }
+  .lettre-citation { padding-left: 38px; }
+  .lettre-citation::before { font-size: 3.2rem; }
+}
+
 /* Formation : validation des blocs */
 .formation-obtenu { font-weight: 600; color: var(--accent); }
 
@@ -427,6 +493,10 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .infos-projet dt { font-size: .9rem; color: var(--on-navy-muted); }
 .infos-projet dd { margin: 2px 0 0; font-weight: 600; }
 .note-lien { margin-top: 10px; font-size: .95rem; color: var(--on-navy-muted); }
+/* Outils du projet, mis en avant en haut de la page (dans l'en-tête) */
+.outils-projet { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--navy-line); }
+.outils-projet h2 { margin: 0 0 10px; font-size: .9rem; font-weight: 400; color: var(--on-navy-muted); }
+.entete-projet .outils li { background: rgba(255, 255, 255, .07); border-color: var(--navy-line); color: var(--on-navy); font-weight: 600; }
 
 /* État d'un projet personnel (champ statut) : texte coloré, sans pastille */
 .projet-cadre .statut { margin-left: auto; font-weight: 600; font-size: .85rem; white-space: nowrap; }
@@ -439,7 +509,7 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .contenu-projet .etat-projet h2 { font-size: 1.1rem; margin-bottom: 6px; }
 .contenu-projet .etat-projet + section { margin-top: 32px; }
 
-/* Page projet : le récit (texte et images) à gauche, une colonne « Outils / Recommandation » à droite */
+/* Page projet : le récit (texte et images) ; quand le projet a une recommandation, elle est dans une colonne à droite */
 .contenu-projet { padding-top: 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px 64px; align-items: start; }
 .projet-principal { min-width: 0; }
 .contenu-projet section { margin-top: 44px; }
@@ -453,7 +523,7 @@ main { padding-bottom: 96px; min-height: 60vh; }
 .outils li { padding: 4px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: .95rem; }
 .projets-voisins { grid-column: 1 / -1; }
 @media (min-width: 1100px) {
-  .contenu-projet { grid-template-columns: minmax(0, 1fr) minmax(320px, 440px); }
+  .contenu-projet.avec-cote { grid-template-columns: minmax(0, 1fr) minmax(320px, 440px); }
   .projet-cote { padding-left: 32px; border-left: 1px solid var(--line); }
 }
 

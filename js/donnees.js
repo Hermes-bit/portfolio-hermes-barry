@@ -517,9 +517,10 @@ const COMPETENCES = [
   },
 ];
 
-/* Recommandations de mes tuteurs d'alternance (page d'accueil et page du projet concerné).
-   Extraits recopiés mot pour mot des lettres ; […] marque un passage coupé.
-   lettre : PDF original (lien « Lire » et « Télécharger ») ; apercu : image de sa première page. */
+/* Recommandations de mes tuteurs d'alternance (page d'accueil, page du projet concerné
+   et rubrique « Recommandations »). Extraits recopiés mot pour mot des lettres ; […] marque un passage coupé.
+   lettre : PDF original (lien « Lire » et « Télécharger ») ; apercu : image de sa première page ;
+   passages : autres passages de la lettre, cités dans la rubrique « Recommandations ». */
 const RECOMMANDATIONS = [
   {
     auteur: "Dominique Louis",
@@ -530,6 +531,11 @@ const RECOMMANDATIONS = [
     lettre: "assets/documents/recommandation-region-nouvelle-aquitaine.pdf",
     apercu: "assets/documents/recommandation-region-nouvelle-aquitaine-apercu.jpg",
     extrait: "Il dispose par ailleurs de compétences en développement qui lui ont permis d'être force de proposition sur le projet dont il a eu la charge durant son alternance, à savoir la conception et la réalisation d'un hub sur les Parcs Naturels Régionaux en Nouvelle-Aquitaine. […] Il est désormais opérationnel sur la plupart des outils de la suite ESRI utilisés par notre service. […] Je recommande donc Hermès BARRY pour toute fonction en lien avec la géomatique.",
+    passages: [
+      "Cette formation, dispensée par l'IDGEO à Toulouse et complétée par son alternance au sein de notre service, lui a permis d'acquérir une maîtrise solide et complète des différents domaines de la géomatique. Il est aujourd'hui un professionnel compétent techniquement dans son champ d'expertise.",
+      "Hermès s'est également parfaitement intégré dans une équipe pluridisciplinaire couvrant l'ensemble de la chaîne géomatique (analyse spatiale, cartographie, gestion et administration des données SIG).",
+      "Enfin, au-delà de ses compétences techniques, Hermès a été unanimement apprécié pour sa bienveillance, sa simplicité et ses qualités relationnelles, qui ont contribué à la dynamique positive de l'équipe durant cette année, aussi enrichissante pour lui que pour nous.",
+    ],
   },
   {
     auteur: "Driss Zeroili",
@@ -540,6 +546,11 @@ const RECOMMANDATIONS = [
     lettre: "assets/documents/recommandation-sncf-reseau.pdf",
     apercu: "assets/documents/recommandation-sncf-reseau-apercu.jpg",
     extrait: "Durant cette période, Hermès a fait preuve d'un excellent niveau technique, démontrant rapidement une bonne maîtrise des outils SIG et des méthodes propres à notre métier. Sa capacité à assimiler les procédures et à appliquer les consignes avec rigueur a été un véritable atout pour l'équipe.",
+    passages: [
+      "Je me permets de recommander chaleureusement M. Hermès BARRY, qui a effectué son contrat d'alternance au sein de SNCF Réseau - Montpellier, du 20 janvier 2025 au 30 juin 2025, sous ma tutelle.",
+      "Par ailleurs, Hermès s'est très bien intégré au sein de l'entreprise. Il a su collaborer efficacement avec ses collègues et faire preuve d'une grande adaptabilité face aux diverses situations rencontrées. Son esprit d'initiative et son sens du travail en équipe ont contribué à la bonne dynamique du service.",
+      "Je suis convaincu que ses compétences techniques solides ainsi que son aisance relationnelle lui permettront de réussir pleinement dans ses futurs projets professionnels […].",
+    ],
   },
 ];
 
